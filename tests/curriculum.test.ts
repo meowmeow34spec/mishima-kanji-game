@@ -1,15 +1,15 @@
 /**
  * Salon Mishima - Yukio Mishima Literary Kanji Curriculum Integrity Test Suite
- * File: tests/curriculum.test.ts
+ * File: tests/curriculum.test.ts (Hardened Version)
  *
  * Verifies:
  * 1. Dataset Inventory & Tier Balance (80 kanji total, exactly 20 per tier)
  * 2. Semantic ID Formatting & Sequential Uniqueness
  * 3. Character Glyph Integrity & Uniqueness (single CJK characters, stroke counts, JLPT, Joyo grades)
- * 4. Literary Compounds Inscription & Furigana Readings
- * 5. Literary Excerpt Inscription & Mishima Oeuvre Attribution
+ * 4. Literary Compounds Inscription & Readings (>= 2 compounds per kanji, anti-dummy checks, descriptive quality)
+ * 5. Literary Excerpt Inscription & Mishima Oeuvre Attribution (authentic quotes, anti-boilerplate context notes)
  * 6. Phonetic Readings Orthography (Katakana for On'yomi, Hiragana for Kun'yomi, okurigana delimiter '・')
- * 7. Salon Mishima Cafe Order Item & Gameplay Metadata
+ * 7. Salon Mishima Cafe Order Item & Gameplay Metadata (thematic menu items, anti-boilerplate patron dialogues)
  * 8. Query Helper Functions Behavior & Graceful Edge Case Handling
  * 9. Confusing Kanji Boss Pairs Integrity & Duel Challenge Verification
  */
@@ -238,19 +238,23 @@ describe('Yukio Mishima Literary Kanji Curriculum Integrity', () => {
   });
 
   // =========================================================================
-  // 4. Literary Compounds Inscription & Readings
+  // 4. Literary Compounds Inscription & Readings (Hardened)
   // =========================================================================
   describe('4. Literary Compounds Inscription & Readings', () => {
-    it('should contain at least one literary compound per kanji', () => {
+    it('should enforce at least 2 literary compounds per kanji (PROJECT.md Feature 4)', () => {
       getAllKanji().forEach((entry) => {
         expect(
           Array.isArray(entry.literaryCompounds),
-          `literaryCompounds for '${entry.character}' must be an array`
+          `literaryCompounds for '${entry.character}' (${entry.id}) must be an array`
         ).toBe(true);
         expect(
           entry.literaryCompounds.length,
-          `Kanji '${entry.character}' (${entry.id}) has no literary compounds`
-        ).toBeGreaterThanOrEqual(1);
+          `Kanji '${entry.character}' (${entry.id}) must have at least 2 literary compounds per specification, found ${entry.literaryCompounds.length}`
+        ).toBeGreaterThanOrEqual(2);
+        expect(
+          entry.literaryCompounds.length,
+          `Kanji '${entry.character}' (${entry.id}) exceeds recommended maximum of 4 compounds (${entry.literaryCompounds.length})`
+        ).toBeLessThanOrEqual(4);
       });
     });
 
@@ -274,16 +278,124 @@ describe('Yukio Mishima Literary Kanji Curriculum Integrity', () => {
             comp.reading,
             `Compound reading "${comp.reading}" for "${comp.compound}" (${entry.character}) must be in Hiragana`
           ).toMatch(hiraganaRegex);
-
-          expect(typeof comp.meaning).toBe('string');
-          expect(comp.meaning.trim().length).toBeGreaterThan(0);
         });
+      });
+    });
+
+    it('CRITICAL: must reject placeholder and dummy compound meanings (no "compound" or " compound" suffix)', () => {
+      const forbiddenEndPattern = /[\s_-]compound$/i;
+      const forbiddenWordPattern = /\bcompound\b/i;
+      const placeholderPattern = /\b(placeholder|todo|tbd|dummy|temp|fixme|undefined|null|\[object)\b/i;
+      const unexpandedTemplatePattern = /\$\{[^}]+\}/;
+
+      getAllKanji().forEach((entry) => {
+        entry.literaryCompounds.forEach((comp) => {
+          const meaning = comp.meaning.trim();
+
+          // 1. Must not end with " compound" (case-insensitive)
+          expect(
+            forbiddenEndPattern.test(meaning),
+            `Integrity violation: compound '${comp.compound}' for '${entry.character}' (${entry.id}) ends with forbidden dummy pattern ' compound': "${meaning}"`
+          ).toBe(false);
+
+          // 2. Must not contain the word "compound" (case-insensitive)
+          expect(
+            forbiddenWordPattern.test(meaning),
+            `Integrity violation: compound '${comp.compound}' for '${entry.character}' (${entry.id}) contains forbidden word 'compound': "${meaning}"`
+          ).toBe(false);
+
+          // 3. Must not contain placeholder tokens
+          expect(
+            placeholderPattern.test(meaning),
+            `Integrity violation: compound '${comp.compound}' for '${entry.character}' (${entry.id}) contains placeholder token: "${meaning}"`
+          ).toBe(false);
+
+          // 4. Must not contain unexpanded template syntax
+          expect(
+            unexpandedTemplatePattern.test(meaning),
+            `Integrity violation: compound '${comp.compound}' for '${entry.character}' (${entry.id}) contains unexpanded template: "${meaning}"`
+          ).toBe(false);
+        });
+      });
+    });
+
+    it('should enforce non-trivial, descriptive definition content for all compound meanings', () => {
+      getAllKanji().forEach((entry) => {
+        entry.literaryCompounds.forEach((comp) => {
+          const meaning = comp.meaning.trim();
+
+          // Must be a non-empty string with at least 3 characters
+          expect(typeof comp.meaning).toBe('string');
+          expect(
+            meaning.length,
+            `Compound '${comp.compound}' for '${entry.character}' (${entry.id}) has trivially short meaning: "${meaning}"`
+          ).toBeGreaterThanOrEqual(3);
+
+          // Must contain alphabetic characters (valid English lexical content)
+          expect(
+            /[a-zA-Z]/.test(meaning),
+            `Compound '${comp.compound}' for '${entry.character}' (${entry.id}) must contain English letters: "${meaning}"`
+          ).toBe(true);
+
+          // Meaning must not merely be the kanji glyph or compound glyph itself
+          expect(
+            meaning,
+            `Compound '${comp.compound}' meaning cannot be just the kanji glyph`
+          ).not.toBe(entry.character);
+          expect(
+            meaning,
+            `Compound '${comp.compound}' meaning cannot be just the compound term`
+          ).not.toBe(comp.compound);
+
+          // Meaning must have at least 3 alphanumeric characters after stripping punctuation
+          const alphanumeric = meaning.replace(/[^a-zA-Z0-9]/g, '');
+          expect(
+            alphanumeric.length,
+            `Compound '${comp.compound}' meaning must contain descriptive words: "${meaning}"`
+          ).toBeGreaterThanOrEqual(3);
+        });
+      });
+    });
+
+    it('should ensure compounds within each kanji entry are distinct multi-character terms', () => {
+      getAllKanji().forEach((entry) => {
+        // Multi-character verification (compounds must be >= 2 characters)
+        entry.literaryCompounds.forEach((comp) => {
+          expect(
+            comp.compound.length,
+            `Compound '${comp.compound}' for kanji '${entry.character}' (${entry.id}) must be multi-character (length >= 2)`
+          ).toBeGreaterThanOrEqual(2);
+        });
+
+        // Distinct compound terms
+        const termList = entry.literaryCompounds.map((c) => c.compound);
+        const uniqueTerms = new Set(termList);
+        expect(
+          uniqueTerms.size,
+          `Kanji '${entry.character}' (${entry.id}) has duplicate compound terms: [${termList.join(', ')}]`
+        ).toBe(entry.literaryCompounds.length);
+
+        // Distinct readings
+        const readingList = entry.literaryCompounds.map((c) => c.reading);
+        const uniqueReadings = new Set(readingList);
+        expect(
+          uniqueReadings.size,
+          `Kanji '${entry.character}' (${entry.id}) has duplicate compound readings: [${readingList.join(', ')}]`
+        ).toBe(entry.literaryCompounds.length);
+
+        // Distinct meanings
+        const meaningList = entry.literaryCompounds.map((c) => c.meaning.toLowerCase().trim());
+        const uniqueMeanings = new Set(meaningList);
+        expect(
+          uniqueMeanings.size,
+          `Kanji '${entry.character}' (${entry.id}) has duplicate compound meanings: [${meaningList.join(', ')}]`
+        ).toBe(entry.literaryCompounds.length);
       });
     });
   });
 
   // =========================================================================
-  // 5. Literary Quotes Inscription & Mishima Oeuvre Attribution
+  // 5. Literary Quotes Inscription & Mishima Oeuvre Attribution (Hardened)
   // =========================================================================
   describe('5. Literary Quotes Inscription & Attribution', () => {
     it('should have a complete literaryQuote structure for every entry', () => {
@@ -335,6 +447,49 @@ describe('Yukio Mishima Literary Kanji Curriculum Integrity', () => {
         expect(typeof entry.primaryWorkEnglish).toBe('string');
         expect(entry.primaryWorkEnglish.trim().length).toBeGreaterThan(0);
       });
+    });
+
+    it('should enforce varied, non-boilerplate context notes across the curriculum', () => {
+      const allKanji = getAllKanji();
+      const boilerplatePrefix = 'Key excerpt demonstrating the aesthetic tension and psychological resonance of';
+
+      // 1. Explicitly ban the legacy cookie-cutter template
+      const templateViolations = allKanji.filter((k) =>
+        k.literaryQuote.contextNote.includes(boilerplatePrefix)
+      );
+      expect(
+        templateViolations.length,
+        `Integrity violation: found ${templateViolations.length} entries using deprecated boilerplate context note "${boilerplatePrefix}..."`
+      ).toBe(0);
+
+      // 2. Enforce minimum length and descriptive substance
+      allKanji.forEach((entry) => {
+        const note = entry.literaryQuote.contextNote.trim();
+        expect(
+          note.length,
+          `Context note for '${entry.character}' (${entry.id}) is too short (${note.length} chars)`
+        ).toBeGreaterThanOrEqual(15);
+      });
+
+      // 3. Enforce high curriculum-wide diversity (at least 30 unique context notes across 80 entries)
+      const uniqueNotes = new Set(allKanji.map((k) => k.literaryQuote.contextNote.trim()));
+      expect(
+        uniqueNotes.size,
+        `Curriculum context notes lack diversity: only ${uniqueNotes.size} unique notes across 80 entries (expected >= 30)`
+      ).toBeGreaterThanOrEqual(30);
+
+      // 4. Cap repetition of any single context note to at most 3 entries
+      const noteCounts = new Map<string, number>();
+      allKanji.forEach((k) => {
+        const note = k.literaryQuote.contextNote.trim();
+        noteCounts.set(note, (noteCounts.get(note) || 0) + 1);
+      });
+      for (const [note, count] of noteCounts.entries()) {
+        expect(
+          count,
+          `Context note duplicated across ${count} entries (max allowed: 3): "${note.slice(0, 40)}..."`
+        ).toBeLessThanOrEqual(3);
+      }
     });
   });
 
@@ -389,7 +544,7 @@ describe('Yukio Mishima Literary Kanji Curriculum Integrity', () => {
   });
 
   // =========================================================================
-  // 7. Salon Mishima Cafe Order Item & Gameplay Metadata
+  // 7. Salon Mishima Cafe Order Item & Gameplay Metadata (Hardened)
   // =========================================================================
   describe('7. Cafe Order Item & Gameplay Metadata', () => {
     it('should define a valid cafeOrderItem for every kanji', () => {
@@ -418,6 +573,54 @@ describe('Yukio Mishima Literary Kanji Curriculum Integrity', () => {
           expect(tag.trim().length).toBeGreaterThan(0);
         });
       });
+    });
+
+    it('should enforce varied, thematic patron dialogue lines without monolithic boilerplate', () => {
+      const allKanji = getAllKanji();
+      const boilerplateTemplate = '文豪・三島由紀夫の美学を宿した【';
+
+      // 1. Explicitly ban the monolithic legacy boilerplate
+      const templateViolations = allKanji.filter((k) =>
+        k.cafeOrderItem.dialogueLine.includes(boilerplateTemplate)
+      );
+      expect(
+        templateViolations.length,
+        `Integrity violation: found ${templateViolations.length} entries using deprecated monolithic dialogue template "${boilerplateTemplate}..."`
+      ).toBe(0);
+
+      // 2. Verify authentic Japanese dialogue formatting (bracketed speech 「...」)
+      allKanji.forEach((entry) => {
+        const dialogue = entry.cafeOrderItem.dialogueLine.trim();
+        expect(
+          dialogue.startsWith('「') && dialogue.endsWith('」'),
+          `Dialogue line for '${entry.character}' (${entry.id}) must be enclosed in Japanese quotation marks 「...」: "${dialogue}"`
+        ).toBe(true);
+
+        expect(
+          dialogue.length,
+          `Dialogue line for '${entry.character}' (${entry.id}) is too short to be authentic dialogue: "${dialogue}"`
+        ).toBeGreaterThanOrEqual(8);
+      });
+
+      // 3. Enforce curriculum-wide dialogue diversity (at least 30 unique dialogues across 80 entries)
+      const uniqueDialogues = new Set(allKanji.map((k) => k.cafeOrderItem.dialogueLine.trim()));
+      expect(
+        uniqueDialogues.size,
+        `Curriculum patron dialogues lack diversity: only ${uniqueDialogues.size} unique lines across 80 entries (expected >= 30)`
+      ).toBeGreaterThanOrEqual(30);
+
+      // 4. Cap repetition of any single dialogue line to at most 3 entries
+      const dialogueCounts = new Map<string, number>();
+      allKanji.forEach((k) => {
+        const line = k.cafeOrderItem.dialogueLine.trim();
+        dialogueCounts.set(line, (dialogueCounts.get(line) || 0) + 1);
+      });
+      for (const [line, count] of dialogueCounts.entries()) {
+        expect(
+          count,
+          `Dialogue line duplicated across ${count} entries (max allowed: 3): "${line}"`
+        ).toBeLessThanOrEqual(3);
+      }
     });
   });
 

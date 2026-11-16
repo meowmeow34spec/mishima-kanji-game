@@ -106,19 +106,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "金箔",
         "reading": "きんぱく",
-        "meaning": "gold compound"
+        "meaning": "gold leaf, gold foil"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「幼時から父は、私によく、金閣のことを語った。」",
       "englishTranslation": "From earliest childhood, my father often spoke to me of the Golden Pavilion.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "『金閣寺』冒頭。吃音の少年・溝口の父が語る「地上で最も美しいもの」としての金閣の原初的記憶。"
     },
     "cafeOrderItem": {
       "itemName": "金箔抹茶パフェ",
       "flavorProfile": "Gold Leaf Matcha Parfait",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【金箔抹茶パフェ】をご賞味ください。」"
+      "dialogueLine": "「父が語り聞かせてくれた金閣の幻影……その黄金の輝きを宿したパフェをいただけますか。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -173,12 +173,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「金閣の全景は、池の青い水面に、微風にゆらぐ楼閣の影を投げていた。」",
       "englishTranslation": "The full view of the Golden Pavilion cast the reflection of the tower upon the blue surface of the pond.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "鏡湖池に揺らめく三層の楼閣建築の威容。現実の建築と水面の虚像が二重写しとなる美の象徴。"
     },
     "cafeOrderItem": {
       "itemName": "楼閣最中",
       "flavorProfile": "Tower Monaka Wafer",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【楼閣最中】をご賞味ください。」"
+      "dialogueLine": "「水面にそびえる優美な楼閣……この香ばしい皮の中に、美の記憶を閉じ込めておくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -233,19 +233,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "禅寺",
         "reading": "ぜんでら",
-        "meaning": "Buddhist temple compound"
+        "meaning": "Zen temple"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「鹿苑寺の山門をくぐると、その寺の静寂が私を包んだ。」",
       "englishTranslation": "Passing through the outer gate of Rokuon-ji, the stillness of the temple enveloped me.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "徒弟僧として鹿苑寺（金閣寺）に入山した溝口を迎える、世俗から隔絶された禅刹の厳粛な静寂。"
     },
     "cafeOrderItem": {
       "itemName": "禅寺煎茶",
       "flavorProfile": "Zen Temple Sencha",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【禅寺煎茶】をご賞味ください。」"
+      "dialogueLine": "「山門をくぐったときのあの張り詰めた静寂……雑念を洗い流す、清冽な煎茶を所望します。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -303,19 +303,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "美意識",
         "reading": "びいしき",
-        "meaning": "beauty compound"
+        "meaning": "aesthetic consciousness, sense of beauty"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「美というものは、何という冷酷な力を持っていることだろう。」",
       "englishTranslation": "What a ruthless power beauty possesses!",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "人間を無力化し、現実の生から拒絶する「絶対美」の冷酷な暴力性に圧倒される溝口の思索。"
     },
     "cafeOrderItem": {
       "itemName": "耽美琥珀羹",
       "flavorProfile": "Aesthetic Amber Agar Jelly",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【耽美琥珀羹】をご賞味ください。」"
+      "dialogueLine": "「美とは人を冷酷に拒絶するもの……その透き通った琥珀の奥に、至高の耽美を見せてくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -371,19 +371,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "水鏡",
         "reading": "みずかがみ",
-        "meaning": "mirror compound"
+        "meaning": "water mirror, calm water reflection"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「鏡湖池の水面に映る金閣は、実物よりもさらに虚構のように美しかった。」",
       "englishTranslation": "Reflected in Mirror Pond, the pavilion was even more fictionally beautiful than the reality.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "実体よりも水鏡に映る虚構のほうが純粋な美を放つという、三島文学における反転した虚実論。"
     },
     "cafeOrderItem": {
       "itemName": "鏡面葛切り",
       "flavorProfile": "Mirror Kudzu Noodles",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鏡面葛切り】をご賞味ください。」"
+      "dialogueLine": "「水鏡に揺らぐ虚構の影こそが、実物よりも美しいのだよ……この澄んだ葛切りを味わおう。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -440,19 +440,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "情炎",
         "reading": "じょうえん",
-        "meaning": "flame compound"
+        "meaning": "flames of passion, burning desire"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「夜空に舞い上がる火炎の中に、金閣の骨組みが黒々と浮かび上がった。」",
       "englishTranslation": "Amidst the flames soaring into the night sky, the dark skeleton of the Golden Pavilion emerged.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "昭和25年の金閣炎上。美を永遠のものとするため、自らの手で放火し炎に包む破滅のクライマックス。"
     },
     "cafeOrderItem": {
       "itemName": "紅炎焙じ茶",
       "flavorProfile": "Crimson Flame Hojicha",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【紅炎焙じ茶】をご賞味ください。」"
+      "dialogueLine": "「夜空を焦がしたあの紅蓮の炎……火の粉の香ばしさを宿した焙じ茶で、喉の渇きを鎮めたい。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -509,19 +509,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "暗影",
         "reading": "あんえい",
-        "meaning": "shadow compound"
+        "meaning": "dark shadow, gloom"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私の心に焼きついた美の影は、決して消え去ることがなかった。」",
       "englishTranslation": "The shadow of beauty seared into my heart would never fade away.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "溝口の意識に不気味なほど鮮烈に焼きつき、女性への接近や実生活を麻痺させる金閣の影。"
     },
     "cafeOrderItem": {
       "itemName": "影絵黒胡麻羊羹",
       "flavorProfile": "Silhouette Black Sesame Yokan",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【影絵黒胡麻羊羹】をご賞味ください。」"
+      "dialogueLine": "「光あるところ、常に濃い影が付きまとう……深い漆黒の黒胡麻羊羹をひとつ頼む。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -573,19 +573,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "高僧",
         "reading": "こうそう",
-        "meaning": "Buddhist monk compound"
+        "meaning": "eminent monk, high priest"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「吃音の学僧であった私は、言葉の世界から追放されていた。」",
       "englishTranslation": "As a stuttering acolyte, I had been exiled from the realm of words.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "吃音という肉体的障害により他者との意志疎通を阻まれ、内面の世界に閉じこもる学僧・溝口の孤独。"
     },
     "cafeOrderItem": {
       "itemName": "雲水薄茶",
       "flavorProfile": "Acolyte Light Matcha",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【雲水薄茶】をご賞味ください。」"
+      "dialogueLine": "「言葉が口から出てこぬもどかしさ……この薄茶の苦味が、私の孤独な心を慰めてくれる。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -642,19 +642,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "夢幻",
         "reading": "むげん",
-        "meaning": "illusion compound"
+        "meaning": "dreams and illusions, phantasm"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私を拒み続ける現実よりも、金閣の幻のほうがはるかに確かであった。」",
       "englishTranslation": "The phantom of the Golden Pavilion was far more solid than the reality that kept rejecting me.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "醜い現実社会の不確かさに対し、妄想と観念の中で結晶化した金閣の幻影の圧倒的な実在感。"
     },
     "cafeOrderItem": {
       "itemName": "幻影落雁",
       "flavorProfile": "Phantom Sugar Candies",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【幻影落雁】をご賞味ください。」"
+      "dialogueLine": "「目に見える現実など儚い幻にすぎん。口の中で静かに消えゆく落雁を供してくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -713,19 +713,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "生滅",
         "reading": "しょうめつ",
-        "meaning": "perish compound"
+        "meaning": "birth and extinction, arising and passing"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「美が滅びる瞬間にこそ、永遠の完成があるのではないか。」",
       "englishTranslation": "Is it not at the very instant beauty perishes that eternal perfection is attained?",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "不滅の建築を灰燼に帰すことで、不可逆的な美の極致を達成しようとする背理の哲学。"
     },
     "cafeOrderItem": {
       "itemName": "滅紫しるこ",
       "flavorProfile": "Extinction Purple Shiruko",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【滅紫しるこ】をご賞味ください。」"
+      "dialogueLine": "「滅びの瞬間に咲く美こそ至高……この滅紫のおしるこに、終わりの甘美さを感じよう。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -784,19 +784,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "延焼",
         "reading": "えんしょう",
-        "meaning": "burn compound"
+        "meaning": "spread of fire, conflagration"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「燃えさかる炎の中で、私はすべてを焼き尽くす決意を固めた。」",
       "englishTranslation": "Amidst the roaring flames, I hardened my resolve to burn everything to ash.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "マッチを擦り、金閣の内部に火を放つ瞬間の、一切の妥協を排した絶対的破壊衝動。"
     },
     "cafeOrderItem": {
       "itemName": "炭焼き団子",
       "flavorProfile": "Charcoal Roasted Dango",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【炭焼き団子】をご賞味ください。」"
+      "dialogueLine": "「火を放つときのあの胸の高鳴り……炭火で香ばしく焼き上げた団子を所望する。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -853,19 +853,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "死灰",
         "reading": "しかい",
-        "meaning": "ash compound"
+        "meaning": "dead ashes, cold cinders"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「かつての燦然たる楼閣は、やがて冷たい灰燼に帰した。」",
       "englishTranslation": "The once resplendent pavilion at last returned to cold ashes.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "炎上が終わり、夜明けの雨の中でくすぶる黒い燃え殻と灰。美の絶対的な消滅と静寂。"
     },
     "cafeOrderItem": {
       "itemName": "灰被り黒蜜蕨餅",
       "flavorProfile": "Ash-Dusted Warabimochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【灰被り黒蜜蕨餅】をご賞味ください。」"
+      "dialogueLine": "「すべてが燃え尽き、残ったのは冷たい灰ばかり……きな粉を灰に見立てた蕨餅をいただこう。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -918,12 +918,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「屋根の頂に立つ金色の鳳凰は、時を超えて空を見つめていた。」",
       "englishTranslation": "The golden phoenix atop the roof gazed out across time into the sky.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "頂上にあって風雨に晒されながらも、地上の一切の惨禍を超越して空を見つめ続ける金銅の鳳凰。"
     },
     "cafeOrderItem": {
       "itemName": "鳳凰金団",
       "flavorProfile": "Golden Phoenix Kinton",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鳳凰金団】をご賞味ください。」"
+      "dialogueLine": "「金閣の屋蓋にそびえる瑞鳥・鳳凰……その高貴な姿を写した金団を所望いたす。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -968,19 +968,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "凰翼",
         "reading": "おうよく",
-        "meaning": "female phoenix compound"
+        "meaning": "wings of the phoenix, phoenix wings"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「鳳凰の羽ばたきは凍てつき、夜の星明かりだけを浴びていた。」",
       "englishTranslation": "The flapping of the phoenix wings was frozen, bathed only in starlight.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "飛翔することのない金属の翼が表現する、永遠に凝固した神秘と美の不吉な冷気。"
     },
     "cafeOrderItem": {
       "itemName": "金鳥練り切り",
       "flavorProfile": "Golden Bird Nerikiri",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【金鳥練り切り】をご賞味ください。」"
+      "dialogueLine": "「夜空に凍りついた黄金の翼……この繊細な練り切りに、あの静止した飛翔の美を感じるよ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1035,19 +1035,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "古池",
         "reading": "ふるいけ",
-        "meaning": "pond compound"
+        "meaning": "old pond, ancient pond"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私は池のほとりに立ち尽くし、さざ波を見つめていた。」",
       "englishTranslation": "I stood motionless on the bank of the pond, watching the ripples.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "金閣を映す鏡湖池の湖畔。青年僧が懊悩と沈黙を抱えて立ち尽くす、水と岩の庭園景観。"
     },
     "cafeOrderItem": {
       "itemName": "蓮池玉露",
       "flavorProfile": "Lotus Pond Gyokuro",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【蓮池玉露】をご賞味ください。」"
+      "dialogueLine": "「さざ波立つ水面を見つめながら思索に耽りたい。蓮の葉陰を思わせる玉露を淹れてくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1106,19 +1106,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "光輝",
         "reading": "こうき",
-        "meaning": "light compound"
+        "meaning": "brilliance, radiant splendor"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「夕暮れの日光を受けて、金箔は燦然たる輝きを放った。」",
       "englishTranslation": "Catching the evening sun, the gold leaf shed a dazzling luster.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "西日の斜光が金閣の潮音洞と究竟頂を射抜く、息をのむような荘厳な夕景の輝き。"
     },
     "cafeOrderItem": {
       "itemName": "黄金光カステラ",
       "flavorProfile": "Golden Light Castella",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【黄金光カステラ】をご賞味ください。」"
+      "dialogueLine": "「西日が射した瞬間の、眩いばかりの光輝……この黄金色に焼き上がったカステラを頼むよ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1177,19 +1177,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "拒絶",
         "reading": "きょぜつ",
-        "meaning": "absolute compound"
+        "meaning": "refusal, rejection, rebuff"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私は絶対の美と、この世の醜悪さとの間で引き裂かれていた。」",
       "englishTranslation": "I was torn between absolute beauty and the world's ugliness.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "完全無欠の金閣と、みじめな吃音の肉体という二極の落差に引き裂かれる溝口の魂の断絶。"
     },
     "cafeOrderItem": {
       "itemName": "絶対純米甘酒",
       "flavorProfile": "Absolute Pure Amazake",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【絶対純米甘酒】をご賞味ください。」"
+      "dialogueLine": "「この世の濁りから隔絶された、純粋無垢な味……麹だけで醸した純米甘酒を一杯願おう。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1240,19 +1240,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "嫉視",
         "reading": "しっし",
-        "meaning": "envy compound"
+        "meaning": "eyeing with envy, looking upon with jealousy"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私は彼らの健やかな世界に対して、暗い嫉妬を抱いていた。」",
       "englishTranslation": "Toward their wholesome, healthy world, I harbored a dark jealousy.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "健やかで迷いのない同世代の若者たちに対する、溝口の陰鬱で激しい嫉妬と憧憬。"
     },
     "cafeOrderItem": {
       "itemName": "嫉妬柚子ソーダ",
       "flavorProfile": "Jealousy Yuzu Soda",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【嫉妬柚子ソーダ】をご賞味ください。」"
+      "dialogueLine": "「他人の眩しい幸福を見ると、胸の奥がきりきりと痛むのだ……酸味の強い柚子ソーダをくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1303,19 +1303,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "猜妬",
         "reading": "さいと",
-        "meaning": "jealousy compound"
+        "meaning": "jealous suspicion, envious malice"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「嫉妬の毒が、私の吃音の舌をいっそう重く縛りつけた。」",
       "englishTranslation": "The venom of envy bound my stuttering tongue even more heavily.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "妬みの情念が毒のように血管を巡り、世界に対する呪詛を深めていく内面劇の克明な描写。"
     },
     "cafeOrderItem": {
       "itemName": "青梅冷菓",
       "flavorProfile": "Bitter Green Plum Sherbet",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【青梅冷菓】をご賞味ください。」"
+      "dialogueLine": "「青い梅の渋みのように、妬みは舌に残るものだね……冷たく爽やかな菓子で毒気を払いたい。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1379,19 +1379,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "死生",
         "reading": "しせい",
-        "meaning": "life compound"
+        "meaning": "life and death, existence and mortality"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「一ト仕事を終えて一服している人がよくそう思うように、生きようと私は思った。」",
       "englishTranslation": "Like a man who has finished a job of work and sits down for a smoke, I wished to live.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "『金閣寺』掉尾の有名な最後の一行。大事業をやり遂げ、左大文字の山中で煙草を吸いながら湧き上がる生の意志。"
     },
     "cafeOrderItem": {
       "itemName": "延命八宝茶",
       "flavorProfile": "Longevity Eight-Treasure Tea",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【延命八宝茶】をご賞味ください。」"
+      "dialogueLine": "「一仕事終えて煙草を燻らす時のように……生きていくための力をくれる八宝茶を淹れてくれ。」"
     },
     "gameplayTags": [
       "tier-1",
@@ -1449,19 +1449,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "潮風",
         "reading": "しおかぜ",
-        "meaning": "tide compound"
+        "meaning": "sea breeze, salty ocean wind"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「遠くから響いてくる潮騒の音が、夜の浜辺を静かに揺らしていた。」",
       "englishTranslation": "The roar of the surf echoing from afar gently rocked the night shore.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "『潮騒』の舞台・伊勢湾口の歌島。夜の帳が降りた砂浜に寄せては返す、永遠の波の囁き。"
     },
     "cafeOrderItem": {
       "itemName": "潮騒塩羊羹",
       "flavorProfile": "Salt-Kissed Surf Yokan",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【潮騒塩羊羹】をご賞味ください。」"
+      "dialogueLine": "「沖から潮騒の音が響いてくる……伊勢の海塩を効かせた、この塩羊羹をいただこうか。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1519,19 +1519,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "物騒",
         "reading": "ぶっそう",
-        "meaning": "clamor compound"
+        "meaning": "dangerous, turbulent, precarious"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「磯の匂いと潮騒の合間に、二人の若い吐息が重なり合った。」",
       "englishTranslation": "Between the scent of the shore and the murmur of the tide, their young breaths mingled.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "荒れ狂う磯の喧騒の中で、新治と初江の無垢な愛が自然の力と同調して高鳴る情景。"
     },
     "cafeOrderItem": {
       "itemName": "磯騒サイダー",
       "flavorProfile": "Reef Surf Cider",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【磯騒サイダー】をご賞味ください。」"
+      "dialogueLine": "「磯の波しぶきが弾けるような、シュワっと清々しいサイダーを喉に流し込みたい！」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1588,19 +1588,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "深海",
         "reading": "しんかい",
-        "meaning": "sea compound"
+        "meaning": "deep sea, ocean depths"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「二百段の石段を昇って見返ると、古代さながらの伊勢の海が眺められる。」",
       "englishTranslation": "Climbing the two hundred stone steps and looking back, the sea of Ise spreads out like the sea of antiquity.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "八代神社から見下ろす太古の海原。文明の喧騒から隔絶された、自然と神々の宿る青い大海。"
     },
     "cafeOrderItem": {
       "itemName": "伊勢海深碧茶",
       "flavorProfile": "Ise Deep Blue Ocean Tea",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【伊勢海深碧茶】をご賞味ください。」"
+      "dialogueLine": "「神社の石段から見下ろす海は、昔も今も変わらぬ碧さだ。この深碧のお茶を頼むよ。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1661,19 +1661,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "豊作",
         "reading": "ほうさく",
-        "meaning": "abundant compound"
+        "meaning": "abundant harvest, bumper crop"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「月光に照らされた砂漠は、豊饒の海という名にふさわしい死の静寂をたたえていた。」",
       "englishTranslation": "Bathed in moonlight, the desert held a silence of death fitting the name Sea of Fertility.",
       "sourceWork": "豊饒の海",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『豊饒の海』."
+      "contextNote": "『豊饒の海』の基底をなす月の枯渇したクレーター（Mare Fecunditatis）。逆説的な虚無の豊かさ。"
     },
     "cafeOrderItem": {
       "itemName": "豊穣蜜芋ぜんざい",
       "flavorProfile": "Rich Honey Yam Zenzai",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【豊穣蜜芋ぜんざい】をご賞味ください。」"
+      "dialogueLine": "「豊かな実りを祝うぜんざいを！ 豊饒の海の神秘に想いを馳せながら味わうとしよう。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1731,19 +1731,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "饒舌",
         "reading": "じょうぜつ",
-        "meaning": "fertile compound"
+        "meaning": "loquacity, talkativeness, garrulity"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「虚無の中にのみ、真の豊饒が存在するのかもしれなかった。」",
       "englishTranslation": "Perhaps only within nothingness does true fertility reside.",
       "sourceWork": "豊饒の海",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『豊饒の海』."
+      "contextNote": "輪廻転生を四代にわたって見届けた本多繁邦が辿り着く、無と豊饒の仏教的・唯識論的境地。"
     },
     "cafeOrderItem": {
       "itemName": "豊饒抹茶饅頭",
       "flavorProfile": "Fertile Matcha Manju",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【豊饒抹茶饅頭】をご賞味ください。」"
+      "dialogueLine": "「何もない虚無の庭にこそ真の豊饒がある……濃厚な抹茶餡の饅頭をひとつ所望いたす。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1790,7 +1790,7 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "白波",
         "reading": "しらなみ",
-        "meaning": "whitecaps"
+        "meaning": "whitecaps, foamy breaking waves"
       },
       {
         "compound": "波濤",
@@ -1807,12 +1807,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「荒れ狂う波をものともせず、新治は海へと飛び込んだ。」",
       "englishTranslation": "Heeding not the raging waves, Shinji dived straight into the sea.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "暴風雨の中、遭難しかけた歌島丸を救うため、荒波に命綱を引いて飛び込む新治の英雄的跳躍。"
     },
     "cafeOrderItem": {
       "itemName": "白波落雁",
       "flavorProfile": "Whitecap Dry Sweets",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【白波落雁】をご賞味ください。」"
+      "dialogueLine": "「白波を蹴立てて海へ飛び込む時のあの気迫！ 砕ける波頭のような落雁をくれ！」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1867,19 +1867,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "漁火",
         "reading": "いさりび",
-        "meaning": "fishing compound"
+        "meaning": "fishing fire, boat lure-lantern"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「若い漁夫の逞しい腕は、潮風と日焼けで赤銅色に輝いていた。」",
       "englishTranslation": "The young fisherman's sinewy arms glowed bronze with sea breeze and sunburn.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "労働の汗と潮風に磨かれた健康な肉体の美しさ。三島が戦後近代の病弱な知性主義に対置した理想の人間像。"
     },
     "cafeOrderItem": {
       "itemName": "漁火焙じ茶ラテ",
       "flavorProfile": "Fisherman's Bonfire Latte",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【漁火焙じ茶ラテ】をご賞味ください。」"
+      "dialogueLine": "「夜の沖合に灯る漁火を見ながら飲む茶は格別だ。香ばしい焙じ茶ラテを一杯頼む。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -1935,19 +1935,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "島民",
         "reading": "とうみん",
-        "meaning": "island compound"
+        "meaning": "island residents, islanders"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「歌島は人口千四百、周囲一里に充たない小島である。」",
       "englishTranslation": "Utajima is a small island with a population of fourteen hundred and a circumference of less than a league.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "『潮騒』の舞台・歌島（神島）。俗世から隔てられ、古代ギリシャの牧歌劇のような純愛を育む孤島。"
     },
     "cafeOrderItem": {
       "itemName": "歌島柑橘ゼリー",
       "flavorProfile": "Utajima Citrus Jelly",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【歌島柑橘ゼリー】をご賞味ください。」"
+      "dialogueLine": "「歌島の潮風を浴びて育った蜜柑のように、爽やかで甘酸っぱいゼリーをいただけますか。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2005,19 +2005,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "笹舟",
         "reading": "ささぶね",
-        "meaning": "boat compound"
+        "meaning": "bamboo-leaf boat, miniature toy skiff"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「波間に揺れる一艘の小舟のように、運命は定まらなかった。」",
       "englishTranslation": "Like a lone boat rocking upon the waves, their destiny was yet unfixed.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "大海原の奔流に木の葉のように揺れる小舟の形象。自然の圧倒的な力と人間の運命の儚さ。"
     },
     "cafeOrderItem": {
       "itemName": "笹舟草餅",
       "flavorProfile": "Bamboo Boat Kusamochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【笹舟草餅】をご賞味ください。」"
+      "dialogueLine": "「波間に揺られる小舟に乗って沖へ出よう。笹の葉香る、この草餅を包んでおくれ。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2064,7 +2064,7 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "砂嵐",
         "reading": "すなあらし",
-        "meaning": "sandstorm"
+        "meaning": "sandstorm, tempest of dust"
       },
       {
         "compound": "春嵐",
@@ -2081,12 +2081,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「嵐の夜、観測塔の暗闇の中で二人の出会いは運命となった。」",
       "englishTranslation": "On the night of the tempest, in the darkness of the observation tower, their encounter became destiny.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "台風が島を襲う夜、廃墟の観測塔で激しい雨風に濡れた二人が焚火の前で結ばれる決定的一幕。"
     },
     "cafeOrderItem": {
       "itemName": "嵐の夜の生姜湯",
       "flavorProfile": "Stormy Night Ginger Elixir",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【嵐の夜の生姜湯】をご賞味ください。」"
+      "dialogueLine": "「外はものすごい嵐だ、雨風に打たれて冷え切っちまった……芯から温まる生姜湯を頼む！」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2143,19 +2143,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "白浜",
         "reading": "しらはま",
-        "meaning": "beach compound"
+        "meaning": "white sand beach, pristine shoreline"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「初江は白い息を吐きながら、誰もいない朝の浜辺を歩いた。」",
       "englishTranslation": "Breathing white mist, Hatsue walked along the deserted morning shore.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "朝靄の漂う冬の砂浜。海女の少女・初江の清純さと、厳しい自然の中で鍛えられた気品ある佇まい。"
     },
     "cafeOrderItem": {
       "itemName": "浜真珠糖花",
       "flavorProfile": "Beach Pearl Candies",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【浜真珠糖花】をご賞味ください。」"
+      "dialogueLine": "「朝露の浜辺で拾った真珠のように愛らしいお菓子ですね。ひとついただいてもよろしいですか。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2214,19 +2214,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "砂漠",
         "reading": "さばく",
-        "meaning": "sand compound"
+        "meaning": "desert, arid wasteland"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「清らかな白砂の上に、二人の濡れた足跡が刻まれた。」",
       "englishTranslation": "Upon the pristine white sand, their wet footprints were imprinted.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "澄み切った海の汀に広がる無垢な白砂。二人の純粋無垢な足跡が波に洗われていく抒情景。"
     },
     "cafeOrderItem": {
       "itemName": "白砂きな粉餅",
       "flavorProfile": "White Sand Kinako Mochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【白砂きな粉餅】をご賞味ください。」"
+      "dialogueLine": "「歌島の清らかな白砂を思わせる、きな粉をたっぷりまぶしたお餅が食べたいな。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2273,19 +2273,29 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "篝火",
         "reading": "かがりび",
-        "meaning": "watchfire/bonfire"
+        "meaning": "bonfire, watchfire, fire basket blazing in the night"
+      },
+      {
+        "compound": "篝船",
+        "reading": "かがりぶね",
+        "meaning": "watchfire boat, cormorant fishing boat with night fire basket"
+      },
+      {
+        "compound": "夜篝",
+        "reading": "よかがり",
+        "meaning": "nocturnal watchfire, night bonfire on the coast"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「その火を飛び越して来い。その篝火を飛び越してきたら……」",
       "englishTranslation": "Jump across that fire! If you leap over that bonfire...!",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "『潮騒』屈指の名場面。観測塔の暗闇で、裸体で焚火の前に立つ初江が新治の純潔と勇気を試す至高の台詞。"
     },
     "cafeOrderItem": {
       "itemName": "篝火焼き林檎",
       "flavorProfile": "Bonfire Roasted Apple",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【篝火焼き林檎】をご賞味ください。」"
+      "dialogueLine": "「『その火を飛び越して来い！』……あの熱い篝火でじっくり焼いた林檎を所望する！」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2335,7 +2345,7 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "潜水",
         "reading": "せんすい",
-        "meaning": "diving"
+        "meaning": "diving, underwater submersion"
       },
       {
         "compound": "潜伏",
@@ -2352,12 +2362,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「島の娘たちは深く水に潜り、鮑を求めて海底を泳いだ。」",
       "englishTranslation": "The island maidens dove deep into the water, swimming along the ocean floor for abalone.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "肺活量の極限まで息を止め、命がけで冷たい深海へと潜水する歌島の勇敢な海女たちの伝統的生業。"
     },
     "cafeOrderItem": {
       "itemName": "潜水玉露",
       "flavorProfile": "Deep Dive Gyokuro",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【潜水玉露】をご賞味ください。」"
+      "dialogueLine": "「冷たい海の底深くまで潜った後のように、身体の隅々まで染み渡る冷水点ての玉露をくれ。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2415,19 +2425,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "祈誓",
         "reading": "きせい",
-        "meaning": "vow compound"
+        "meaning": "prayerful vow, solemn oath"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「八代神社の神前で、二人は生涯の愛を密かに誓い合った。」",
       "englishTranslation": "Before the altar of Yashiro Shrine, the two secretly pledged lifelong love.",
       "sourceWork": "潮騒",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『潮騒』."
+      "contextNote": "村人の無情な噂や障害を乗り越え、海の神の御前で永遠の貞節と結合を神聖に誓い合う二人。"
     },
     "cafeOrderItem": {
       "itemName": "神前契り煎餅",
       "flavorProfile": "Shrine Vow Senbei",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【神前契り煎餅】をご賞味ください。」"
+      "dialogueLine": "「神仏の前で交わした固い誓いは、生涯破りません。この縁起の良いお煎餅をいただきましょう。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2474,7 +2484,7 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "春雪",
         "reading": "しゅんせつ",
-        "meaning": "spring snow"
+        "meaning": "spring snowfall, snow falling in spring"
       },
       {
         "compound": "春の雪",
@@ -2484,19 +2494,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "青春",
         "reading": "せいしゅん",
-        "meaning": "spring compound"
+        "meaning": "youth, springtime of life"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「春の雪は薄墨色の空から舞い降り、たちまち手のひらで消え失せた。」",
       "englishTranslation": "The spring snow drifted down from the pale ink-wash sky and melted away upon the palm.",
       "sourceWork": "春の雪",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『春の雪』."
+      "contextNote": "『春の雪』。貴族の子弟・松枝清顕と綾倉聡子の宿命的な恋の情景。儚く溶けゆく春の牡丹雪の美。"
     },
     "cafeOrderItem": {
       "itemName": "春雪桜餅",
       "flavorProfile": "Spring Snow Sakura Mochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【春雪桜餅】をご賞味ください。」"
+      "dialogueLine": "「薄墨色の空から降る春の雪……桜の葉が薫る、上品な桜餅を一服のお供に。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2552,19 +2562,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "白雪",
         "reading": "しらゆき",
-        "meaning": "snow compound"
+        "meaning": "white snow, virgin snow"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「降る雪の音さえ聞こえるような、貴族の邸宅の深い静寂であった。」",
       "englishTranslation": "It was a silence so profound within the aristocratic mansion that one could hear the falling snow.",
       "sourceWork": "春の雪",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『春の雪』."
+      "contextNote": "明治・大正の華族邸宅の奥深く、雪に閉ざされた密室で展開する、禁じられた情熱と美意識の結晶。"
     },
     "cafeOrderItem": {
       "itemName": "淡雪羹",
       "flavorProfile": "Light Snow Agar Dessert",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【淡雪羹】をご賞味ください。」"
+      "dialogueLine": "「深閑とした雪の降る庭を眺めながら……口の中で淡く溶ける淡雪羹を所望します。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2621,19 +2631,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "衰弱",
         "reading": "すいじゃく",
-        "meaning": "decline compound"
+        "meaning": "debilitation, bodily weakness"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「頭上の花冠は萎れ、腋の下から汗が流れ出る、これぞ天人五衰の兆しであった。」",
       "englishTranslation": "The floral crown atop his head withered and sweat flowed from beneath his arms—the omen of the angel's decay.",
       "sourceWork": "天人五衰",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『天人五衰』."
+      "contextNote": "『天人五衰』。仏教で天人が寿命を迎える際の五つの衰亡兆候（花冠萎れ、衣垢染み、腋汗など）。"
     },
     "cafeOrderItem": {
       "itemName": "五衰萎れ花茶",
       "flavorProfile": "Angel's Floral Infusion",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【五衰萎れ花茶】をご賞味ください。」"
+      "dialogueLine": "「天上の天使でさえ衰亡の時を免れぬという……儚い花の香りを湛えたお茶を淹れておくれ。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2680,7 +2690,7 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "滝下",
         "reading": "たきした",
-        "meaning": "beneath the waterfall"
+        "meaning": "beneath the waterfall, plunge pool foot"
       },
       {
         "compound": "滝壺",
@@ -2697,12 +2707,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「また、会うぜ。きっと会う。滝下で。」",
       "englishTranslation": "I will see you again. I know I will. Beneath the waterfall.",
       "sourceWork": "春の雪",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『春の雪』."
+      "contextNote": "『春の雪』清顕の死の直前の遺言。「滝下」とは輪廻の転生先である『奔馬』の飯沼勲への約束の合言葉。"
     },
     "cafeOrderItem": {
       "itemName": "滝しぶき冷水点茶",
       "flavorProfile": "Waterfall Mist Cold Brew",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【滝しぶき冷水点茶】をご賞味ください。」"
+      "dialogueLine": "「『また会うぜ。滝下で……』あの清冽な滝の飛沫を浴びるような冷茶を一杯頼む。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2762,19 +2772,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "寂寥",
         "reading": "じゃくりょう",
-        "meaning": "lonely compound"
+        "meaning": "desolation, solitary loneliness"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「そのほかには何一つ音とてなく、寂莫を極めている。この庭には何もない。」",
       "englishTranslation": "There was not another sound, desolation supreme. In this garden there was nothing.",
       "sourceWork": "天人五衰",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『天人五衰』."
+      "contextNote": "『天人五衰』掉尾。老いた本多が月修寺の庭で老尼となった聡子と対面し、一切の記憶と存在が無に帰する全四巻の大団円。"
     },
     "cafeOrderItem": {
       "itemName": "寂静枯山水菓子",
       "flavorProfile": "Dry Landscape Solitude Sweet",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【寂静枯山水菓子】をご賞味ください。」"
+      "dialogueLine": "「一切の記憶が消え去った、寂莫たる枯山水の庭……この静けさを菓子として味わいたい。」"
     },
     "gameplayTags": [
       "tier-2",
@@ -2834,12 +2844,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「私は仮面をつけ、それを本物の素顔だと人々に信じ込ませた。」",
       "englishTranslation": "I donned a mask and made the world believe it was my true countenance.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "『仮面の告白』の根本主題。世間の「正常」を演じるための仮面が、やがて自らの第二の皮膚となっていく実存の悲喜劇。"
     },
     "cafeOrderItem": {
       "itemName": "仮面舞踏会ショコラ",
       "flavorProfile": "Masquerade Dark Chocolate",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【仮面舞踏会ショコラ】をご賞味ください。」"
+      "dialogueLine": "「誰しも心に仮面を被って世間を歩くものさ。ビターなショコラで仮面の裏を隠すとしよう。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -2905,12 +2915,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「鏡に映る自分の顔は、いつの間にか仮面そのものになっていた。」",
       "englishTranslation": "The reflection in the glass had imperceptibly become the mask itself.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "虚偽の演技を続けるうちに、もはや素顔と仮面の区別を喪失してしまった語り手の戦慄すべき自己省察。"
     },
     "cafeOrderItem": {
       "itemName": "素顔合わせ練り切り",
       "flavorProfile": "True-Face Nerikiri",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【素顔合わせ練り切り】をご賞味ください。」"
+      "dialogueLine": "「仮面を外したとき、そこにあるのは真実の素顔か、それとも虚無か……練り切りをひとつ。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -2966,19 +2976,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "宣告",
         "reading": "せんこく",
-        "meaning": "confess compound"
+        "meaning": "sentence, verdict, solemn pronouncement"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「この手記は、誰にも打ち明けられぬ私の真実の告白である。」",
       "englishTranslation": "These memoirs are my true confession, which I could disclose to no one.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "自らの倒錯した欲望と孤独な肉体の目覚めを、冷徹な筆致で解剖・告白していく自伝的小説の宣言。"
     },
     "cafeOrderItem": {
       "itemName": "密やかな告白珈琲",
       "flavorProfile": "Secret Confession Coffee",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【密やかな告白珈琲】をご賞味ください。」"
+      "dialogueLine": "「誰にも言えない秘密を打ち明けるように……深煎りの苦い告白珈琲を静かに淹れておくれ。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3037,19 +3047,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "潔白",
         "reading": "けっぱく",
-        "meaning": "white compound"
+        "meaning": "innocence, purity, blamelessness"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「白磁のような肉体の上に、鮮やかな赤い血が滴り落ちた。」",
       "englishTranslation": "Upon that porcelain-white flesh, bright crimson blood dripped down.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "大理石や白磁に喩えられる青年の硬質な純白の肉体と、そこを汚す赤い流血の強烈な色彩対比。"
     },
     "cafeOrderItem": {
       "itemName": "純白淡雪プリン",
       "flavorProfile": "Pure White Blancmange",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【純白淡雪プリン】をご賞味ください。」"
+      "dialogueLine": "「冷たい白磁のように滑らかなプリンを……純白の上に広がる紅い果実のソースが美しいね。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3102,19 +3112,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "厳禁",
         "reading": "げんきん",
-        "meaning": "forbid compound"
+        "meaning": "strict prohibition, strictly forbidden"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「俊輔は青年の美貌を使い、禁色の園へと女たちを誘い込んだ。」",
       "englishTranslation": "Shunsuke used the youth's beauty to lure women into the garden of forbidden colors.",
       "sourceWork": "禁色",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『禁色』."
+      "contextNote": "『禁色』。老作家・檜俊輔が絶世の美青年・悠一を操り人間に仕立て上げ、女性たちへ復讐する耽美小説。"
     },
     "cafeOrderItem": {
       "itemName": "禁色の紫芋モンブラン",
       "flavorProfile": "Forbidden Purple Mont Blanc",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【禁色の紫芋モンブラン】をご賞味ください。」"
+      "dialogueLine": "「禁忌の園へと踏み込む勇気はあるかい？ 妖しく紫に染まったモンブランを試してみよう。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3172,19 +3182,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "景色",
         "reading": "けしき",
-        "meaning": "color compound"
+        "meaning": "scenery, landscape, scenic view"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「青年の冷徹な瞳には、あらゆる欲望の色が映っては消えた。」",
       "englishTranslation": "In the youth's icy eyes, colors of every desire flickered and vanished.",
       "sourceWork": "禁色",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『禁色』."
+      "contextNote": "性愛、虚栄、嫉妬が渦巻く都会の社交場において、自らは決して愛さず欲望の色を冷たく反射する美青年・悠一。"
     },
     "cafeOrderItem": {
       "itemName": "七色琥珀糖",
       "flavorProfile": "Prismatic Kohakuto",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【七色琥珀糖】をご賞味ください。」"
+      "dialogueLine": "「世間の欲望など、ガラス越しの万華鏡のようなもの。きらめく琥珀糖をひと粒所望する。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3241,19 +3251,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "罪業",
         "reading": "ざいごう",
-        "meaning": "sin compound"
+        "meaning": "sinful karma, sins, spiritual transgression"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「幼少期の私は、自分が生まれながらにして罪を背負っていると感じていた。」",
       "englishTranslation": "From childhood, I felt I had been born burdened with innate guilt.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "生まれつき常人とは異なる性的指向を抱えていることに対する、幼年期からの根源的な罪業意識。"
     },
     "cafeOrderItem": {
       "itemName": "原罪カカオトリュフ",
       "flavorProfile": "Original Sin Cacao Truffle",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【原罪カカオトリュフ】をご賞味ください。」"
+      "dialogueLine": "「生まれながらに背負った原罪の重み……ほろ苦いビターカカオのトリュフで噛み締めよう。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3312,19 +3322,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "偽物",
         "reading": "にせもの",
-        "meaning": "falsehood compound"
+        "meaning": "counterfeit, fake, imitation"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私の生活のすべては偽りであり、私は偽りの感情を演じ続けた。」",
       "englishTranslation": "My entire life was a counterfeit; I continuously acted out false emotions.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "異性愛者としての普通の市民生活を装うため、好意や情熱さえも計算された演技として演じる青年の悲哀。"
     },
     "cafeOrderItem": {
       "itemName": "偽りの金箔オペラ",
       "flavorProfile": "Counterfeit Gilt Opera Cake",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【偽りの金箔オペラ】をご賞味ください。」"
+      "dialogueLine": "「真実の感情などどこにもない、すべては舞台の虚構さ……金箔をあしらった豪華なオペラを。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3383,19 +3393,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "恥部",
         "reading": "ちぶ",
-        "meaning": "shame compound"
+        "meaning": "private parts, shameful secret"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「聖セバスチャンの画を見たとき、激しい羞恥と歓喜が私を貫いた。」",
       "englishTranslation": "Beholding the painting of Saint Sebastian, fierce shame and ecstasy pierced me.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "グイド・レーニ作『聖セバスチャン』の複製画を目撃した瞬間、激しい羞恥と同時に肉体の最初の覚醒を経験する戦慄の回想。"
     },
     "cafeOrderItem": {
       "itemName": "羞恥の林檎パイ",
       "flavorProfile": "Blushing Apple Tart",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【羞恥の林檎パイ】をご賞味ください。」"
+      "dialogueLine": "「禁じられた画を見て頬を赤らめたあの日の羞恥……甘酸っぱい林檎のパイを焼いておくれ。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3448,19 +3458,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "劇場",
         "reading": "げきじょう",
-        "meaning": "drama compound"
+        "meaning": "theatre, playhouse"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私の人生は、観客のいない劇場で演じられる悲劇にすぎなかった。」",
       "englishTranslation": "My life was nothing but a tragedy staged in a theater devoid of spectators.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "自らの宿命を観客なき劇場での孤独な悲劇に見立てる、三島特有の演劇的・戯曲的世界観。"
     },
     "cafeOrderItem": {
       "itemName": "悲劇のクランベリータルト",
       "flavorProfile": "Tragedy Cranberry Tart",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【悲劇のクランベリータルト】をご賞味ください。」"
+      "dialogueLine": "「誰も観客のいない舞台で、私は悲劇の主役を演じている……真紅のクランベリータルトを。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3513,19 +3523,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "公演",
         "reading": "こうえん",
-        "meaning": "perform compound"
+        "meaning": "public performance, stage presentation"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「私は他人が期待する通りの『正常な少年』を完璧に演じてみせた。」",
       "englishTranslation": "I performed to perfection the role of the 'normal boy' that others expected.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "家族や友人の前で「健全な模範的少年」を演じる息苦しいパフォーマンスの緊張感。"
     },
     "cafeOrderItem": {
       "itemName": "舞台裏の紅茶",
       "flavorProfile": "Backstage Earl Grey",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【舞台裏の紅茶】をご賞味ください。」"
+      "dialogueLine": "「拍手に応える舞台の裏で、役者はそっと息を吐く……安らぎのダージリンティーを一杯。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3581,19 +3591,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "耽読",
         "reading": "たんどく",
-        "meaning": "indulge compound"
+        "meaning": "absorbed reading, voracious reading"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「老作家・檜俊輔は、美への耽溺こそが精神の復讐であると信じた。」",
       "englishTranslation": "The aged author Shunsuke Hinoki believed indulgence in beauty was the mind's vengeance.",
       "sourceWork": "禁色",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『禁色』."
+      "contextNote": "老醜と死に抗い、究極の肉体美と官能に耽溺することで世俗への復讐を完遂しようとする老作家の信念。"
     },
     "cafeOrderItem": {
       "itemName": "耽溺赤ワイン羹",
       "flavorProfile": "Indulgence Port Agar Jelly",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【耽溺赤ワイン羹】をご賞味ください。」"
+      "dialogueLine": "「醜悪な現実に復讐するには、至高の美に耽溺するほかない。濃厚な赤ワイン羹をいただこう。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3649,19 +3659,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "弓矢",
         "reading": "ゆみや",
-        "meaning": "arrow compound"
+        "meaning": "bow and arrow, archery weapons"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「聖セバスチャンの引き締まった胸を、無残な矢が深く射抜いていた。」",
       "englishTranslation": "Cruel arrows deeply pierced the taut chest of Saint Sebastian.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "樹木に縛り付けられ、弓矢で射抜かれた若き殉教者の引き締まった胸と脇腹の肉体美への官能的陶酔。"
     },
     "cafeOrderItem": {
       "itemName": "銀の矢シナモンチュロス",
       "flavorProfile": "Silver Arrow Churros",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【銀の矢シナモンチュロス】をご賞味ください。」"
+      "dialogueLine": "「殉教者の胸を刺し貫いた鋭い銀の矢……シナモン香るサクサクのチュロスを注文するよ。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3713,19 +3723,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "殉難",
         "reading": "じゅんなん",
-        "meaning": "martyrdom compound"
+        "meaning": "martyrdom, sacrificial death"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「苦痛の中で天を見上げる若き殉教者の姿に、私は魂を奪われた。」",
       "englishTranslation": "Beholding the young martyr gazing heavenward in pain, my soul was stolen away.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "肉体の苦痛と至福のエクスタシーが未分化に融合した殉教の図像に魂を奪われる語り手。"
     },
     "cafeOrderItem": {
       "itemName": "殉教者サブレ",
       "flavorProfile": "Martyr Shortbread",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【殉教者サブレ】をご賞味ください。」"
+      "dialogueLine": "「自らの信念に殉じる者の姿ほど神聖なものはない。素朴で潔いサブレをひとつ願おう。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3784,19 +3794,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "照射",
         "reading": "しょうしゃ",
-        "meaning": "shoot compound"
+        "meaning": "irradiation, projecting light, shining upon"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「冷酷な矢が肉体を射抜く瞬間、そこに美の頂点が現出する。」",
       "englishTranslation": "The moment the cold arrow pierces the flesh, beauty's zenith appears.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "矢が肉体を射抜く電撃的刹那。苦痛と恍惚が火花を散らす瞬間にのみ現出する三島的美のクライマックス。"
     },
     "cafeOrderItem": {
       "itemName": "一矢エスプレッソ",
       "flavorProfile": "Piercing Espresso Shot",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【一矢エスプレッソ】をご賞味ください。」"
+      "dialogueLine": "「心臓を射抜かれたような衝撃が欲しいのだ。極限まで濃く抽出したエスプレッソを！」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3838,19 +3848,29 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "恍惚",
         "reading": "こうこつ",
-        "meaning": "rapture/ecstasy"
+        "meaning": "ecstasy, trance, rapturous aesthetic enchantment"
+      },
+      {
+        "compound": "恍然",
+        "reading": "こうぜん",
+        "meaning": "in an ecstatic trance, suddenly dazed with rapt wonder"
+      },
+      {
+        "compound": "恍惚境",
+        "reading": "こうこつきょう",
+        "meaning": "realm of ecstasy, sublime state of rapture"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「死の痛覚と官能が交錯するとき、青年は恍惚の境地に達した。」",
       "englishTranslation": "When the pang of death and sensuality intertwined, the youth reached ecstasy.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "激痛と快楽の境界が消失し、神秘的な恍惚（エクスタシー）の彼方へと昇華していく心理の極致。"
     },
     "cafeOrderItem": {
       "itemName": "恍惚バニラスフレ",
       "flavorProfile": "Ecstatic Vanilla Soufflé",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【恍惚バニラスフレ】をご賞味ください。」"
+      "dialogueLine": "「痛覚と陶酔が溶け合うあの恍惚の瞬間……焼きたてで甘く膨らんだスフレを味わいたい。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3901,19 +3921,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "自惚れ",
         "reading": "うぬぼれ",
-        "meaning": "enchanted compound"
+        "meaning": "conceit, vanity, narcissism"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「恍惚とした笑みを浮かべたまま、絵の中の聖者は息絶えようとしていた。」",
       "englishTranslation": "Wearing an ecstatic smile, the painted saint seemed about to draw his last breath.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "死の苦悶のさなかに浮かべられた聖者の陶酔的な微笑。死とエロスが合一した美の完成。"
     },
     "cafeOrderItem": {
       "itemName": "恋惚れローズヒップティー",
       "flavorProfile": "Infatuation Rosehip Infusion",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【恋惚れローズヒップティー】をご賞味ください。」"
+      "dialogueLine": "「あの絵の聖者の微笑みに、私は心を奪われてしまった……真紅のローズヒップティーを。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -3963,19 +3983,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "鹿肉",
         "reading": "しかにく",
-        "meaning": "deer compound"
+        "meaning": "venison, deer meat"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「鹿鳴館の華やかな夜会に、時代の光と影が交錯していた。」",
       "englishTranslation": "At the brilliant soiree of Rokumeikan, the era's light and shadows crossed.",
       "sourceWork": "鹿鳴館",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『鹿鳴館』."
+      "contextNote": "『鹿鳴館』。明治の社交界、欧化政策の華麗なる舞踏会の裏で渦巻く政治的謀略と愛憎のメロドラマ。"
     },
     "cafeOrderItem": {
       "itemName": "鹿鳴館ロイヤルミルクティー",
       "flavorProfile": "Rokumeikan Royal Milk Tea",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鹿鳴館ロイヤルミルクティー】をご賞味ください。」"
+      "dialogueLine": "「ワルツの調べが響く舞踏会の夜……舶来の紅茶にミルクを注いだロイヤルミルクティーを。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -4033,19 +4053,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "悲鳴",
         "reading": "ひめい",
-        "meaning": "ring compound"
+        "meaning": "shriek, scream of distress"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「ワルツの旋律の陰で、破滅を告げる銃声が館内に鳴り響いた。」",
       "englishTranslation": "Behind the waltz melody, gunshots heralding doom rang through the hall.",
       "sourceWork": "鹿鳴館",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『鹿鳴館』."
+      "contextNote": "華やかな舞踏会の喧騒と音楽の背後で、冷酷に鳴り響く陰謀と破滅のピストルの銃声。"
     },
     "cafeOrderItem": {
       "itemName": "鈴鳴りマカロン",
       "flavorProfile": "Chiming Bell Macaron",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鈴鳴りマカロン】をご賞味ください。」"
+      "dialogueLine": "「華麗なサロンのざわめきに耳を澄まそう。鈴の音のように可憐な彩りのマカロンを所望する。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -4102,19 +4122,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "館内",
         "reading": "かんない",
-        "meaning": "hall compound"
+        "meaning": "inside the hall, building interior"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「文明開化の象徴たるこの館で、貴族たちの陰謀が渦巻いていた。」",
       "englishTranslation": "In this mansion symbolizing civilization and enlightenment, nobles' plots swirled.",
       "sourceWork": "鹿鳴館",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『鹿鳴館』."
+      "contextNote": "ジョサイア・コンドル設計の鹿鳴館。明治近代化の光彩と、旧武士階級の滅びゆく哀愁が宿る館。"
     },
     "cafeOrderItem": {
       "itemName": "貴賓館スコーン",
       "flavorProfile": "Grand Pavilion Scones",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【貴賓館スコーン】をご賞味ください。」"
+      "dialogueLine": "「文明開化の華やぎを誇る洋館の午後……クロテッドクリームを添えたスコーンを頼むよ。」"
     },
     "gameplayTags": [
       "tier-3",
@@ -4173,19 +4193,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "杞憂",
         "reading": "きゆう",
-        "meaning": "grieve compound"
+        "meaning": "groundless fear, baseless anxiety"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「憂国の情に駆られた青年将校は、大義のために命を捧げる決意を固めた。」",
       "englishTranslation": "Impelled by patriotic grief, the young officer resolved to lay down his life for the cause.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "『憂国』。二・二六事件に際し、友軍相撃を避けるため皇軍への忠義と友情の板挟みとなって割腹を決意する武山中尉。"
     },
     "cafeOrderItem": {
       "itemName": "憂国深煎珈琲",
       "flavorProfile": "Patriot Dark Roast",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【憂国深煎珈琲】をご賞味ください。」"
+      "dialogueLine": "「祖国の行く末を憂え、胸が張り裂けそうだ……覚悟を決めた男の喉を潤す、漆黒の深煎り珈琲を。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4242,19 +4262,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "祖国",
         "reading": "そこく",
-        "meaning": "country compound"
+        "meaning": "fatherland, motherland, homeland"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「国の危急に際し、友軍相撃の事態を避けるため、中尉は自決を選んだ。」",
       "englishTranslation": "In the nation's crisis, to avoid brother troops shooting one another, the lieutenant chose suicide.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "国体の純潔を守り、同胞相撃の惨劇を拒絶して至高の死を選ぶ、武士道と皇国思想の純粋結晶。"
     },
     "cafeOrderItem": {
       "itemName": "皇国菊茶",
       "flavorProfile": "Imperial Chrysanthemum Tea",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【皇国菊茶】をご賞味ください。」"
+      "dialogueLine": "「菊花の御紋に忠誠を誓い、国の弥栄を祈るのみ。清らかな香りの菊茶を一杯所望する。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4309,19 +4329,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "疾奔",
         "reading": "しっぽん",
-        "meaning": "run compound"
+        "meaning": "sprinting at full speed, headlong dash"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「飯沼勲の純粋な狂気は、荒野を疾走する奔馬のように止めようがなかった。」",
       "englishTranslation": "Isao Iinuma's pure madness was unstoppable like runaway horses galloping across wild plains.",
       "sourceWork": "奔馬",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『奔馬』."
+      "contextNote": "『奔馬』。腐敗した財閥要人の暗殺と昭和維新を企てる若き剣士・飯沼勲の、打算を排した純粋無垢な疾走。"
     },
     "cafeOrderItem": {
       "itemName": "奔馬黒糖カヌレ",
       "flavorProfile": "Runaway Horse Canelé",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【奔馬黒糖カヌレ】をご賞味ください。」"
+      "dialogueLine": "「荒野を疾駆する野生馬のように、ただ一途に大義へ突進するのだ！ 濃厚な黒糖カヌレをくれ！」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4378,19 +4398,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "白馬",
         "reading": "はくば",
-        "meaning": "horse compound"
+        "meaning": "white horse, white steed"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「駆ける馬の嘶きのごとく、若者たちの志は闇を切り裂いた。」",
       "englishTranslation": "Like the neighing of a charging steed, the young men's conviction slashed through the dark.",
       "sourceWork": "奔馬",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『奔馬』."
+      "contextNote": "神風連の血を受け継ぐ純粋な蹶起者たち。暗雲立ち込める昭和初期の日本を駆け抜けた若武者たちの魂の象徴。"
     },
     "cafeOrderItem": {
       "itemName": "白馬練り切り",
       "flavorProfile": "White Steed Nerikiri",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【白馬練り切り】をご賞味ください。」"
+      "dialogueLine": "「神前を駆け抜ける神馬の清浄さ……気高く白く仕上げられた練り切りをひとついただこう。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4447,19 +4467,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "暁星",
         "reading": "ぎょうせい",
-        "meaning": "dawn compound"
+        "meaning": "morning star, dawn star, Venus"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「暁の寺の尖塔が、夜明けの光を浴びて金色に輝き始めた。」",
       "englishTranslation": "The spires of the Temple of Dawn began to glow gold bathed in dawn's light.",
       "sourceWork": "暁の寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『暁の寺』."
+      "contextNote": "『暁の寺』。バンコクのチャオプラヤー川沿いにそびえるワット・アルン。熱帯の夜明けの神秘的輝きと輪廻の予感。"
     },
     "cafeOrderItem": {
       "itemName": "暁光チャイ",
       "flavorProfile": "Dawn Spiced Chai",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【暁光チャイ】をご賞味ください。」"
+      "dialogueLine": "「バンコクの川辺で見た、あの燦然たる暁の光……スパイスの薫り立つ熱いチャイを淹れてくれ。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4515,19 +4535,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "鉄拳",
         "reading": "てっけん",
-        "meaning": "iron compound"
+        "meaning": "iron fist, blow of retribution"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「冷たい鉄の重みを通じてのみ、私の肉体は確固たる実在を回復した。」",
       "englishTranslation": "Only through the weight of cold iron did my physical body recover solid reality.",
       "sourceWork": "太陽と鉄",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『太陽と鉄』."
+      "contextNote": "『太陽と鉄』。言葉の腐食に抗し、バーベルという無機質な鉄の重量と格闘することで肉体を彫琢していく自伝的思索。"
     },
     "cafeOrderItem": {
       "itemName": "鉄器点て濃茶",
       "flavorProfile": "Cast-Iron Whisked Koicha",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鉄器点て濃茶】をご賞味ください。」"
+      "dialogueLine": "「言葉に欺かれるな、鉄の無言の重みと対話せよ。南部鉄器の湯で練り上げた、漆黒の濃茶を！」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4584,19 +4604,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "朝陽",
         "reading": "ちょうよう",
-        "meaning": "sun compound"
+        "meaning": "morning sun, rising sun rays"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「太陽の容赦ない光が、青空の下で逞しい肉体を照らし出した。」",
       "englishTranslation": "The sun's merciless glare illuminated the sinewy physique under the blue sky.",
       "sourceWork": "太陽と鉄",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『太陽と鉄』."
+      "contextNote": "蒼白い文弱の青年に死の影と生命の充実をもたらす「太陽」の発見。死と光が一体化する三島独自の太陽信仰。"
     },
     "cafeOrderItem": {
       "itemName": "日輪金柑タルト",
       "flavorProfile": "Solar Kumquat Tart",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【日輪金柑タルト】をご賞味ください。」"
+      "dialogueLine": "「中天に輝く太陽の熱を、この肌に刻みつけたい。黄金の日輪を模した金柑タルトを所望する。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4655,19 +4675,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "丸太",
         "reading": "まるた",
-        "meaning": "great compound"
+        "meaning": "log, rough-hewn timber"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「太陽と死という二つの絶対的な存在が、私の中で結びついた。」",
       "englishTranslation": "Two absolute realities—the sun and death—joined together within me.",
       "sourceWork": "太陽と鉄",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『太陽と鉄』."
+      "contextNote": "古代ギリシャの戦士や日本の武士が共有した、太陽の下での英雄的な死という壮大な宇宙的結合の思想。"
     },
     "cafeOrderItem": {
       "itemName": "太古の蜜酒",
       "flavorProfile": "Primordial Mead Elixir",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【太古の蜜酒】をご賞味ください。」"
+      "dialogueLine": "「太古の昔から男たちが夢見てきた、太陽の下での名誉ある死……琥珀色の蜜酒を一献頼む。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4720,19 +4740,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "骨肉",
         "reading": "こつにく",
-        "meaning": "flesh compound"
+        "meaning": "flesh and blood, blood relations, kin"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「つらつら幼時を思いめぐらすと、私にとっては、言葉の記憶は肉体の記憶よりもはるかに遠くまで遡る。」",
       "englishTranslation": "Recalling my childhood, the memory of words reaches back much further than the memory of flesh.",
       "sourceWork": "太陽と鉄",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『太陽と鉄』."
+      "contextNote": "肉体よりも言葉が先立ってしまった近代知識人の宿命を克服し、遅れてやってきた「肉体の創出」を誓うマニフェスト。"
     },
     "cafeOrderItem": {
       "itemName": "鍛錬黒豆羹",
       "flavorProfile": "Iron-Forged Black Bean Jelly",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【鍛錬黒豆羹】をご賞味ください。」"
+      "dialogueLine": "「弛んだ肉体を鉄で鍛え直し、精神の鎧とするのだ。大粒の黒豆がぎっしり詰まった羊羹をくれ。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4789,19 +4809,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "筋力",
         "reading": "きんりょく",
-        "meaning": "muscle compound"
+        "meaning": "muscular strength, physical power"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「鉄を持ち上げることによって鍛えられた筋肉は、精神の鎧となった。」",
       "englishTranslation": "The muscles forged by lifting iron became the armor of the spirit.",
       "sourceWork": "太陽と鉄",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『太陽と鉄』."
+      "contextNote": "思考の侵蝕を食い止め、自らの存在を外界に向けて主張する防壁としての彫刻的筋肉美の賛歌。"
     },
     "cafeOrderItem": {
       "itemName": "剛健プロテイン甘酒",
       "flavorProfile": "Vigor Protein Amazake",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【剛健プロテイン甘酒】をご賞味ください。」"
+      "dialogueLine": "「日々の鍛錬こそが、揺るぎなき自己を築く。身体を芯から養う剛健なプロテイン甘酒を！」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4859,19 +4879,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "闘魂",
         "reading": "とうこん",
-        "meaning": "soul compound"
+        "meaning": "fighting spirit, warrior soul"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「肉体の滅びとともに、純粋な魂は天へと昇りゆくのだ。」",
       "englishTranslation": "Along with the destruction of the body, the pure soul rises heavenward.",
       "sourceWork": "奔馬",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『奔馬』."
+      "contextNote": "濁世に妥協することなく、自らの肉体を切り裂くことで純白の魂を天へと還そうとする神道・国学の至誠の死生観。"
     },
     "cafeOrderItem": {
       "itemName": "魂結び五平餅",
       "flavorProfile": "Soul-Knot Gohei Mochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【魂結び五平餅】をご賞味ください。」"
+      "dialogueLine": "「我が身は滅びようとも、大和魂は永久に滅びぬ。香ばしい味噌だれを塗った五平餅を頼む。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4929,19 +4949,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "刃物",
         "reading": "はもの",
-        "meaning": "blade compound"
+        "meaning": "edged tool, cutlery, bladed weapon"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「研ぎ澄まされた白刃が、清冽な月光を反射して青白く光った。」",
       "englishTranslation": "The whetted naked blade shone pale blue, reflecting the crisp moonlight.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "鞘から抜かれた日本刀の白刃。一切の虚偽と弁解を断ち切る、冷厳なる審判と死の官能の具現。"
     },
     "cafeOrderItem": {
       "itemName": "白刃切餅",
       "flavorProfile": "Honed Blade Sliced Mochi",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【白刃切餅】をご賞味ください。」"
+      "dialogueLine": "「鞘を払った瞬間の、あの身の引き締まるような冷気……鋭く切り分けた潔い白餅を所望する。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -4998,19 +5018,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "腹背",
         "reading": "ふくはい",
-        "meaning": "belly compound"
+        "meaning": "front and back, belly and back, both flanks"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「正に刀を腹へ突き立てた瞬間、日輪は瞼の裏に赫奕と昇った。」",
       "englishTranslation": "The instant the blade plunged into his belly, the sun disc rose in dazzling radiance behind his eyelids.",
       "sourceWork": "奔馬",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『奔馬』."
+      "contextNote": "『奔馬』結末。実業家・蔵原を刺殺した勲が、断崖の上で肚を決めて短刀を腹へと突き立てる神話的最後。"
     },
     "cafeOrderItem": {
       "itemName": "覚悟の濃黒胡麻団子",
       "flavorProfile": "Resolution Black Sesame Dango",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【覚悟の濃黒胡麻団子】をご賞味ください。」"
+      "dialogueLine": "「腹を据えて事に当たる覚悟ができた。胸の内を黒々と引き締める、濃厚な黒胡麻団子をくれ。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5069,19 +5089,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "親切",
         "reading": "しんせつ",
-        "meaning": "cut compound"
+        "meaning": "kindness, gentleness, cordiality"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「中尉は見事に切腹を遂げ、妻もまた微笑んで夫の後を追った。」",
       "englishTranslation": "The lieutenant accomplished flawless seppuku, and his wife too smiled, following her husband in death.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "『憂国』。軍服の襟元を正し、軍刀で壮絶な割腹を遂げる武山中尉と、頸動脈を突いて殉死する貞淑な妻・麗子の至純の愛。"
     },
     "cafeOrderItem": {
       "itemName": "切腹最中",
       "flavorProfile": "Seppuku Monaka",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【切腹最中】をご賞味ください。」"
+      "dialogueLine": "「武士として恥じぬ最期を遂げようぞ。溢れんばかりの餡を挟んだ、名物の切腹最中を。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5134,19 +5154,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "忠節",
         "reading": "ちゅうせつ",
-        "meaning": "loyalty compound"
+        "meaning": "fealty, unswerving loyalty, steadfast allegiance"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「至誠にして忠義を尽くすことこそ、武士道の至高の美徳であった。」",
       "englishTranslation": "To maintain utmost sincerity and fulfill loyalty was the supreme virtue of Bushido.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "二心なく君主と大義に身命を捧げる「忠」の精神。三島が戦後民主主義の中で失われたと嘆じた絶対的道徳。"
     },
     "cafeOrderItem": {
       "itemName": "至誠忠義緑茶",
       "flavorProfile": "Devotion Sencha",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【至誠忠義緑茶】をご賞味ください。」"
+      "dialogueLine": "「我が心に二心なし。至誠を貫く志士の喉を潤す、一分の曇りもなき緑茶を点ててくれ。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5204,19 +5224,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "車輪",
         "reading": "しゃりん",
-        "meaning": "wheel compound"
+        "meaning": "wheel, vehicle wheel"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「正に刀を腹へ突き立てた瞬間、日輪は瞼の裏に赫奕と昇った。」",
       "englishTranslation": "The instant the blade plunged into his belly, the sun disc rose in dazzling radiance behind his eyelids.",
       "sourceWork": "奔馬",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『奔馬』."
+      "contextNote": "『奔馬』の最終センテンス。刃が肉体を裂いたその刹那、瞼の裏に燦然と昇り輝く黄金の日輪（太陽）。"
     },
     "cafeOrderItem": {
       "itemName": "日輪バウムクーヘン",
       "flavorProfile": "Solar Wheel Baumkuchen",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【日輪バウムクーヘン】をご賞味ください。」"
+      "dialogueLine": "「瞼の裏に昇る赫奕たる日輪の光……幾重もの年輪を描いた黄金のバウムクーヘンを所望する。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5277,19 +5297,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "廻転",
         "reading": "かいてん",
-        "meaning": "revolve compound"
+        "meaning": "revolution, rotation, turning around"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「輪廻の環から解き放たれることを求めつつ、魂は巡り続ける。」",
       "englishTranslation": "Yearning to be freed from the wheel of Samsara, the soul continues to transmigrate.",
       "sourceWork": "豊饒の海",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『豊饒の海』."
+      "contextNote": "清顕から勲へ、勲からジン・ジャンへ、そして透へ……『豊饒の海』全四巻を貫く仏教的カルマと輪廻転生の螺旋。"
     },
     "cafeOrderItem": {
       "itemName": "輪廻渦巻きロール",
       "flavorProfile": "Samsara Swirl Roll Cake",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【輪廻渦巻きロール】をご賞味ください。」"
+      "dialogueLine": "「魂は生と死の環を果てしなく巡る……螺旋を描いて美しく巻かれたロールケーキを味わおう。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5345,12 +5365,12 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       "originalJapanese": "「永遠とは、激しく燃え上がる刹那の火花の中にこそ存在する。」",
       "englishTranslation": "Eternity exists only within the furiously burning spark of the instant.",
       "sourceWork": "金閣寺",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『金閣寺』."
+      "contextNote": "永続する惰性的な生を拒否し、火花のように激しく散る一瞬（刹那）にこそ永遠の絶対美が宿るとする三島哲学。"
     },
     "cafeOrderItem": {
       "itemName": "刹那氷菓子",
       "flavorProfile": "Ephemeral Flash Sorbet",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【刹那氷菓子】をご賞味ください。」"
+      "dialogueLine": "「永遠などいらぬ、今この刹那に命を燃やし尽くしたい！ 口で瞬く間に溶けゆく氷菓子を！」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5409,19 +5429,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "宿泊",
         "reading": "しゅくはく",
-        "meaning": "destiny compound"
+        "meaning": "lodging, staying overnight, accommodation"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「人は誰しも、己の生まれ持った宿命から逃れることはできない。」",
       "englishTranslation": "No man can escape the destiny with which he was born.",
       "sourceWork": "仮面の告白",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『仮面の告白』."
+      "contextNote": "避けがたい運命の引力に抗い、あるいはそれに抱かれて破滅へと向かう人間の悲劇的宿命論。"
     },
     "cafeOrderItem": {
       "itemName": "宿命の深煎りエスプレッソ",
       "flavorProfile": "Fate Double Espresso",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【宿命の深煎りエスプレッソ】をご賞味ください。」"
+      "dialogueLine": "「逃れることのできぬ宿命ならば、真正面から受け止めよう。胃腑に沁みる濃いエスプレッソを。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5480,19 +5500,19 @@ export const MISHIMA_KANJI_CURRICULUM: MishimaKanjiEntry[] = [
       {
         "compound": "使命",
         "reading": "しめい",
-        "meaning": "life compound"
+        "meaning": "mission, calling, life purpose"
       }
     ],
     "literaryQuote": {
       "originalJapanese": "「己の命を捧げることによってのみ、美は完成されるのだ。」",
       "englishTranslation": "Only by dedicating one's life is beauty brought to completion.",
       "sourceWork": "憂国",
-      "contextNote": "Key excerpt demonstrating the aesthetic tension and psychological resonance of 『憂国』."
+      "contextNote": "Mishima Curriculum 全80漢字の掉尾。自らの生命を美と大義の祭壇に捧げることで、生の究極の完成を遂げる三島文学の至高の結語。"
     },
     "cafeOrderItem": {
       "itemName": "命の雫玉露",
       "flavorProfile": "Drop-of-Life Gyokuro",
-      "dialogueLine": "「文豪・三島由紀夫の美学を宿した【命の雫玉露】をご賞味ください。」"
+      "dialogueLine": "「命を賭して成すべき大義がある。最後の一滴まで生命の気迫を込めた、至高の玉露を所望いたす。」"
     },
     "gameplayTags": [
       "tier-4",
@@ -5554,4 +5574,9 @@ export function getKanjiByWork(workTitle: string): MishimaKanjiEntry[] {
   return MISHIMA_KANJI_CURRICULUM.filter(
     (k) => k.primaryWork === workTitle || k.allRelatedWorks.includes(workTitle)
   );
+}
+
+export function normalizeReading(reading: string): string {
+  if (!reading) return '';
+  return reading.replace(/[・s]/g, '').trim();
 }
