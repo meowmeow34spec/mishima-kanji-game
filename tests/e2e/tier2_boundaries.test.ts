@@ -83,10 +83,10 @@ describe('Tier 2: Boundary & Corner Cases (10 Tests)', () => {
     expect(Number.isFinite(reward50)).toBe(true);
   });
 
-  it('T2-BND-04: Rush timer underflow (timer at 0.4s penalized by 1.5s clamps to 0.0s)', () => {
+  it.skipIf(!hasGame)('T2-BND-04: Rush timer underflow (timer at 0.4s penalized by 1.5s clamps to 0.0s)', async () => {
     const currentTime = 0.4;
     const penalty = 1.5;
-    const clampedTime = Math.max(0, currentTime - penalty);
+    const clampedTime = await driver.applyRushPenalty(currentTime, penalty);
 
     expect(clampedTime).toBe(0.0);
     expect(clampedTime).not.toBeLessThan(0);
@@ -160,10 +160,12 @@ describe('Tier 2: Boundary & Corner Cases (10 Tests)', () => {
     const rawKunyomi = (kanjiWithDot?.kunyomi || kanjiWithDot?.readings?.kunyomi || [])[0];
     expect(rawKunyomi).toContain('・');
 
-    // Stripped version for matching
-    const stripped = rawKunyomi.replace(/・/g, '');
+    // Call canonical reading normalization helper from curriculum engine
+    const stripped = await driver.normalizeReading(rawKunyomi);
     expect(stripped).not.toContain('・');
     expect(stripped.length).toBeLessThan(rawKunyomi.length);
+    // Verify that the original entry preserves the delimiter for display
+    expect(rawKunyomi).toContain('・');
   });
 
   it.skipIf(!hasSrs)('T2-BND-10: Daily review launched with 0 due cards enters free practice or informs user', async () => {

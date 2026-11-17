@@ -1,36 +1,152 @@
+/**
+ * Salon Mishima - Showa Kissaten Aesthetic Style System Variables
+ * File: src/styles/variables.css (Proposed Architecture)
+ * Designed by Explorer 3 (Showa Kissaten Aesthetics & CSS Architect)
+ */
+
 :root {
-  /* Palette: Showa Kissaten & Mishima Aesthetic */
-  --color-lacquer-dark: #181514;
-  --color-lacquer-deep: #12100f;
-  --color-wood-mahogany: #2b1810;
-  --color-wood-amber: #4a2912;
-  --color-gold-burnished: #d4af37;
-  --color-gold-light: #f3e5ab;
-  --color-washi-bg: #f7f4ec;
-  --color-washi-card: #fffdfa;
-  --color-washi-dim: #e8e3d5;
-  --color-ink-primary: #1a1817;
-  --color-ink-secondary: #4a453f;
-  --color-ink-muted: #7d756b;
-  --color-crimson-seal: #9e2a2b;
-  --color-crimson-bright: #c1121f;
-  --color-jade-green: #2a4d38;
-  --color-velvet-green: #1a3024;
+  /* =========================================================================
+     1. Lacquer Darks & Polished Hardwoods (漆黒 & 銘木)
+     ========================================================================= */
+  --color-lacquer: #181514;          /* Pure Japanese Black Lacquer (Urushi) */
+  --color-lacquer-deep: #100e0d;     /* Deepest under-counter shadow */
+  --color-lacquer-surface: #24201e;  /* Elevated panel surface */
+  --color-mahogany: #2c1810;         /* Polished Aged Mahogany wood */
+  --color-counter: #3d2314;          /* Main Kissaten Serving Counter rail */
+  --color-wood-amber: #5a2e14;       /* Warm illuminated wood grain highlight */
+  --color-wood-grain: #452615;       /* 3D wooden block base tone */
 
-  /* Typography */
-  --font-serif: "Shippori Mincho", "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  /* Backwards compatibility aliases */
+  --color-lacquer-dark: var(--color-lacquer);
+  --color-wood-mahogany: var(--color-mahogany);
+
+  /* =========================================================================
+     2. Burnished Gold & Brass Inlays (沈金 & 真鍮)
+     ========================================================================= */
+  --color-gold: #d4af37;             /* Burnished Gold leaf (Chinkin) */
+  --color-gold-light: #f3e5ab;       /* Radiant gold highlight / illuminated edge */
+  --color-gold-dark: #aa820a;        /* Antique aged brass shadow */
+  --color-gold-glow: rgba(212, 175, 55, 0.45);
+  --color-gold-border: rgba(212, 175, 55, 0.4);
+
+  /* Backwards compatibility alias */
+  --color-gold-burnished: var(--color-gold);
+
+  /* =========================================================================
+     3. Washi Paper & Calligraphic Inks (和紙 & 墨汁)
+     ========================================================================= */
+  --color-washi: #f7f4ec;            /* Handcrafted Mulberry Washi paper */
+  --color-washi-dim: #e8e2d5;        /* Aged tea-stained washi parchment */
+  --color-washi-card: #fffdf9;       /* Bright celebratory card washi */
+  --color-ink: #1a1614;              /* Deep pine-soot calligraphy ink */
+  --color-ink-primary: #1a1817;      /* Primary text on light paper */
+  --color-ink-secondary: #4a453f;    /* Secondary text / annotations */
+  --color-ink-muted: #7d756b;        /* Subdued text / furigana */
+
+  /* Backwards compatibility aliases */
+  --color-washi-bg: var(--color-washi);
+
+  /* =========================================================================
+     4. Vermilion Seals & Urgent Crimson (朱印 & 紅蓮)
+     ========================================================================= */
+  --color-crimson: #9e2a2b;          /* Traditional Vermilion Seal Stamp (Hanko) */
+  --color-seal: #ba181b;             /* Vibrant cinnabar seal ink */
+  --color-crimson-bright: #e63946;   /* Rush mode urgency & penalty flash */
+  --color-seal-dark: #7d1012;        /* Deep claret shadow / boss duel dark */
+  --glow-crimson: 0 0 18px rgba(186, 24, 27, 0.6);
+
+  /* Backwards compatibility alias */
+  --color-crimson-seal: var(--color-crimson);
+
+  /* =========================================================================
+     5. Emerald Velvet & Matcha Jade (ビロード & 抹茶翡翠)
+     ========================================================================= */
+  --color-velvet: #1b4332;           /* Deep Kissaten Velvet Booth Green */
+  --color-emerald: #2d6a4f;          /* Rich Matcha Jade */
+  --color-velvet-dark: #132a20;      /* Dark booth recess */
+  --color-emerald-light: #52b788;    /* Correct match celebration green */
+  --color-emerald-tint: rgba(45, 106, 79, 0.25);
+
+  /* Backwards compatibility aliases */
+  --color-velvet-green: var(--color-velvet);
+  --color-jade-green: var(--color-emerald);
+
+  /* =========================================================================
+     6. Deep Blackboard Darks & Chalk (黒板 & 白墨)
+     ========================================================================= */
+  --color-slate: #22252a;            /* Deep blackboard charcoal slate */
+  --color-chalkboard: #1c2b22;       /* Classic dark green kissaten menu slate */
+  --color-chalk: #f4f4f2;            /* Soft white calcium chalk */
+  --color-chalk-yellow: #fff3b0;     /* Pastel yellow highlight chalk */
+  --color-chalk-dim: #bfbfb8;        /* Weathered erased chalk dust */
+
+  /* =========================================================================
+     7. Curriculum Tier Thematic Colors (四重文学階層)
+     ========================================================================= */
+  --tier-1-color: #d4af37;           /* Tier 1: 金閣の炎 (Golden Pavilion - Gold) */
+  --tier-2-color: #1d4e89;           /* Tier 2: 潮騒の海 (Sound of Waves - Ocean) */
+  --tier-3-color: #2d6a4f;           /* Tier 3: 春雪の幽玄 (Spring Snow - Emerald) */
+  --tier-4-color: #9e2a2b;           /* Tier 4: 奔馬の志・鉄 (Sun & Steel - Crimson) */
+  --tier-boss-color: #7d1012;        /* Boss: 宿敵決闘 (Confusing Kanji Duel) */
+
+  /* =========================================================================
+     8. Showa Typography & Font Hierarchy (昭和活字組版)
+     ========================================================================= */
+  --font-serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "Courier New", "Consolas", monospace;
 
-  /* Elevation & Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.18);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.28);
-  --shadow-gold: 0 0 16px rgba(212, 175, 55, 0.35);
+  /* Type Scale */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-md: 1.125rem;   /* 18px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 1.875rem;  /* 30px */
+  --font-size-3xl: 2.25rem;   /* 36px */
+  --font-size-4xl: 3rem;      /* 48px */
+  --font-size-kanji: 4.5rem;  /* 72px - Reveal Modal Glyph */
 
-  /* Borders & Radius */
+  /* =========================================================================
+     9. Tactile Depth & 3D Lighting Shadows (陰影礼賛)
+     ========================================================================= */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(212, 175, 55, 0.25);
+  --shadow-gold: 0 0 16px rgba(212, 175, 55, 0.4);
+  --shadow-crimson: 0 0 20px rgba(186, 24, 27, 0.5);
+
+  /* 3D Wooden Block Physical Elevation */
+  --shadow-block: 0 6px 0 #180c05, 0 10px 15px rgba(0, 0, 0, 0.6), inset 0 2px 3px rgba(255, 230, 180, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-block-hover: 0 10px 0 #180c05, 0 14px 20px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.5);
+  --shadow-block-active: 0 3px 0 #180c05, 0 5px 8px rgba(0, 0, 0, 0.5);
+
+  /* =========================================================================
+     10. Borders & Lacquer Inlays (金縁・枠取)
+     ========================================================================= */
   --border-gold: 1px solid rgba(212, 175, 55, 0.4);
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --border-gold-double: 3px double rgba(212, 175, 55, 0.7);
+  --border-gold-bright: 2px solid #d4af37;
+  --border-wood: 2px solid #3d2314;
+  --border-lacquer: 2px solid #181514;
+  --border-tray-empty: 2px dashed rgba(212, 175, 55, 0.6);
+
+  /* =========================================================================
+     11. Radii & Dimensions (丸みと間)
+     ========================================================================= */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* =========================================================================
+     12. Transitions & Timings (挙動速度)
+     ========================================================================= */
+  --trans-fast: 0.15s ease;
+  --trans-normal: 0.25s ease;
+  --trans-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

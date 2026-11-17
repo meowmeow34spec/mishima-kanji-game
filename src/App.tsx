@@ -1,65 +1,190 @@
-import React, { useState } from 'react';
-import { Coffee, Flame, Sparkles } from 'lucide-react';
+/**
+ * Salon Mishima - Root Application Component & Mode Router
+ * File: src/App.tsx
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Coffee, Flame, Coins, BookOpen, Settings, Volume2, VolumeX } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useGameState, useGameDispatch } from './hooks/useGameState';
+import { getAllKanji } from './data/mishimaCurriculum';
+import { recordDailyLogin } from './srs/storageManager';
+import { setAudioMuted, setAudioVolume, isAudioMuted } from './audio/soundSynthesizer';
+import { setSpeechEnabled } from './audio/speechSynthesizer';
+
+import { TitleScreen } from './components/TitleScreen';
+import { SalonMap } from './components/SalonMap';
+import { SalonCounter } from './components/SalonCounter';
+import { WordRevealModal } from './components/WordRevealModal';
+import { BossArena } from './components/BossArena';
+import { RushOverlay } from './components/RushOverlay';
+import { StudyCodexModal } from './components/StudyCodexModal';
+import { DailyReviewModal } from './components/DailyReviewModal';
+import { SettingsModal } from './components/SettingsModal';
 
 export const App: React.FC = () => {
-  const [coins, setCoins] = useState(100);
+  const state = useGameState();
+  const dispatch = useGameDispatch();
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [muted, setMuted] = useState<boolean>(() => isAudioMuted());
 
-  const handleCelebrate = () => {
-    confetti({
-      particleCount: 40,
-      spread: 60,
-      origin: { y: 0.8 },
-    });
-    setCoins((c) => c + 10);
+  // Initialize daily login streak & audio settings on mount
+  useEffect(() => {
+    try {
+      const updated = recordDailyLogin();
+      if (updated.audioSettings) {
+        setAudioMuted(Boolean(updated.audioSettings.muted));
+        setAudioVolume(updated.audioSettings.sfxVolume ?? 0.8);
+        setMuted(Boolean(updated.audioSettings.muted));
+      }
+      setSpeechEnabled(updated.settings?.voiceEnabled ?? true);
+      dispatch({ type: 'UPDATE_PROFILE', payload: updated });
+    } catch {
+      // Safe fallback in isolated environments
+    }
+  }, [dispatch]);
+
+  // Celebratory confetti on boss victory or stage completion
+  useEffect(() => {
+    if (state.bossState?.isDefeated || state.isLevelComplete) {
+      try {
+        const canUseCanvas =
+          typeof document !== 'undefined' &&
+          typeof document.createElement === 'function' &&
+          Boolean(document.createElement('canvas')?.getContext?.('2d'));
+        if (canUseCanvas) {
+          confetti({
+            particleCount: 55,
+            spread: 70,
+            origin: { y: 0.7 },
+          });
+        }
+      } catch {
+        // Canvas may be unavailable in jsdom or headless environments
+      }
+    }
+  }, [state.bossState?.isDefeated, state.isLevelComplete]);
+
+  const handleQuickMuteToggle = () => {
+    const nextMuted = !muted;
+    setMuted(nextMuted);
+    setAudioMuted(nextMuted);
+    if (state.profile) {
+      dispatch({
+        type: 'UPDATE_PROFILE',
+        payload: {
+          audioSettings: {
+            muted: nextMuted,
+            sfxVolume: state.profile.audioSettings?.sfxVolume ?? 0.8,
+            bgmVolume: state.profile.audioSettings?.bgmVolume ?? 0.5,
+          },
+        },
+      });
+    }
   };
 
-  return (
-    <div style={{ padding: '2rem', textAlign: 'center', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <header style={{ marginBottom: '2rem' }}>
-        <h1 style={{ color: 'var(--color-gold-burnished)', fontSize: '2.75rem', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-          サロン三島
-        </h1>
-        <p style={{ color: 'var(--color-washi-dim)', letterSpacing: '0.12em', fontSize: '1.1rem' }}>
-          Yukio Mishima Literary Kanji Learning Game
-        </p>
-      </header>
+  const streak = state.profile?.streak ?? 1;
+  const allKanji = getAllKanji();
 
-      <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', background: 'rgba(255,255,255,0.03)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: 'var(--border-gold)' }}>
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Coffee size={22} color="var(--color-gold-burnished)" />
-            <span style={{ fontSize: '1.15rem' }}>所持金: {coins} 銭</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Flame size={22} color="var(--color-crimson-bright)" />
-            <span style={{ fontSize: '1.15rem' }}>連続: 1 日</span>
-          </div>
+  return (
+    <div id="salon-mishima-app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Persistent Showa Top HUD */}
+      <header className="salon-hud" data-testid="salon-hud">
+        <div
+          className="salon-hud-brand"
+          style={{ cursor: 'pointer' }}
+          onClick={() => dispatch({ type: 'RETURN_TO_TITLE' })}
+        >
+          <Coffee size={22} color="var(--color-gold-light)" />
+          <span className="salon-hud-title">サロン三島 (Salon Mishima)</span>
         </div>
 
-        <button
-          onClick={handleCelebrate}
-          style={{
-            marginTop: '0.5rem',
-            padding: '0.85rem 1.75rem',
-            backgroundColor: 'var(--color-gold-burnished)',
-            color: 'var(--color-lacquer-dark)',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 'bold',
-            fontSize: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            boxShadow: 'var(--shadow-gold)',
-            transition: 'transform 0.15s ease, background-color 0.15s ease',
-          }}
-          onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
-          onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-        >
-          <Sparkles size={18} />
-          <span>注文を給仕する (Serve Order)</span>
-        </button>
+        <div className="salon-hud-stats">
+          <div className="stat-badge stat-badge--coins" data-testid="hud-coins">
+            <Coins size={15} />
+            <span>{state.coins} 銭</span>
+          </div>
+
+          <div className="stat-badge stat-badge--streak" data-testid="hud-streak">
+            <Flame size={15} />
+            <span>{streak} 日</span>
+          </div>
+
+          <button
+            type="button"
+            className="btn-icon"
+            aria-label="Open Study Codex"
+            title="三島漢字録 (Study Codex)"
+            onClick={() => dispatch({ type: 'OPEN_CODEX' })}
+          >
+            <BookOpen size={18} />
+          </button>
+
+          <button
+            type="button"
+            className="btn-icon"
+            aria-label={muted ? 'Unmute Audio' : 'Mute Audio'}
+            title={muted ? '消音解除' : '消音'}
+            onClick={handleQuickMuteToggle}
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+
+          <button
+            type="button"
+            className="btn-icon"
+            aria-label="Open Settings"
+            title="設定 (Settings)"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <Settings size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* Active Mode Screen */}
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {state.mode === 'title' && (
+          <TitleScreen onOpenSettings={() => setSettingsOpen(true)} />
+        )}
+
+        {(state.mode === 'map' || state.mode === 'codex' || state.mode === 'review') && (
+          <SalonMap onOpenSettings={() => setSettingsOpen(true)} />
+        )}
+
+        {state.mode === 'lesson' && <SalonCounter />}
+
+        {state.mode === 'boss' && <BossArena />}
+
+        {state.mode === 'rush' && <RushOverlay />}
       </main>
+
+      {/* Global Overlays & Modals */}
+      <WordRevealModal
+        isOpen={Boolean(state.revealKanji)}
+        kanji={state.revealKanji}
+        onClose={() => dispatch({ type: 'DISMISS_REVEAL' })}
+      />
+
+      <StudyCodexModal
+        isOpen={state.mode === 'codex'}
+        kanjiList={allKanji}
+        onClose={() => dispatch({ type: 'CLOSE_CODEX' })}
+      />
+
+      <DailyReviewModal
+        isOpen={state.mode === 'review'}
+        profile={state.profile}
+        onClose={() => dispatch({ type: 'CLOSE_REVIEW' })}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => {
+          setSettingsOpen(false);
+          setMuted(isAudioMuted());
+        }}
+      />
     </div>
   );
 };

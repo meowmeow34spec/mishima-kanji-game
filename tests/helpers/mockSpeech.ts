@@ -8,6 +8,7 @@ import {
   spokenUtterances,
   mockSpeechSynthesis,
   MockSpeechSynthesisUtterance,
+  getActiveUtterance,
 } from '../setup';
 
 export function getSpokenUtterances(): MockSpeechSynthesisUtterance[] {
@@ -21,6 +22,10 @@ export function getLastSpokenUtterance(): MockSpeechSynthesisUtterance | undefin
 export function getLastSpokenText(): string | undefined {
   const last = getLastSpokenUtterance();
   return last?.text;
+}
+
+export function getActiveUtteranceInstance(): MockSpeechSynthesisUtterance | null {
+  return getActiveUtterance();
 }
 
 export function assertSpoken(expectedText: string, expectedLang: string = 'ja-JP'): void {
@@ -38,6 +43,15 @@ export function assertSpoken(expectedText: string, expectedLang: string = 'ja-JP
 export function assertSpeechCancelled(): void {
   expect(mockSpeechSynthesis.cancel).toHaveBeenCalled();
   expect(mockSpeechSynthesis.speaking).toBe(false);
+  expect(getActiveUtterance()).toBeNull();
+}
+
+export function assertSpeechActive(): void {
+  expect(mockSpeechSynthesis.speaking).toBe(true);
+}
+
+export function assertSpeechPaused(): void {
+  expect(mockSpeechSynthesis.paused).toBe(true);
 }
 
 export function resetSpeechMocks(): void {

@@ -19,6 +19,7 @@ import {
   assertSoundDispatched,
   assertAudioMuted,
   getCreatedOscillators,
+  getLastCreatedOscillator,
   resetAudioMocks,
 } from '../helpers/mockAudio';
 import {
@@ -173,21 +174,38 @@ describe('Tier 3: Cross-Feature Interactions (6 Tests)', () => {
     'T3-INT-04: Audio State Transitions (Title -> Map [Salon BGM] -> Counter [Bell] -> Boss [Boss BGM])',
     async () => {
       // 1. Enter Map -> Start Salon BGM
+      const initialOscCount = getCreatedOscillators().length;
       await driver.startBgm('salon');
-      expect(true).toBe(true);
+      const oscsAfterSalon = getCreatedOscillators();
+      expect(oscsAfterSalon.length).toBeGreaterThan(initialOscCount);
+      const salonOsc = getLastCreatedOscillator();
+      expect(salonOsc).toBeDefined();
+      expect(salonOsc?.start).toHaveBeenCalled();
+      expect(salonOsc?.stop).not.toHaveBeenCalled();
 
-      // 2. Counter Arrival -> Sound effect
+      // 2. Counter Arrival -> Procedural bell chime SFX
       await driver.playSound('bell');
       assertSoundDispatched();
+      const bellOsc = getLastCreatedOscillator();
+      expect(bellOsc).toBeDefined();
+      expect(bellOsc?.start).toHaveBeenCalled();
 
       // 3. Enter Boss Duel -> Stop salon BGM, Start Boss BGM
       await driver.stopBgm();
-      await driver.startBgm('boss');
-      expect(true).toBe(true);
+      expect(salonOsc?.stop).toHaveBeenCalled();
 
-      // 4. End battle
+      const preBossOscCount = getCreatedOscillators().length;
+      await driver.startBgm('boss');
+      const oscsAfterBoss = getCreatedOscillators();
+      expect(oscsAfterBoss.length).toBeGreaterThan(preBossOscCount);
+      const bossOsc = getLastCreatedOscillator();
+      expect(bossOsc).toBeDefined();
+      expect(bossOsc?.start).toHaveBeenCalled();
+      expect(bossOsc?.stop).not.toHaveBeenCalled();
+
+      // 4. End battle -> Stop Boss BGM
       await driver.stopBgm();
-      expect(true).toBe(true);
+      expect(bossOsc?.stop).toHaveBeenCalled();
     }
   );
 

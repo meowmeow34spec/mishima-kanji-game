@@ -5578,5 +5578,5 @@ export function getKanjiByWork(workTitle: string): MishimaKanjiEntry[] {
 
 export function normalizeReading(reading: string): string {
   if (!reading) return '';
-  return reading.replace(/[・s]/g, '').trim();
+  return reading.replace(/[・\s]/g, '').trim();
 }

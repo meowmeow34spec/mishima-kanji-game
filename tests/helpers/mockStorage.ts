@@ -12,13 +12,19 @@ export function getStoredRaw(): string | null {
   return localStorage.getItem(STORAGE_KEY);
 }
 
-export function getStoredProfile(): PlayerProfile | null {
+export function getStoredProfile(fallbackToDefault?: false): PlayerProfile | null;
+export function getStoredProfile(fallbackToDefault: true): PlayerProfile;
+export function getStoredProfile(fallbackToDefault: boolean = false): PlayerProfile | null {
   const raw = getStoredRaw();
-  if (!raw) return null;
+  if (!raw) return fallbackToDefault ? createDefaultTestProfile() : null;
   try {
-    return JSON.parse(raw) as PlayerProfile;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return fallbackToDefault ? createDefaultTestProfile() : null;
+    }
+    return parsed as PlayerProfile;
   } catch {
-    return null;
+    return fallbackToDefault ? createDefaultTestProfile() : null;
   }
 }
 

@@ -21,6 +21,7 @@ import {
   assertSoundDispatched,
   assertAudioMuted,
   getCreatedOscillators,
+  getLastCreatedGain,
   resetAudioMocks,
 } from '../helpers/mockAudio';
 import {
@@ -43,6 +44,13 @@ const hasSrs = fs.existsSync(path.join(rootDir, 'src/srs/storageManager.ts'));
 const hasGame = fs.existsSync(path.join(rootDir, 'src/game/gameEngine.ts'));
 const hasUI = fs.existsSync(path.join(rootDir, 'src/App.tsx'));
 const hasDOM = typeof document !== 'undefined';
+const hasReadme = fs.existsSync(path.join(rootDir, 'README.md'));
+const hasServingTray = fs.existsSync(path.join(rootDir, 'src/components/ServingTray.tsx'));
+const hasWordReveal = fs.existsSync(path.join(rootDir, 'src/components/WordRevealModal.tsx'));
+const hasBossArena = fs.existsSync(path.join(rootDir, 'src/components/BossArena.tsx'));
+const hasStudyCodex = fs.existsSync(path.join(rootDir, 'src/components/StudyCodexModal.tsx'));
+const hasSalonMap = fs.existsSync(path.join(rootDir, 'src/components/SalonMap.tsx'));
+const hasSalonCounter = fs.existsSync(path.join(rootDir, 'src/components/SalonCounter.tsx'));
 
 describe('Tier 1: Feature Coverage (37 Tests)', () => {
   beforeEach(() => {
@@ -193,11 +201,12 @@ describe('Tier 1: Feature Coverage (37 Tests)', () => {
     });
 
     it.skipIf(!hasGame)('T1-MEC-06: 25s rush mode timer countdown and -1.5s mistake penalty', async () => {
-      let timeLeft = 25.0;
-      timeLeft -= 1.0; // 1s tick
-      expect(timeLeft).toBe(24.0);
-      timeLeft -= 1.5; // mistake penalty
-      expect(timeLeft).toBe(22.5);
+      const initialTime = 25.0;
+      const afterTick = await driver.tickRushTimer(initialTime, 1.0);
+      expect(afterTick).toBe(24.0);
+
+      const afterPenalty = await driver.applyRushPenalty(afterTick, 1.5);
+      expect(afterPenalty).toBe(22.5);
     });
 
     it.skipIf(!hasGame)('T1-MEC-07: Boss duel round resolution (Boss HP reduction vs Player heart loss)', async () => {
@@ -314,18 +323,11 @@ describe('Tier 1: Feature Coverage (37 Tests)', () => {
         confusion: {},
       });
 
-      const profile = await driver.loadProfile();
-      // When loaded on a new consecutive day, streak increments
-      if (profile.lastLoginDate === today) {
-        expect(profile.streak).toBe(2);
-      } else {
-        // If profile was loaded as yesterday, updating to today increments streak
-        profile.streak += 1;
-        profile.lastLoginDate = today;
-        await driver.saveProfile(profile);
-        const reloaded = await driver.loadProfile();
-        expect(reloaded.streak).toBe(2);
-      }
+      const updated = await driver.recordDailyLogin(today);
+      expect(updated.streak).toBe(2);
+      expect(updated.lastLoginDate).toBe(today);
+      const reloaded = await driver.loadProfile();
+      expect(reloaded.streak).toBe(2);
     });
   });
 
@@ -342,10 +344,34 @@ describe('Tier 1: Feature Coverage (37 Tests)', () => {
     });
 
     it.skipIf(!hasAudio)('T1-AUD-02: Showa jazz ambient BGM and Boss battle BGM scheduling', async () => {
+      const initialOscCount = getCreatedOscillators().length;
+
+      // 1. Start Salon BGM -> Verify oscillator created and started
       await driver.startBgm('salon');
+      const salonOscs = getCreatedOscillators();
+      expect(salonOscs.length).toBeGreaterThan(initialOscCount);
+      const salonOsc = salonOscs[salonOscs.length - 1];
+      expect(salonOsc.start).toHaveBeenCalled();
+      expect(salonOsc.stop).not.toHaveBeenCalled();
+
+      // Verify gain node allocated for ambient BGM
+      const salonGain = getLastCreatedGain();
+      expect(salonGain).toBeDefined();
+
+      // 2. Transition to Boss Battle BGM -> Salon stopped, Boss started
+      const preBossOscCount = salonOscs.length;
       await driver.startBgm('boss');
+      expect(salonOsc.stop).toHaveBeenCalled();
+
+      const bossOscs = getCreatedOscillators();
+      expect(bossOscs.length).toBeGreaterThan(preBossOscCount);
+      const bossOsc = bossOscs[bossOscs.length - 1];
+      expect(bossOsc.start).toHaveBeenCalled();
+      expect(bossOsc.stop).not.toHaveBeenCalled();
+
+      // 3. Stop BGM -> Boss oscillator stopped
       await driver.stopBgm();
-      expect(true).toBe(true);
+      expect(bossOsc.stop).toHaveBeenCalled();
     });
 
     it.skipIf(!hasAudio)('T1-AUD-03: Audio mute setting enforcement (zero audio output when muted)', async () => {
@@ -387,55 +413,167 @@ describe('Tier 1: Feature Coverage (37 Tests)', () => {
       expect(titleElem).toMatch(/サロン三島|三島|Mishima/i);
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-02: SalonMap stage unlock status and star ratings', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      await driver.startShift();
-      const text = document.body.textContent;
-      expect(text).toBeDefined();
+    it.skipIf(!hasSalonMap || !hasDOM)('T1-UI-02: SalonMap stage unlock status and star ratings', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/SalonMap' as any);
+      const SalonMap = mod.default || mod.SalonMap;
+      await driver.renderApp(React.createElement(SalonMap, {
+        unlockedTiers: [1],
+        completedStages: [],
+        onSelectStage: vi.fn(),
+      }));
+      const mapContainer = document.querySelector('[data-testid="salon-map"]');
+      expect(mapContainer).not.toBeNull();
+      const stageButtons = document.querySelectorAll('[data-testid^="stage-btn-"]');
+      expect(stageButtons.length).toBeGreaterThan(0);
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-03: SalonCounter active customer order display and conveyor rail', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      await driver.startShift();
-      await driver.selectTierStage(1, 'stage-1');
-      const text = document.body.textContent;
-      expect(text).toBeDefined();
+    it.skipIf(!hasSalonCounter || !hasDOM)('T1-UI-03: SalonCounter active customer order display and conveyor rail', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/SalonCounter' as any);
+      const SalonCounter = mod.default || mod.SalonCounter;
+      const kanjiList = await driver.getAllKanji();
+      await driver.renderApp(React.createElement(SalonCounter, {
+        activeOrder: {
+          id: 'ord-1',
+          customerName: '有為子',
+          customerAvatar: 'avatar-1',
+          dialogue: '金閣を見せておくれ',
+          targetKanji: kanjiList[0],
+          mode: 'pick',
+          prompt: '金',
+          options: ['金', '銀', '銅', '鉄'],
+          correctOption: '金',
+        },
+      }));
+      expect(document.querySelector('[data-testid="salon-counter"]')).not.toBeNull();
+      expect(document.querySelector('[data-testid="customer-dialogue"]')?.textContent).toContain('金閣');
+      expect(document.querySelector('[data-testid="conveyor-rail"]')).not.toBeNull();
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-04: ServingTray slot rendering and visual placement feedback', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      await driver.startShift();
-      await driver.selectTierStage(1, 'stage-1');
-      expect(document.body).toBeDefined();
+    it.skipIf(!hasServingTray || !hasDOM)('T1-UI-04: ServingTray slot rendering and visual placement feedback', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/ServingTray' as any);
+      const ServingTray = mod.default || mod.ServingTray;
+
+      // Render ServingTray with 2 slots (initial empty state for compound like 金閣)
+      await driver.renderApp(React.createElement(ServingTray, {
+        slots: [null, null],
+        capacity: 2,
+        orderKanji: '金閣',
+      }));
+
+      // 1. Semantic query: Tray container element
+      const trayElem = document.querySelector('[data-testid="serving-tray"]');
+      expect(trayElem).not.toBeNull();
+
+      // 2. Semantic query: Slot count matches capacity (2 slots)
+      const slotElems = document.querySelectorAll('[data-testid^="tray-slot-"]');
+      expect(slotElems.length).toBe(2);
+
+      // 3. Semantic query: Visual outline styling on empty slots
+      slotElems.forEach((slot) => {
+        const classAndStyle = `${slot.getAttribute('class') || ''} ${slot.getAttribute('style') || ''}`;
+        expect(classAndStyle).toMatch(/slot|outline|border|dashed|empty/i);
+      });
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-05: WordRevealModal displaying kanji, reading, and Mishima excerpt quote', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      expect(document.body).toBeDefined();
+    it.skipIf(!hasWordReveal || !hasDOM)('T1-UI-05: WordRevealModal displaying kanji, reading, and Mishima excerpt quote', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/WordRevealModal' as any);
+      const WordRevealModal = mod.default || mod.WordRevealModal;
+      const kanjiList = await driver.getAllKanji();
+      const sampleKanji = kanjiList[0]; // Tier 1 entry (e.g. 金 from 金閣寺)
+
+      await driver.renderApp(React.createElement(WordRevealModal, {
+        isOpen: true,
+        kanji: sampleKanji,
+        onClose: vi.fn(),
+      }));
+
+      // 1. Semantic query: Modal dialog container
+      const modal = document.querySelector('[data-testid="word-reveal-modal"]');
+      expect(modal).not.toBeNull();
+
+      // 2. Semantic query: Character glyph
+      const charElem = document.querySelector('[data-testid="reveal-character"]');
+      expect(charElem).not.toBeNull();
+      expect(charElem?.textContent?.trim()).toBe(sampleKanji.character);
+
+      // 3. Semantic query: Mishima excerpt quote text
+      const quoteElem = document.querySelector('[data-testid="reveal-quote"]');
+      expect(quoteElem).not.toBeNull();
+      expect(quoteElem?.textContent).toContain(sampleKanji.literaryQuote.originalJapanese);
+
+      // 4. Semantic query: Source work title
+      const sourceElem = document.querySelector('[data-testid="reveal-source"]');
+      expect(sourceElem).not.toBeNull();
+      expect(sourceElem?.textContent).toContain(sampleKanji.literaryQuote.sourceWork);
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-06: BossArena Boss HP bar and player heart cups', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      await driver.startShift();
-      await driver.enterBossArena();
-      expect(document.body).toBeDefined();
+    it.skipIf(!hasBossArena || !hasDOM)('T1-UI-06: BossArena Boss HP bar and player heart cups', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/BossArena' as any);
+      const BossArena = mod.default || mod.BossArena;
+
+      await driver.renderApp(React.createElement(BossArena, {
+        bossName: '金閣の幻影',
+        bossHp: 100,
+        maxBossHp: 100,
+        playerHearts: 3,
+        maxHearts: 3,
+        timeLeft: 6.0,
+        currentQuestion: {
+          id: 'bq-1',
+          prompt: 'どちらが「寺」か？',
+          options: ['寺', '侍'],
+          correctAnswer: '寺',
+        },
+        onAnswer: vi.fn(),
+      }));
+
+      // 1. Semantic query: Boss Arena container
+      const arena = document.querySelector('[data-testid="boss-arena"]');
+      expect(arena).not.toBeNull();
+
+      // 2. Semantic query: Boss HP bar with progress value
+      const hpBar = document.querySelector('[data-testid="boss-hp-bar"]');
+      expect(hpBar).not.toBeNull();
+      const hpVal = hpBar?.getAttribute('aria-valuenow') || hpBar?.textContent;
+      expect(hpVal).toMatch(/100/);
+
+      // 3. Semantic query: Player heart cups display (exactly 3 hearts)
+      const heartsContainer = document.querySelector('[data-testid="hearts-display"]');
+      expect(heartsContainer).not.toBeNull();
+      const heartIcons = heartsContainer?.textContent?.match(/❤️|♥|cup/gi) || [];
+      expect(heartIcons.length).toBe(3);
     });
 
-    it.skipIf(!hasUI || !hasDOM)('T1-UI-07: StudyCodexModal 80-kanji grid rendering and search filtering', async () => {
-      const AppMod: any = await import(/* @vite-ignore */ '../../src/App' as any);
-      const App = AppMod.default || AppMod.App;
-      await driver.renderApp(React.createElement(App));
-      expect(document.body).toBeDefined();
+    it.skipIf(!hasStudyCodex || !hasDOM)('T1-UI-07: StudyCodexModal 80-kanji grid rendering and search filtering', async () => {
+      const mod = await import(/* @vite-ignore */ '../../src/components/StudyCodexModal' as any);
+      const StudyCodexModal = mod.default || mod.StudyCodexModal;
+      const kanjiList = await driver.getAllKanji();
+      expect(kanjiList.length).toBe(80);
+
+      const { fireEvent } = await import(/* @vite-ignore */ '@testing-library/react' as any);
+
+      await driver.renderApp(React.createElement(StudyCodexModal, {
+        isOpen: true,
+        kanjiList,
+        onClose: vi.fn(),
+      }));
+
+      // 1. Semantic query: Search filter input
+      const searchInput = document.querySelector<HTMLInputElement>('[data-testid="codex-search-input"]');
+      expect(searchInput).not.toBeNull();
+
+      // 2. Semantic query: 80-kanji grid items count
+      const allCards = document.querySelectorAll('[data-testid^="codex-card-"]');
+      expect(allCards.length).toBe(80);
+
+      // 3. Semantic interaction: Search filter execution
+      if (searchInput && fireEvent) {
+        fireEvent.change(searchInput, { target: { value: '金' } });
+        const filteredCards = document.querySelectorAll('[data-testid^="codex-card-"]');
+        expect(filteredCards.length).toBeGreaterThan(0);
+        expect(filteredCards.length).toBeLessThan(80);
+        expect(filteredCards[0].textContent).toContain('金');
+      }
     });
   });
 
@@ -473,28 +611,24 @@ describe('Tier 1: Feature Coverage (37 Tests)', () => {
       expect(logOutput.length).toBeGreaterThan(0);
     });
 
-    it('T1-GIT-04: Comprehensive README content completeness', () => {
+    it.skipIf(!hasReadme)('T1-GIT-04: Comprehensive README content completeness', () => {
       const readmePath = path.join(rootDir, 'README.md');
-      if (fs.existsSync(readmePath)) {
-        const content = fs.readFileSync(readmePath, 'utf8');
-        expect(content).toMatch(/Yukio Mishima|三島由紀夫/i);
-        expect(content).toMatch(/npm (run dev|test|install)/i);
-      } else {
-        // Verify README is planned in scope
-        expect(true).toBe(true);
-      }
+      expect(fs.existsSync(readmePath)).toBe(true);
+      const content = fs.readFileSync(readmePath, 'utf8');
+      expect(content).toMatch(/Yukio Mishima|三島由紀夫/i);
+      expect(content).toMatch(/npm (run dev|test|install)/i);
+      expect(content).toMatch(/kanji/i);
     });
 
     it('T1-GIT-05: Production build verification (build script configured in package.json)', () => {
       const pkgPath = path.join(rootDir, 'package.json');
-      if (fs.existsSync(pkgPath)) {
-        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-        expect(pkg.scripts).toBeDefined();
-        expect(pkg.scripts.build).toBeDefined();
-        expect(pkg.scripts.test).toBeDefined();
-      } else {
-        expect(true).toBe(true);
-      }
+      expect(fs.existsSync(pkgPath)).toBe(true);
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      expect(pkg.scripts).toBeDefined();
+      expect(pkg.scripts.build).toBeDefined();
+      expect(pkg.scripts.build).toMatch(/vite build/);
+      expect(pkg.scripts.test).toBeDefined();
+      expect(pkg.scripts.test).toMatch(/vitest/);
     });
   });
 });

@@ -16,6 +16,22 @@ import {
 } from './contracts';
 import { getStoredProfile } from './mockStorage';
 
+export interface RushSessionState {
+  initialTime: number;
+  timeLeft: number;
+  hits: number;
+  misses: number;
+  earnedCoins: number;
+  isActive: boolean;
+}
+
+export interface RushSessionConfig {
+  initialTime?: number;
+  correctHits: number;
+  secondsPerHit?: number;
+  coinRewardPerHit?: number;
+}
+
 let testingLibraryCache: any = null;
 async function getTestingLibrary(): Promise<any> {
   if (!testingLibraryCache) {
@@ -81,6 +97,20 @@ export class GameDriver {
     throw new Error('getAllBossPairs implementation not available in src/data/bossPairs');
   }
 
+  async normalizeReading(reading: string): Promise<string> {
+    const currMod = await this.importModuleSafe('../../src/data/mishimaCurriculum');
+    if (currMod && typeof currMod.normalizeReading === 'function') {
+      return currMod.normalizeReading(reading);
+    }
+    const gameMod =
+      (await this.importModuleSafe('../../src/game/matchingEngine')) ||
+      (await this.importModuleSafe('../../src/game/gameEngine'));
+    if (gameMod && typeof gameMod.normalizeReading === 'function') {
+      return gameMod.normalizeReading(reading);
+    }
+    throw new Error('normalizeReading implementation not available in curriculum or game engine');
+  }
+
   // -------------------------------------------------------------------------
   // 3. SRS & Storage Contracts
   // -------------------------------------------------------------------------
@@ -111,6 +141,17 @@ export class GameDriver {
       return mod.recordReviewResult(kanjiId, correct, mistakenOption);
     }
     throw new Error('recordReviewResult implementation not available in src/srs/storageManager');
+  }
+
+  async recordDailyLogin(
+    targetDateOrProfile: string | PlayerProfile,
+    optionalDate?: string
+  ): Promise<PlayerProfile> {
+    const mod = await this.importModuleSafe('../../src/srs/storageManager');
+    if (mod && typeof mod.recordDailyLogin === 'function') {
+      return mod.recordDailyLogin(targetDateOrProfile, optionalDate);
+    }
+    throw new Error('recordDailyLogin implementation not available in src/srs/storageManager');
   }
 
   async promoteCard(card: CardProgress, now?: number): Promise<CardProgress> {
@@ -215,6 +256,45 @@ export class GameDriver {
       return mod.calculateComboReward(combo, baseAward, multiplier);
     }
     throw new Error('calculateComboReward implementation not available in src/game/comboCalculator');
+  }
+
+  async tickRushTimer(currentTime: number, deltaSeconds: number = 1.0): Promise<number> {
+    const mod =
+      (await this.importModuleSafe('../../src/game/rushController')) ||
+      (await this.importModuleSafe('../../src/game/gameEngine'));
+    if (mod && typeof mod.tickRushTimer === 'function') {
+      return mod.tickRushTimer(currentTime, deltaSeconds);
+    }
+    throw new Error('tickRushTimer implementation not available in src/game/rushController or src/game/gameEngine');
+  }
+
+  async applyRushPenalty(currentTime: number, penalty: number = 1.5): Promise<number> {
+    const mod =
+      (await this.importModuleSafe('../../src/game/rushController')) ||
+      (await this.importModuleSafe('../../src/game/gameEngine'));
+    if (mod && typeof mod.applyRushPenalty === 'function') {
+      return mod.applyRushPenalty(currentTime, penalty);
+    }
+    throw new Error('applyRushPenalty implementation not available in src/game/rushController or src/game/gameEngine');
+  }
+
+  async runRushSession(config: RushSessionConfig): Promise<RushSessionState> {
+    const mod =
+      (await this.importModuleSafe('../../src/game/rushController')) ||
+      (await this.importModuleSafe('../../src/game/gameEngine'));
+    if (mod && typeof mod.runRushSession === 'function') {
+      return mod.runRushSession(config);
+    }
+    if (mod && typeof mod.startRushSession === 'function' && typeof mod.recordRushHit === 'function') {
+      let session = mod.startRushSession(config.initialTime ?? 25.0);
+      const step = config.secondsPerHit ?? 1.0;
+      const reward = config.coinRewardPerHit ?? 15;
+      for (let r = 0; r < config.correctHits; r++) {
+        session = mod.recordRushHit(session, true, step, reward);
+      }
+      return session;
+    }
+    throw new Error('runRushSession implementation not available in src/game/rushController or src/game/gameEngine');
   }
 
   async resolveBossRound(

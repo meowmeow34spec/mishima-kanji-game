@@ -77,20 +77,18 @@ describe('Tier 4: Real-World Workload Scenarios (5 Comprehensive Scenarios)', ()
       expect(combo).toBe(6);
       expect(earnedCoins).toBeGreaterThan(300);
 
-      // 5. Simulate 25s Rush Mode execution with fake timers
+      // 5. Execute 25s Rush Mode via GameDriver / RushController
       vi.useFakeTimers();
-      let rushTimeLeft = 25.0;
-      let rushHits = 0;
-
-      // 10 rapid correct hits during rush
-      for (let r = 0; r < 10; r++) {
-        rushTimeLeft -= 1.0;
-        vi.advanceTimersByTime(1000);
-        rushHits++;
-        earnedCoins += 15;
-      }
-      expect(rushHits).toBe(10);
-      expect(rushTimeLeft).toBe(15.0);
+      const rushResult = await driver.runRushSession({
+        initialTime: 25.0,
+        correctHits: 10,
+        secondsPerHit: 1.0,
+        coinRewardPerHit: 15,
+      });
+      vi.advanceTimersByTime(10000);
+      expect(rushResult.hits).toBe(10);
+      expect(rushResult.timeLeft).toBe(15.0);
+      earnedCoins += rushResult.earnedCoins;
       vi.useRealTimers();
 
       // 6. Complete stage: Award 3 stars, save stage completion and SRS cards
@@ -278,33 +276,20 @@ describe('Tier 4: Real-World Workload Scenarios (5 Comprehensive Scenarios)', ()
       await driver.saveProfile(profile);
       expect(profile.streak).toBe(1);
 
-      // Helper function simulating daily streak update logic
-      const processDailyLogin = (prof: PlayerProfile, todayDate: string) => {
-        const last = new Date(prof.lastLoginDate);
-        const current = new Date(todayDate);
-        const diffDays = Math.round((current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-          prof.streak += 1;
-        } else if (diffDays > 1) {
-          prof.streak = 1; // Streak reset due to missed day
-        }
-        prof.lastLoginDate = todayDate;
-      };
-
       // Day 2 ("2026-11-17"): Consecutive login -> Streak = 2
-      processDailyLogin(profile, '2026-11-17');
-      await driver.saveProfile(profile);
+      profile = await driver.recordDailyLogin('2026-11-17');
       expect(profile.streak).toBe(2);
+      expect(profile.lastLoginDate).toBe('2026-11-17');
 
       // Day 3 ("2026-11-18"): Consecutive login -> Streak = 3
-      processDailyLogin(profile, '2026-11-18');
-      await driver.saveProfile(profile);
+      profile = await driver.recordDailyLogin('2026-11-18');
       expect(profile.streak).toBe(3);
+      expect(profile.lastLoginDate).toBe('2026-11-18');
 
       // Day 5 ("2026-11-20"): Skipped Day 4 (gap = 2 days) -> Streak resets to 1
-      processDailyLogin(profile, '2026-11-20');
-      await driver.saveProfile(profile);
+      profile = await driver.recordDailyLogin('2026-11-20');
+      expect(profile.streak).toBe(1);
+      expect(profile.lastLoginDate).toBe('2026-11-20');
 
       const reloaded = await driver.loadProfile();
       expect(reloaded.streak).toBe(1);

@@ -1,18 +1,37 @@
+/**
+ * Salon Mishima - Showa Kissaten Complete CSS Architecture
+ * File: src/styles/salon.css (Proposed Architecture)
+ * Designed by Explorer 3 (Showa Kissaten Aesthetics & CSS Architect)
+ */
+
 @import './variables.css';
 
-* {
+/* =========================================================================
+   1. Reset & Global Base
+   ========================================================================= */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-serif);
-  background-color: var(--color-lacquer-dark);
-  color: var(--color-washi-bg);
-  min-height: 100vh;
-  overflow-x: hidden;
+  background-color: var(--color-lacquer);
+  color: var(--color-washi);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(ellipse at 50% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 10% 90%, rgba(44, 24, 16, 0.5) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 #root {
@@ -21,9 +40,1084 @@ body {
   flex-direction: column;
 }
 
+/* Custom Showa Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-lacquer-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-counter);
+  border: 1px solid var(--color-gold-dark);
+  border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wood-amber);
+}
+
+/* Base Interactive Elements */
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
   outline: none;
+  background: transparent;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--trans-fast), box-shadow var(--trans-fast), background-color var(--trans-fast);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}
+
+/* =========================================================================
+   2. Showa Button System
+   ========================================================================= */
+.btn-gold {
+  background: linear-gradient(180deg, var(--color-gold-light) 0%, var(--color-gold) 60%, var(--color-gold-dark) 100%);
+  color: var(--color-lacquer);
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--color-gold-light);
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-gold:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 0 16px var(--color-gold-glow);
+  transform: translateY(-2px);
+}
+
+.btn-gold:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.btn-lacquer {
+  background: linear-gradient(180deg, #2a221f 0%, var(--color-lacquer) 100%);
+  color: var(--color-gold-light);
+  border: 1px solid var(--color-gold-border);
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-lacquer:hover {
+  border-color: var(--color-gold);
+  background: linear-gradient(180deg, #382c28 0%, #1e1917 100%);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+}
+
+.btn-crimson {
+  background: linear-gradient(180deg, var(--color-seal) 0%, var(--color-crimson) 100%);
+  color: var(--color-washi);
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(158, 42, 43, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-crimson:hover {
+  box-shadow: 0 0 16px var(--color-crimson);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-lacquer-surface);
+  border: 1px solid var(--color-gold-border);
+  color: var(--color-gold-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-icon:hover {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 10px var(--color-gold-glow);
+  transform: scale(1.05);
+}
+
+/* =========================================================================
+   3. Top HUD & Navigation Bar
+   ========================================================================= */
+.salon-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(180deg, rgba(24, 21, 20, 0.95) 0%, rgba(16, 14, 13, 0.85) 100%);
+  border-bottom: 1px solid var(--color-gold-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.salon-hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.salon-hud-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-gold-light);
+  letter-spacing: 0.12em;
+}
+
+.salon-hud-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-washi);
+}
+
+.stat-badge--coins {
+  border-color: rgba(212, 175, 55, 0.5);
+  color: var(--color-gold-light);
+}
+
+.stat-badge--streak {
+  border-color: rgba(230, 57, 70, 0.5);
+  color: #ff9e9d;
+}
+
+/* =========================================================================
+   4. Title Screen (Screen 1)
+   ========================================================================= */
+.title-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.title-crest {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-counter) 0%, var(--color-lacquer-deep) 100%);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.3), inset 0 0 15px rgba(212, 175, 55, 0.2);
+  position: relative;
+}
+
+.title-crest::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 1px dashed rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-full);
+}
+
+.title-main-banner {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--color-gold-light);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.title-subtitle {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  color: var(--color-washi-dim);
+  letter-spacing: 0.22em;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.title-shift-card {
+  background: rgba(36, 32, 30, 0.7);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 3rem;
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.title-mastery-stats {
+  display: flex;
+  gap: 2rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-washi-dim);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  padding-top: 1.25rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* =========================================================================
+   5. Salon Map & Stage Selection (Screen 2)
+   ========================================================================= */
+.salon-map {
+  flex: 1;
+  padding: 2rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.map-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.map-header-title {
+  color: var(--color-gold-light);
+  font-size: var(--font-size-2xl);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.map-tier-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.tier-section {
+  background: rgba(36, 32, 30, 0.55);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.tier-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--tier-accent-color, var(--color-gold));
+}
+
+.tier-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  padding-bottom: 0.75rem;
+}
+
+.tier-section-title {
+  font-size: var(--font-size-xl);
+  color: var(--color-gold-light);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.25rem;
+}
+
+.stage-btn {
+  background: linear-gradient(180deg, #3d2314 0%, #24140b 100%);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-washi);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.stage-btn:hover:not(:disabled) {
+  border-color: var(--color-gold);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5), 0 0 12px var(--color-gold-glow);
+}
+
+.stage-btn--boss {
+  background: linear-gradient(180deg, #4a0e11 0%, #2b080a 100%);
+  border-color: rgba(230, 57, 70, 0.6);
+}
+
+.stage-btn--boss:hover:not(:disabled) {
+  border-color: var(--color-crimson-bright);
+  box-shadow: 0 0 16px rgba(230, 57, 70, 0.6);
+}
+
+.stage-btn--locked {
+  opacity: 0.55;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
+}
+
+.stage-kanji-preview {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  line-height: 1.2;
+}
+
+.stage-stars {
+  color: var(--color-gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+}
+
+/* =========================================================================
+   6. Cafe Counter Gameplay (Screen 3)
+   ========================================================================= */
+.salon-counter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1rem 1.5rem 2rem;
+  gap: 1.25rem;
+}
+
+/* Blackboard Order Board */
+.blackboard-order {
+  background: linear-gradient(135deg, var(--color-chalkboard) 0%, var(--color-slate) 100%);
+  border: 6px solid #3d2314;
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.75rem;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), var(--shadow-md);
+  position: relative;
+}
+
+.blackboard-title {
+  color: var(--color-chalk-yellow);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 3px rgba(255, 243, 176, 0.4);
+  margin-bottom: 0.5rem;
+}
+
+.blackboard-prompt {
+  color: var(--color-chalk);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Customer Area & Speech Bubble */
+.customer-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.patron-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-gold);
+  background: radial-gradient(circle, #3d2314 0%, #181514 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+  flex-shrink: 0;
+}
+
+.customer-speech-bubble {
+  background: var(--color-washi);
+  color: var(--color-ink);
+  border: 1px solid var(--color-washi-dim);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  max-width: 650px;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.customer-speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--color-washi);
+}
+
+/* =========================================================================
+   7. Multi-Slot Serving Tray (Test Requirement T1-UI-04)
+   ========================================================================= */
+.serving-tray {
+  background: linear-gradient(180deg, #2b1810 0%, #1a0e08 100%);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7), var(--shadow-md);
+  position: relative;
+}
+
+.tray-title {
+  font-size: var(--font-size-sm);
+  color: var(--color-gold-light);
+  letter-spacing: 0.15em;
+}
+
+.tray-slots-row {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Empty slot styling satisfies test T1-UI-04 regex: /slot|outline|border|dashed|empty/i */
+.tray-slot {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  transition: all var(--trans-normal);
+  position: relative;
+}
+
+.tray-slot--empty,
+.tray-slot-empty {
+  border: 2px dashed rgba(212, 175, 55, 0.6);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.tray-slot--filled,
+.tray-slot-filled {
+  border: 2px solid var(--color-gold-light);
+  background: linear-gradient(135deg, #4a2c1a 0%, #2b1810 100%);
+  color: var(--color-gold-light);
+  box-shadow: var(--shadow-block), 0 0 15px var(--color-gold-glow);
+  animation: slot-drop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* =========================================================================
+   8. 3D Wooden Blocks & Mahogany Conveyor Rail
+   ========================================================================= */
+.conveyor-rail {
+  background: linear-gradient(180deg, #1f0f08 0%, #2c1810 30%, #3d2314 70%, #1f0f08 100%);
+  border-top: 3px solid #5a3018;
+  border-bottom: 3px solid #140904;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1rem;
+  box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.15);
+  position: relative;
+  overflow-x: auto;
+}
+
+.conveyor-track {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 90px;
+}
+
+/* 3D Tactile Wooden Block */
+.wooden-block,
+.conveyor-block {
+  width: 76px;
+  height: 76px;
+  background: linear-gradient(135deg, #50301d 0%, #351c10 50%, #221108 100%);
+  border: 2px solid rgba(212, 175, 55, 0.5);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold-light);
+  font-size: 2.25rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-block);
+  cursor: pointer;
+  user-select: none;
+  transform: translateY(0);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.wooden-block:hover:not(:disabled) {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-block-hover);
+  border-color: var(--color-gold);
+}
+
+.wooden-block:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: var(--shadow-block-active);
+}
+
+.wooden-block--correct {
+  border-color: var(--color-emerald-light) !important;
+  box-shadow: 0 0 20px var(--color-emerald-light) !important;
+}
+
+.wooden-block--wrong {
+  border-color: var(--color-crimson-bright) !important;
+  box-shadow: 0 0 20px var(--color-crimson-bright) !important;
+  animation: block-shake 0.4s ease-in-out;
+}
+
+/* =========================================================================
+   9. Word Reveal Modal (Screen 4 / Test T1-UI-05)
+   ========================================================================= */
+.word-reveal-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 7, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.reveal-parchment-card {
+  background-color: var(--color-washi);
+  background-image: 
+    radial-gradient(#e8e2d5 1px, transparent 1px),
+    linear-gradient(180deg, #fffdf9 0%, #f7f4ec 100%);
+  background-size: 16px 16px, 100% 100%;
+  color: var(--color-ink);
+  border: 3px double var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 3rem;
+  max-width: 540px;
+  width: 100%;
+  box-shadow: var(--shadow-modal);
+  position: relative;
+  text-align: center;
+  outline: 1px solid rgba(170, 130, 10, 0.35);
+  outline-offset: -8px;
+}
+
+.reveal-header-badge {
+  font-size: var(--font-size-sm);
+  color: var(--color-crimson);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.reveal-character {
+  font-size: var(--font-size-kanji);
+  font-weight: 900;
+  color: var(--color-ink);
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.reveal-readings {
+  font-size: var(--font-size-md);
+  color: var(--color-ink-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.reveal-meaning {
+  font-size: var(--font-size-base);
+  color: var(--color-ink);
+  margin-bottom: 1.5rem;
+}
+
+.reveal-quote-box {
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 4px solid var(--color-crimson);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.reveal-quote {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-ink-primary);
+  font-style: normal;
+  margin-bottom: 0.5rem;
+}
+
+.reveal-source {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Hanko Crimson Seal */
+.hanko-seal {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--color-seal);
+  color: var(--color-seal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  border-radius: var(--radius-xs);
+  transform: rotate(-6deg);
+  opacity: 0.9;
+  letter-spacing: 0.1em;
+  user-select: none;
+}
+
+/* =========================================================================
+   10. Boss Arena (Screen 5 / Test T1-UI-06)
+   ========================================================================= */
+.boss-arena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem 1.5rem;
+  gap: 1.75rem;
+  background: radial-gradient(circle at 50% 20%, #4a0e11 0%, #2b080a 45%, #181514 85%);
+  border: 2px solid rgba(230, 57, 70, 0.5);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 30px rgba(186, 24, 27, 0.4);
+}
+
+.boss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.boss-title {
+  font-size: var(--font-size-2xl);
+  color: #ff9e9d;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+/* Boss HP Bar */
+.boss-hp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.boss-hp-bar {
+  width: 100%;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.boss-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ba181b 0%, #e63946 60%, #ff758f 100%);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.7);
+}
+
+/* Player Heart Cups Display */
+.hearts-display {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.5rem;
+  color: var(--color-crimson-bright);
+}
+
+.boss-duel-card {
+  background: rgba(24, 21, 20, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.boss-prompt-text {
+  font-size: var(--font-size-xl);
+  color: var(--color-washi);
+}
+
+.boss-target-kanji {
+  font-size: 4rem;
+  color: var(--color-gold-light);
+  font-weight: 900;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.boss-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.boss-choice-btn {
+  background: linear-gradient(180deg, #38241b 0%, #20130d 100%);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1rem;
+  font-size: 1.35rem;
+  color: var(--color-washi);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.boss-choice-btn:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-3px);
+  box-shadow: 0 0 16px var(--color-gold-glow);
+}
+
+/* =========================================================================
+   11. Rush Mode Overlay
+   ========================================================================= */
+.rush-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  box-shadow: inset 0 0 50px rgba(186, 24, 27, 0.7), inset 0 0 120px rgba(230, 57, 70, 0.4);
+  animation: rush-pulse 1.2s infinite ease-in-out;
+}
+
+.rush-hud-banner {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, var(--color-seal) 0%, var(--color-crimson) 100%);
+  color: var(--color-washi);
+  padding: 0.5rem 2rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(230, 57, 70, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  letter-spacing: 0.1em;
+  z-index: 85;
+}
+
+/* =========================================================================
+   12. Study Codex Modal (Test T1-UI-07)
+   ========================================================================= */
+.study-codex-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 9, 0.9);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  padding: 2rem 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.codex-dialog {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-lacquer-surface);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+
+.codex-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.codex-title {
+  font-size: var(--font-size-2xl);
+  color: var(--color-gold-light);
+  letter-spacing: 0.12em;
+}
+
+.codex-search-input {
+  background: var(--color-lacquer-deep);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.25rem;
+  color: var(--color-washi);
+  font-size: var(--font-size-base);
+  width: 280px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.codex-search-input:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 12px var(--color-gold-glow);
+}
+
+.codex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem;
+  overflow-y: auto;
+  padding: 0.5rem 0.25rem;
+  flex: 1;
+}
+
+.codex-card {
+  background: var(--color-washi-card);
+  color: var(--color-ink);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.codex-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-gold);
+}
+
+.codex-tier-tag {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  color: #fff;
+  background: var(--tier-accent-color, var(--color-gold));
+}
+
+.codex-card-char {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--color-ink);
+  line-height: 1.1;
+}
+
+.codex-card-reading {
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+}
+
+.codex-card-meaning {
+  font-size: 0.75rem;
+  color: var(--color-ink-secondary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* =========================================================================
+   13. Virtual Keypad Recall
+   ========================================================================= */
+.keypad-recall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.keypad-key {
+  background: linear-gradient(180deg, #3d2314 0%, #20130b 100%);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 0.75rem;
+  color: var(--color-washi);
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: 0 4px 0 #120904, 0 6px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.keypad-key:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-2px);
+}
+
+.keypad-key:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #120904, 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================================
+   14. Keyframe Animations
+   ========================================================================= */
+@keyframes rush-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 40px rgba(186, 24, 27, 0.6), inset 0 0 80px rgba(230, 57, 70, 0.3);
+  }
+  50% {
+    box-shadow: inset 0 0 70px rgba(186, 24, 27, 0.9), inset 0 0 140px rgba(230, 57, 70, 0.6);
+  }
+}
+
+@keyframes block-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes slot-drop {
+  0% { transform: scale(1.15) translateY(-8px); opacity: 0.8; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* =========================================================================
+   15. Responsive Adaptations
+   ========================================================================= */
+@media (max-width: 768px) {
+  .title-main-banner {
+    font-size: 2.5rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .title-shift-card {
+    padding: 1.5rem;
+  }
+  
+  .salon-hud {
+    padding: 0.5rem 1rem;
+  }
+  
+  .conveyor-track {
+    gap: 0.75rem;
+  }
+  
+  .wooden-block,
+  .conveyor-block {
+    width: 62px;
+    height: 62px;
+    font-size: 1.85rem;
+  }
+  
+  .tray-slot {
+    width: 60px;
+    height: 60px;
+    font-size: 1.85rem;
+  }
+  
+  .reveal-parchment-card {
+    padding: 1.75rem 1.5rem;
+  }
+  
+  .reveal-character {
+    font-size: 3.5rem;
+  }
+  
+  .boss-target-kanji {
+    font-size: 3rem;
+  }
+  
+  .boss-options-grid {
+    grid-template-columns: 1fr;
+  }
 }
