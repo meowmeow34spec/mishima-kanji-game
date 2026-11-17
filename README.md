@@ -4,6 +4,9 @@
 
 Inspired by [`katakana-cafe`](https://github.com/meowmeow34spec/katakana-cafe), **Salon Mishima** places you behind the polished mahogany counter of a 1950s–60s Japanese literary café. Iconic characters from Yukio Mishima's novels visit the salon and order thematic wagashi sweets and teas—and you must identify, recall, and assemble the kanji woven through Mishima's prose to serve them.
 
+### Play Now in Your Browser (웹에서 바로 플레이)
+👉 **[https://meowmeow34spec.github.io/mishima-kanji-game/](https://meowmeow34spec.github.io/mishima-kanji-game/)**
+
 ---
 
 ## Table of Contents
