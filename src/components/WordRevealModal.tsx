@@ -3,9 +3,10 @@
  * File: src/components/WordRevealModal.tsx
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Volume2, ArrowRight } from 'lucide-react';
 import type { MishimaKanjiEntry } from '../types/curriculum';
+import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
 import { speakKanji } from '../audio/speechSynthesizer';
 
 export interface WordRevealModalProps {
@@ -19,9 +20,24 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
   kanji,
   onClose,
 }) => {
+  useEffect(() => {
+    if (!isOpen || !kanji) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, kanji, onClose]);
+
   if (!isOpen || !kanji) {
     return null;
   }
+
+  const koGloss = getKoreanGloss(kanji.character);
+  const workKo = getKoreanWorkTitle(kanji.literaryQuote.sourceWork);
 
   const onyomiList = kanji.onyomi?.length
     ? kanji.onyomi
@@ -80,6 +96,11 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
 
         <div className="reveal-meaning">
           <strong>意味:</strong> {kanji.meanings.join(', ')}
+          {koGloss && (
+            <div style={{ marginTop: '0.25rem', color: 'var(--color-crimson)', fontWeight: 700 }}>
+              훈음: {koGloss.huneum} ({koGloss.meaningKo})
+            </div>
+          )}
         </div>
 
         {kanji.literaryCompounds?.length > 0 && (
@@ -94,6 +115,7 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
             {kanji.literaryCompounds[0].compound}（
             {kanji.literaryCompounds[0].reading}）—{' '}
             {kanji.literaryCompounds[0].meaning}
+            {koGloss?.primaryCompoundKo ? ` · ${koGloss.primaryCompoundKo}` : ''}
           </div>
         )}
 
@@ -112,7 +134,7 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
             {kanji.literaryQuote.englishTranslation}
           </p>
           <div className="reveal-source" data-testid="reveal-source">
-            —— 三島由紀夫『{kanji.literaryQuote.sourceWork}』
+            —— 三島由紀夫『{kanji.literaryQuote.sourceWork}』{workKo ? ` (${workKo})` : ''}
           </div>
         </div>
 

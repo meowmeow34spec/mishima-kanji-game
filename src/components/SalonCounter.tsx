@@ -74,7 +74,6 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     (activeOrder !== undefined ? activeOrder?.traySlots : gameState.traySlots) ??
     [];
 
-  // Disable input while WordRevealModal is displayed (in engine-driven mode)
   const isInputDisabled =
     Boolean(activeOrder === undefined && gameState.revealKanji) || resolvedGameOver;
 
@@ -141,6 +140,26 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     () => '❤️'
   ).join(' ');
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (isInputDisabled || !resolvedOrder) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        document.querySelector('[role="dialog"]')
+      ) {
+        return;
+      }
+      const keyIdx = ['1', '2', '3', '4'].indexOf(e.key);
+      if (keyIdx >= 0 && keyIdx < resolvedOrder.options.length) {
+        e.preventDefault();
+        handlePick(resolvedOrder.options[keyIdx]);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
   if (!resolvedOrder) {
     return (
       <div className="salon-counter" data-testid="salon-counter">
@@ -161,9 +180,8 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     );
   }
 
-  const orderCompound =
-    resolvedOrder.targetKanji?.literaryCompounds?.[0]?.compound ||
-    resolvedOrder.prompt;
+  const orderCompoundReading =
+    resolvedOrder.targetKanji?.literaryCompounds?.[0]?.reading || '';
 
   return (
     <div className="salon-counter" data-testid="salon-counter">
@@ -245,7 +263,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
           <ServingTray
             slots={resolvedTraySlots}
             capacity={resolvedTraySlots.length || 2}
-            orderKanji={orderCompound}
+            orderKanji={orderCompoundReading}
             onClearSlot={handleClearTray}
           />
           <ConveyorRail
@@ -259,7 +277,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
 
       {resolvedOrder.mode === 'recall' && (
         <KeypadRecall
-          prompt={resolvedOrder.prompt}
+          prompt="正しい読みの鍵盤をお選びください · 알맞은 읽기를 선택하세요"
           options={resolvedOrder.options}
           onSelectReading={handlePick}
           disabled={isInputDisabled}

@@ -3,7 +3,7 @@
  * File: src/game/bossBattleEngine.ts
  */
 
-import { BossKanjiPair } from '../types/curriculum';
+import { BossKanjiPair, BossQuestion } from '../types/curriculum';
 import { BossBattleState, BossRoundResult } from '../types/game';
 import { getAllBossPairs, getBossPairById } from '../data/bossPairs';
 import { SoundType } from '../types/audio';
@@ -14,6 +14,25 @@ export const MIN_BOSS_ROUND_TIME = 3.6;
 export const BOSS_TIME_DECAY_PER_ROUND = 0.4;
 
 export type { BossBattleState, BossRoundResult };
+
+/**
+ * Returns a shallow copy of a boss quiz question with randomized option order
+ * so the correct choice is not pinned to index 0 on every round.
+ */
+export function withShuffledBossOptions(question: BossQuestion): BossQuestion {
+  if (!question || !Array.isArray(question.options) || question.options.length <= 1) {
+    return question;
+  }
+  const shuffled = [...question.options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return {
+    ...question,
+    options: shuffled,
+  };
+}
 
 /**
  * Resolves a single round in a boss duel.
@@ -74,15 +93,16 @@ export function initBossBattle(
 
   const initialHp = pair?.bossHp || 10;
   const initialTime = pair?.timeLimitSeconds || DEFAULT_BOSS_BASE_ROUND_TIME;
-  const currentQuestion = pair?.questions?.[0] || {
+  const baseQuestion = pair?.questions?.[0] || {
     id: 'fallback-q0',
-    type: 'glyph_to_sound',
+    type: 'glyph_to_sound' as const,
     prompt: `${pair?.characterA} vs ${pair?.characterB}`,
     targetCharacter: pair?.characterA || '寺',
     options: [],
     correctAnswer: pair?.characterA || '寺',
     explanation: 'Confusing kanji distinction',
   };
+  const currentQuestion = withShuffledBossOptions(baseQuestion);
 
   return {
     bossPair: pair,
@@ -123,7 +143,9 @@ export function submitBossAnswer(
   }
 
   const nextIndex = (state.currentQuestionIndex + 1) % (state.bossPair.questions.length || 1);
-  const nextQuestion = state.bossPair.questions[nextIndex] || state.currentQuestion;
+  const nextQuestion = withShuffledBossOptions(
+    state.bossPair.questions[nextIndex] || state.currentQuestion
+  );
   const nextTime = calculateBossRoundTime(
     state.bossPair.timeLimitSeconds || DEFAULT_BOSS_BASE_ROUND_TIME,
     nextIndex

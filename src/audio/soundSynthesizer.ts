@@ -100,7 +100,7 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
   private bgmBedOscillator: OscillatorNode | null = null;
 
   constructor() {
-    this.initAudioContext();
+    // Lazily initialize AudioContext on first user gesture, unlock(), play(), or startBgm()
   }
 
   private initAudioContext(): void {
@@ -153,8 +153,22 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
     if (!this.ctx) {
       this.initAudioContext();
     }
-    if (this.ctx && this.ctx.state === 'suspended' && typeof this.ctx.resume === 'function') {
+    if (
+      this.ctx &&
+      (this.ctx.state === 'suspended' || (this.ctx.state as string) === 'interrupted') &&
+      typeof this.ctx.resume === 'function'
+    ) {
       await this.ctx.resume();
+    }
+  }
+
+  public async suspend(): Promise<void> {
+    if (this.ctx && this.ctx.state === 'running' && typeof this.ctx.suspend === 'function') {
+      try {
+        await this.ctx.suspend();
+      } catch {
+        // Safe ignore
+      }
     }
   }
 
@@ -471,10 +485,16 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
 
   private scheduleBgmNotes(): void {
     if (!this.ctx || !this.currentBgmMode || !this.bgmGain || this.muted) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
 
     const config = BGM_CONFIGS[this.currentBgmMode];
     const stepDuration = 60 / config.bpm / 2; // Eighth note duration
     const lookahead = 0.25;
+
+    // Prevent catch-up burst if tab was throttled in the background
+    if (this.bgmNextTime < this.ctx.currentTime - 0.5) {
+      this.bgmNextTime = this.ctx.currentTime + 0.05;
+    }
 
     while (this.bgmNextTime < this.ctx.currentTime + lookahead) {
       const delay = Math.max(0, this.bgmNextTime - this.ctx.currentTime);
@@ -590,6 +610,10 @@ export function getAudioVolume(): number {
 
 export function unlockAudio(): Promise<void> {
   return soundSynthesizer.unlock();
+}
+
+export function suspendAudio(): Promise<void> {
+  return soundSynthesizer.suspend();
 }
 
 export default soundSynthesizer;

@@ -92,6 +92,16 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           昭和の純文学喫茶「サロン三島」へようこそ。
           <br />
           文豪の名作に息づく漢字の美と響きを、お客様へ給仕いたしましょう。
+          <span
+            style={{
+              display: 'block',
+              marginTop: '0.45rem',
+              fontSize: '0.85rem',
+              color: 'var(--color-gold)',
+            }}
+          >
+            쇼와 시대 문학 찻집에서 미시마 유키오의 명작 한자 80자를 손님에게 대접하며 외워보세요.
+          </span>
         </p>
 
         <button

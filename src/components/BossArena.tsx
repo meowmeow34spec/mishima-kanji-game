@@ -3,8 +3,8 @@
  * File: src/components/BossArena.tsx
  */
 
-import React, { useEffect } from 'react';
-import { ArrowLeft, Swords, Timer } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Swords, Timer, Lightbulb } from 'lucide-react';
 import type { BossChoiceOption, BossKanjiPair } from '../types/curriculum';
 import { useGameState, useGameDispatch } from '../hooks/useGameState';
 
@@ -66,6 +66,11 @@ export const BossArena: React.FC<BossArenaProps> = ({
   const resolvedDefeated = isDefeated ?? engineBoss?.isDefeated ?? false;
   const resolvedPlayerDefeated =
     isPlayerDefeated ?? engineBoss?.isPlayerDefeated ?? false;
+  const [showHint, setShowHint] = useState(false);
+
+  useEffect(() => {
+    setShowHint(false);
+  }, [resolvedQuestion?.id, engineBoss?.currentQuestionIndex, engineBoss?.bossHp, engineBoss?.playerHearts]);
 
   useEffect(() => {
     if (isStandalone || !engineBoss?.isActive || resolvedDefeated || resolvedPlayerDefeated) {
@@ -105,6 +110,36 @@ export const BossArena: React.FC<BossArenaProps> = ({
       dispatch({ type: 'ANSWER_BOSS', payload: { answer: answerValue } });
     }
   };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (resolvedDefeated || resolvedPlayerDefeated || !resolvedQuestion) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        document.querySelector('[role="dialog"]')
+      ) {
+        return;
+      }
+      const keyIdx = ['1', '2', '3', '4'].indexOf(e.key);
+      if (keyIdx >= 0 && keyIdx < resolvedQuestion.options.length) {
+        e.preventDefault();
+        handleSelectOption(resolvedQuestion.options[keyIdx]);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
+  const duelGlyphBanner = resolvedPair
+    ? resolvedPair.additionalCharacters && resolvedPair.additionalCharacters.length > 0
+      ? [
+          resolvedPair.characterA,
+          resolvedPair.characterB,
+          ...resolvedPair.additionalCharacters,
+        ].join(' · ')
+      : `${resolvedPair.characterA} ⚔ ${resolvedPair.characterB}`
+    : '';
 
   const handleReturn = () => {
     if (onReturnToMap) {
@@ -227,7 +262,7 @@ export const BossArena: React.FC<BossArenaProps> = ({
 
           {resolvedPair && (
             <div className="boss-target-kanji" aria-hidden="true">
-              {resolvedPair.characterA} ⚔ {resolvedPair.characterB}
+              {duelGlyphBanner}
             </div>
           )}
 
@@ -255,15 +290,30 @@ export const BossArena: React.FC<BossArenaProps> = ({
           </div>
 
           {resolvedPair?.mnemonicTip && (
-            <p
-              style={{
-                fontSize: '0.85rem',
-                color: 'var(--color-washi-dim)',
-                maxWidth: '520px',
-              }}
-            >
-              助言: {resolvedPair.mnemonicTip}
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              {!showHint ? (
+                <button
+                  type="button"
+                  data-testid="btn-boss-hint"
+                  className="btn-lacquer"
+                  style={{ padding: '0.35rem 0.9rem', fontSize: '0.8rem' }}
+                  onClick={() => setShowHint(true)}
+                >
+                  <Lightbulb size={14} />
+                  <span>助言を見る (힌트 보기)</span>
+                </button>
+              ) : (
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--color-washi-dim)',
+                    maxWidth: '520px',
+                  }}
+                >
+                  助言: {resolvedPair.mnemonicTip}
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}

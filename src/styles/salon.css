@@ -147,6 +147,7 @@ input {
 .btn-icon {
   width: 42px;
   height: 42px;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
@@ -170,6 +171,8 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(180deg, rgba(24, 21, 20, 0.95) 0%, rgba(16, 14, 13, 0.85) 100%);
   border-bottom: 1px solid var(--color-gold-border);
@@ -183,7 +186,8 @@ input {
 .salon-hud-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  min-width: 0;
 }
 
 .salon-hud-title {
@@ -191,12 +195,13 @@ input {
   font-weight: 700;
   color: var(--color-gold-light);
   letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 .salon-hud-stats {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
 }
 
 .stat-badge {
@@ -209,6 +214,8 @@ input {
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
   color: var(--color-washi);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .stat-badge--coins {
@@ -291,7 +298,8 @@ input {
 
 .title-mastery-stats {
   display: flex;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
   font-size: var(--font-size-sm);
   color: var(--color-washi-dim);
   border-top: 1px solid rgba(212, 175, 55, 0.2);
@@ -647,7 +655,8 @@ input {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  padding: 1.5rem;
+  padding: 1.25rem;
+  overflow-y: auto;
   backdrop-filter: blur(8px);
 }
 
@@ -660,8 +669,11 @@ input {
   color: var(--color-ink);
   border: 3px double var(--color-gold);
   border-radius: var(--radius-lg);
-  padding: 2.5rem 3rem;
+  padding: 2.25rem 2.5rem;
   max-width: 540px;
+  max-height: calc(100dvh - 2.5rem);
+  overflow-y: auto;
+  margin: auto;
   width: 100%;
   box-shadow: var(--shadow-modal);
   position: relative;
@@ -673,8 +685,9 @@ input {
 .reveal-header-badge {
   font-size: var(--font-size-sm);
   color: var(--color-crimson);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   margin-bottom: 0.75rem;
+  padding: 0 3.25rem;
   font-weight: 700;
 }
 
@@ -874,22 +887,22 @@ input {
 }
 
 .rush-hud-banner {
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   background: linear-gradient(180deg, var(--color-seal) 0%, var(--color-crimson) 100%);
   color: var(--color-washi);
-  padding: 0.5rem 2rem;
+  padding: 0.55rem 1.75rem;
   border-radius: var(--radius-full);
-  font-size: var(--font-size-xl);
+  font-size: clamp(1rem, 3.5vw, var(--font-size-xl));
   font-weight: 900;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 20px rgba(230, 57, 70, 0.6);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  letter-spacing: 0.1em;
-  z-index: 85;
+  justify-content: center;
+  gap: 0.85rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  max-width: 100%;
+  z-index: 90;
 }
 
 /* =========================================================================
@@ -902,7 +915,7 @@ input {
   display: flex;
   flex-direction: column;
   z-index: 100;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem;
   backdrop-filter: blur(8px);
 }
 
@@ -911,12 +924,14 @@ input {
   margin: 0 auto;
   width: 100%;
   flex: 1;
+  min-height: 0;
+  max-height: calc(100dvh - 3rem);
   display: flex;
   flex-direction: column;
   background: var(--color-lacquer-surface);
   border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-lg);
-  padding: 1.75rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-modal);
   overflow: hidden;
 }
@@ -925,25 +940,36 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .codex-title {
-  font-size: var(--font-size-2xl);
+  font-size: clamp(1.25rem, 3vw, var(--font-size-2xl));
   color: var(--color-gold-light);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
+}
+
+.codex-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  flex: 1 1 320px;
+  justify-content: flex-end;
 }
 
 .codex-search-input {
   background: var(--color-lacquer-deep);
   border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-md);
-  padding: 0.65rem 1.25rem;
+  padding: 0.6rem 1rem;
   color: var(--color-washi);
-  font-size: var(--font-size-base);
-  width: 280px;
+  font-size: var(--font-size-sm);
+  width: 100%;
+  max-width: 320px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -952,12 +978,40 @@ input {
   box-shadow: 0 0 12px var(--color-gold-glow);
 }
 
+.codex-tier-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  padding-bottom: 0.25rem;
+  flex-shrink: 0;
+}
+
+.codex-detail-panel {
+  background: var(--color-washi);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-gold);
+  padding: 0.9rem 1.15rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-height: 35vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
 .codex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 0.85rem;
   overflow-y: auto;
-  padding: 0.5rem 0.25rem;
+  padding: 0.4rem 0.25rem;
+  min-height: 140px;
   flex: 1;
 }
 
@@ -1075,21 +1129,96 @@ input {
    15. Responsive Adaptations
    ========================================================================= */
 @media (max-width: 768px) {
+  .salon-hud {
+    padding: 0.5rem 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .salon-hud-subtitle {
+    display: none;
+  }
+
+  .salon-hud-title {
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+  }
+
+  .salon-hud-stats {
+    gap: 0.35rem;
+  }
+
+  .stat-badge {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .title-screen {
+    padding: 1.5rem 1rem;
+  }
+
   .title-main-banner {
-    font-size: 2.5rem;
+    font-size: 2.35rem;
     letter-spacing: 0.1em;
   }
   
   .title-shift-card {
-    padding: 1.5rem;
+    padding: 1.35rem 1.15rem;
   }
-  
-  .salon-hud {
-    padding: 0.5rem 1rem;
+
+  .salon-map {
+    padding: 1.25rem 0.85rem;
+  }
+
+  .tier-section {
+    padding: 1.15rem 1rem;
+  }
+
+  .tier-section-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .salon-counter {
+    padding: 0.65rem 0.75rem 1rem;
+    gap: 0.65rem;
+  }
+
+  .blackboard-order {
+    padding: 0.75rem 0.95rem;
+  }
+
+  .blackboard-prompt {
+    font-size: 1.1rem;
+  }
+
+  .customer-section {
+    gap: 0.75rem;
+  }
+
+  .patron-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+
+  .customer-speech-bubble {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .conveyor-rail {
+    padding: 0.9rem 0.65rem;
   }
   
   .conveyor-track {
     gap: 0.75rem;
+    min-height: 70px;
   }
   
   .wooden-block,
@@ -1104,17 +1233,64 @@ input {
     height: 60px;
     font-size: 1.85rem;
   }
+
+  .word-reveal-modal {
+    padding: 0.75rem;
+  }
   
   .reveal-parchment-card {
-    padding: 1.75rem 1.5rem;
+    padding: 1.5rem 1.15rem;
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  .reveal-header-badge {
+    padding: 0 2.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .hanko-seal {
+    top: 0.85rem;
+    right: 0.85rem;
+    width: 42px;
+    height: 42px;
+    font-size: 0.65rem;
   }
   
   .reveal-character {
-    font-size: 3.5rem;
+    font-size: 3.25rem;
+  }
+
+  .study-codex-modal {
+    padding: 0.65rem;
+  }
+
+  .codex-dialog {
+    padding: 1rem;
+    max-height: calc(100dvh - 1.3rem);
+  }
+
+  .codex-search-input {
+    max-width: none;
+  }
+
+  .codex-detail-panel {
+    max-height: 30vh;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .codex-grid {
+    grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
+    gap: 0.65rem;
+  }
+
+  .boss-arena {
+    padding: 1.15rem 0.9rem;
+    gap: 1.15rem;
   }
   
   .boss-target-kanji {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
   
   .boss-options-grid {

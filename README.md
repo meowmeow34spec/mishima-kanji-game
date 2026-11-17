@@ -54,7 +54,7 @@ Each kanji entry includes:
 ## Gameplay Mechanics
 
 ### 1. Salon Floor Plan (`SalonMap`)
-Navigate across the 4 literary tiers, each featuring **3 counter service stages** (`第N幕・壱 / 弐 / 参`) and **1 Boss Duel** (`第N幕・決闘`), alongside instant access to **25s Rush Mode**, **Daily Review**, and the **Study Codex**.
+Navigate across the 4 literary tiers, each featuring **4 counter service stages** (`第N幕・壱 / 弐 / 参 / 肆`, covering all 20 kanji per tier across all 80 kanji) and **all 8 Boss Duels** (including dual-boss tiers and the Grand Master final trial `幻影文豪・三島`), alongside instant access to **25s Rush Mode**, **Daily Review**, and the **Study Codex** (searchable in Japanese, English, and Korean 훈음/뜻).
 
 ### 2. Counter Service Orders (`SalonCounter`)
 Each stage consists of 6 customer orders cycling through three interactive task modes:

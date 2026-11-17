@@ -277,6 +277,10 @@ export function getDistractors<T extends string | { id: string; character?: stri
       }
       return false;
     });
+    for (let i = sameTier.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [sameTier[i], sameTier[j]] = [sameTier[j], sameTier[i]];
+    }
     for (const item of sameTier) {
       if (selected.length >= count) break;
       const id = getItemId(item);

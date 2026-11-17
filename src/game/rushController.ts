@@ -6,6 +6,7 @@
 import { MishimaKanjiEntry } from '../types/curriculum';
 import { RushSessionConfig, RushSessionState, RushPrompt } from '../types/game';
 import { getAllKanji } from '../data/mishimaCurriculum';
+import { getKoreanGloss } from '../data/koreanGlossary';
 import { getDistractors } from '../srs/leitnerEngine';
 
 export const DEFAULT_RUSH_DURATION_SECONDS = 25.0;
@@ -127,15 +128,18 @@ export function generateRushPrompt(
   }
 
   const options = [correctOption, ...distractors].slice(0, 4);
-  // Simple deterministic rotation to place correct option
-  const rot = (kanji.character.charCodeAt(0) || 0) % options.length;
-  const [removed] = options.splice(0, 1);
-  options.splice(rot, 0, removed);
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
+  const baseMeaning = kanji.meanings?.[0] || (kanji as any).meaning || '';
+  const koGloss = getKoreanGloss(kanji.character);
 
   return {
     id: `rush-prompt-${kanji.id}-${Date.now()}`,
     kanji,
-    promptText: kanji.meanings?.[0] || (kanji as any).meaning || '',
+    promptText: koGloss ? `${baseMeaning} · ${koGloss.meaningKo}` : baseMeaning,
     options,
     correctOption,
   };

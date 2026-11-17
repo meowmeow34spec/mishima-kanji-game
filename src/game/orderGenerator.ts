@@ -6,6 +6,7 @@
 import { ActiveOrder, TaskMode } from '../types/game';
 import { MishimaKanjiEntry } from '../types/curriculum';
 import { getAllKanji } from '../data/mishimaCurriculum';
+import { getKoreanGloss } from '../data/koreanGlossary';
 import { getDistractors } from '../srs/leitnerEngine';
 import { ConfusionMatrix } from '../types/srs';
 
@@ -54,11 +55,16 @@ export async function generateOrder(
   orderCounter++;
   const orderId = `order-${Date.now()}-${orderCounter}`;
 
-  // Select customer matched to tier or cycle through customers
-  const customerIndex = (kanji.tier ? (kanji.tier - 1) * 2 : 0) % SALON_CUSTOMERS.length;
-  const customer = SALON_CUSTOMERS[customerIndex] || SALON_CUSTOMERS[0];
+  // Select customer matched to novel work when available, cycling through all 8 patrons
+  const workMatched = SALON_CUSTOMERS.filter(
+    (c) => kanji.primaryWork && c.work === kanji.primaryWork
+  );
+  const customerPool = workMatched.length > 0 ? workMatched : SALON_CUSTOMERS;
+  const customer =
+    customerPool[(orderCounter - 1) % customerPool.length] || SALON_CUSTOMERS[0];
 
   const meaning = kanji.meanings?.[0] || (kanji as any).meaning || '';
+  const koGloss = getKoreanGloss(kanji.character);
 
   const dialogue =
     kanji.cafeOrderItem?.dialogueLine ||
@@ -72,24 +78,30 @@ export async function generateOrder(
   const allKanji = getAllKanji();
 
   if (mode === 'build') {
-    // Multi-slot serving tray compound assembly
+    // Multi-slot serving tray compound assembly (prompted by reading + meaning without spoiling kanji)
     const compoundObj =
       kanji.literaryCompounds && kanji.literaryCompounds.length > 0
         ? kanji.literaryCompounds[0]
         : { compound: `${kanji.character}美`, reading: 'び', meaning };
 
     const compound = compoundObj.compound;
-    traySlots = Array(compound.length).fill(null);
-    correctOption = compound[0] || kanji.character;
-    prompt = `熟語「${compound}」（${compoundObj.meaning}）を完成させてください`;
+    const compoundChars = Array.from(compound);
+    traySlots = Array(compoundChars.length).fill(null);
+    correctOption = compoundChars[0] || kanji.character;
+    const compoundMeaningLabel = koGloss?.primaryCompoundKo
+      ? `${compoundObj.meaning} · ${koGloss.primaryCompoundKo}`
+      : compoundObj.meaning;
+    prompt = `熟語【${compoundObj.reading}】（${compoundMeaningLabel}・${compoundChars.length}字）を調合してください`;
 
     // Candidate options: characters from the compound + distractors
-    const compoundChars = compound.split('');
-    const neededDistractors = Math.max(0, 4 - compoundChars.length);
+    const targetOptionCount = Math.max(4, compoundChars.length);
+    const neededDistractors = Math.max(0, targetOptionCount - compoundChars.length);
 
     let extraChars: string[] = [];
     if (customDistractors && customDistractors.length >= neededDistractors) {
-      extraChars = customDistractors.slice(0, neededDistractors);
+      extraChars = customDistractors
+        .filter((ch) => !compoundChars.includes(ch))
+        .slice(0, neededDistractors);
     } else {
       const distKanji = getDistractors(kanji, allKanji, 4, confusionMatrix);
       extraChars = distKanji
@@ -99,13 +111,15 @@ export async function generateOrder(
     }
 
     const rawOptions = Array.from(new Set([...compoundChars, ...extraChars]));
-    while (rawOptions.length < 4) {
-      const fallback = allKanji[rawOptions.length % allKanji.length]?.character || '文';
+    let fallbackIdx = 0;
+    while (rawOptions.length < targetOptionCount && fallbackIdx < allKanji.length) {
+      const fallback = allKanji[fallbackIdx % allKanji.length]?.character || '文';
       if (!rawOptions.includes(fallback)) {
         rawOptions.push(fallback);
       }
+      fallbackIdx++;
     }
-    options = shuffle(rawOptions.slice(0, 4));
+    options = shuffle(rawOptions.slice(0, targetOptionCount));
     if (!options.includes(correctOption)) {
       options[0] = correctOption;
       options = shuffle(options);
@@ -117,7 +131,8 @@ export async function generateOrder(
       (kanji.readings.kunyomi && kanji.readings.kunyomi[0]) ||
       kanji.character;
 
-    prompt = `漢字「${kanji.character}」（${meaning}）の読みをお選びください`;
+    const meaningLabel = koGloss ? `${meaning} · ${koGloss.meaningKo}` : meaning;
+    prompt = `漢字「${kanji.character}」（${meaningLabel}）の読みをお選びください`;
 
     let distractorReadings: string[] = [];
     if (customDistractors && customDistractors.length >= 3) {
@@ -150,7 +165,8 @@ export async function generateOrder(
   } else {
     // 'pick' mode: Conveyor rail target identification
     correctOption = kanji.character;
-    prompt = `「${meaning}」の漢字をお選びください`;
+    const meaningLabel = koGloss ? `${meaning} · ${koGloss.huneum}` : meaning;
+    prompt = `「${meaningLabel}」の漢字をお選びください`;
 
     let distractorChars: string[] = [];
     if (customDistractors && customDistractors.length >= 3) {

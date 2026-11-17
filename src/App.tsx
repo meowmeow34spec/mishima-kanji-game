@@ -9,8 +9,14 @@ import confetti from 'canvas-confetti';
 import { useGameState, useGameDispatch } from './hooks/useGameState';
 import { getAllKanji } from './data/mishimaCurriculum';
 import { recordDailyLogin } from './srs/storageManager';
-import { setAudioMuted, setAudioVolume, isAudioMuted } from './audio/soundSynthesizer';
-import { setSpeechEnabled } from './audio/speechSynthesizer';
+import {
+  setAudioMuted,
+  setAudioVolume,
+  isAudioMuted,
+  unlockAudio,
+  suspendAudio,
+} from './audio/soundSynthesizer';
+import { setSpeechEnabled, cancelSpeech } from './audio/speechSynthesizer';
 
 import { TitleScreen } from './components/TitleScreen';
 import { SalonMap } from './components/SalonMap';
@@ -43,6 +49,35 @@ export const App: React.FC = () => {
       // Safe fallback in isolated environments
     }
   }, [dispatch]);
+
+  // Unlock Web Audio on first user gesture & pause audio cleanly when tab is hidden
+  useEffect(() => {
+    let unlocked = false;
+    const handleGesture = () => {
+      if (!unlocked && !isAudioMuted()) {
+        unlocked = true;
+        unlockAudio().catch(() => {});
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (typeof document === 'undefined') return;
+      if (document.hidden) {
+        cancelSpeech();
+        suspendAudio().catch(() => {});
+      } else if (unlocked && !isAudioMuted()) {
+        unlockAudio().catch(() => {});
+      }
+    };
+
+    window.addEventListener('pointerdown', handleGesture, { passive: true });
+    window.addEventListener('keydown', handleGesture, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('pointerdown', handleGesture);
+      window.removeEventListener('keydown', handleGesture);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   // Celebratory confetti on boss victory or stage completion
   useEffect(() => {
@@ -95,8 +130,10 @@ export const App: React.FC = () => {
           style={{ cursor: 'pointer' }}
           onClick={() => dispatch({ type: 'RETURN_TO_TITLE' })}
         >
-          <Coffee size={22} color="var(--color-gold-light)" />
-          <span className="salon-hud-title">サロン三島 (Salon Mishima)</span>
+          <Coffee size={22} color="var(--color-gold-light)" style={{ flexShrink: 0 }} />
+          <span className="salon-hud-title">
+            サロン三島 <span className="salon-hud-subtitle">(Salon Mishima)</span>
+          </span>
         </div>
 
         <div className="salon-hud-stats">

@@ -3,10 +3,11 @@
  * File: src/components/StudyCodexModal.tsx
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Volume2, X, BookOpen } from 'lucide-react';
 import type { MishimaKanjiEntry, CurriculumTierNumber } from '../types/curriculum';
 import { getAllKanji, TIER_METADATA } from '../data/mishimaCurriculum';
+import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
 import { speakKanji } from '../audio/speechSynthesizer';
 
 export interface StudyCodexModalProps {
@@ -52,6 +53,12 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
         .join(' ')
         .toLowerCase();
 
+      const koGloss = getKoreanGloss(entry.character);
+      const workKo = getKoreanWorkTitle(entry.primaryWork).toLowerCase();
+      const koSearchBlob = koGloss
+        ? `${koGloss.huneum} ${koGloss.meaningKo} ${koGloss.primaryCompoundKo}`.toLowerCase()
+        : '';
+
       return (
         entry.character.includes(query) ||
         onyomi.includes(query) ||
@@ -59,10 +66,24 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
         meanings.includes(query) ||
         entry.primaryWork.toLowerCase().includes(query) ||
         entry.primaryWorkEnglish.toLowerCase().includes(query) ||
+        workKo.includes(query) ||
+        koSearchBlob.includes(query) ||
         compounds.includes(query)
       );
     });
   }, [sourceList, searchQuery, selectedTier]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) {
     return null;
@@ -83,8 +104,8 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
             <h2 className="codex-title">三島漢字録 ({filteredKanji.length} / {sourceList.length})</h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <div className="codex-controls">
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: '1 1 220px', minWidth: 0 }}>
               <Search
                 size={16}
                 color="var(--color-gold)"
@@ -95,7 +116,7 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
                 data-testid="codex-search-input"
                 className="codex-search-input"
                 style={{ paddingLeft: '2.35rem' }}
-                placeholder="漢字、読み、意味、作品名で検索..."
+                placeholder="漢字・読み・意味・한국어 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -114,19 +135,12 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
         </div>
 
         {/* Tier Filter Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '0.5rem',
-            marginBottom: '1rem',
-            flexWrap: 'wrap',
-          }}
-        >
+        <div className="codex-tier-tabs">
           <button
             type="button"
             data-testid="codex-tier-all"
             className={selectedTier === 'all' ? 'btn-gold' : 'btn-lacquer'}
-            style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+            style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem', flexShrink: 0 }}
             onClick={() => setSelectedTier('all')}
           >
             全階層 (All)
@@ -137,7 +151,7 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
               type="button"
               data-testid={`codex-tier-${meta.tier}`}
               className={selectedTier === meta.tier ? 'btn-gold' : 'btn-lacquer'}
-              style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+              style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem', flexShrink: 0 }}
               onClick={() => setSelectedTier(meta.tier)}
             >
               第{meta.tier}階層：{meta.name}
@@ -146,79 +160,72 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
         </div>
 
         {/* Selected Kanji Inspector */}
-        {selectedKanji && (
-          <div
-            data-testid="codex-detail-panel"
-            style={{
-              background: 'var(--color-washi)',
-              color: 'var(--color-ink)',
-              borderRadius: 'var(--radius-md)',
-              border: '2px solid var(--color-gold)',
-              padding: '1rem 1.25rem',
-              marginBottom: '1rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              gap: '1.25rem',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '3.25rem', fontWeight: 900, lineHeight: 1 }}>
-                {selectedKanji.character}
-              </span>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>
-                  {selectedKanji.meanings.join(', ')}
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--color-ink-secondary)' }}>
-                  音: {(selectedKanji.onyomi || []).join('・') || '—'} ／ 訓:{' '}
-                  {(selectedKanji.kunyomi || []).join('・') || '—'} ／ 画数:{' '}
-                  {selectedKanji.strokeCount}画 ({selectedKanji.jlptLevel})
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--color-crimson)', marginTop: '0.2rem' }}>
-                  代表作: 『{selectedKanji.primaryWork}』 ({selectedKanji.primaryWorkEnglish})
+        {selectedKanji && (() => {
+          const koDetail = getKoreanGloss(selectedKanji.character);
+          const workKoDetail = getKoreanWorkTitle(selectedKanji.primaryWork);
+          return (
+            <div
+              data-testid="codex-detail-panel"
+              className="codex-detail-panel"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>
+                  {selectedKanji.character}
+                </span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>
+                    {selectedKanji.meanings.join(', ')}
+                    {koDetail ? ` · ${koDetail.huneum}` : ''}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-ink-secondary)' }}>
+                    音: {(selectedKanji.onyomi || []).join('・') || '—'} ／ 訓:{' '}
+                    {(selectedKanji.kunyomi || []).join('・') || '—'} ／ 画数:{' '}
+                    {selectedKanji.strokeCount}画 ({selectedKanji.jlptLevel})
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-crimson)', marginTop: '0.2rem' }}>
+                    代表作: 『{selectedKanji.primaryWork}』{workKoDetail ? ` (${workKoDetail})` : ` (${selectedKanji.primaryWorkEnglish})`}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div style={{ flex: 1, minWidth: '240px' }}>
-              <p style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
-                {selectedKanji.literaryQuote.originalJapanese}
-              </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-ink-secondary)', fontStyle: 'italic' }}>
-                {selectedKanji.literaryQuote.englishTranslation}
-              </p>
-            </div>
+              <div style={{ flex: '1 1 220px', minWidth: 0 }}>
+                <p style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
+                  {selectedKanji.literaryQuote.originalJapanese}
+                </p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-ink-secondary)', fontStyle: 'italic' }}>
+                  {selectedKanji.literaryQuote.englishTranslation}
+                </p>
+              </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                type="button"
-                className="btn-lacquer"
-                onClick={() => {
-                  try {
-                    speakKanji(
-                      selectedKanji.literaryCompounds?.[0]?.reading ||
-                        selectedKanji.character
-                    );
-                  } catch {
-                    // Fallback
-                  }
-                }}
-              >
-                <Volume2 size={16} />
-                <span>発音</span>
-              </button>
-              <button
-                type="button"
-                className="btn-lacquer"
-                onClick={() => setSelectedKanji(null)}
-              >
-                <X size={16} />
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  className="btn-lacquer"
+                  onClick={() => {
+                    try {
+                      speakKanji(
+                        selectedKanji.literaryCompounds?.[0]?.reading ||
+                          selectedKanji.character
+                      );
+                    } catch {
+                      // Fallback
+                    }
+                  }}
+                >
+                  <Volume2 size={16} />
+                  <span>発音</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn-lacquer"
+                  onClick={() => setSelectedKanji(null)}
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 80-Kanji Grid */}
         <div className="codex-grid">
@@ -228,6 +235,7 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
               entry.kunyomi?.[0] ||
               entry.readings?.onyomi?.[0] ||
               '';
+            const koCard = getKoreanGloss(entry.character);
             return (
               <button
                 key={entry.id}
@@ -245,7 +253,7 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
                 <span className="codex-card-char">{entry.character}</span>
                 <span className="codex-card-reading">{firstReading}</span>
                 <span className="codex-card-meaning">
-                  {entry.meanings?.[0] || ''}
+                  {koCard ? `${koCard.huneum.split(' · ')[0]} · ${entry.meanings?.[0] || ''}` : entry.meanings?.[0] || ''}
                 </span>
               </button>
             );

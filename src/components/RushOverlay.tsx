@@ -91,6 +91,26 @@ export const RushOverlay: React.FC<RushOverlayProps> = ({
     }
   };
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!resolvedActive || !activePrompt) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        document.querySelector('[role="dialog"]')
+      ) {
+        return;
+      }
+      const keyIdx = ['1', '2', '3', '4'].indexOf(e.key);
+      if (keyIdx >= 0 && keyIdx < activePrompt.options.length) {
+        e.preventDefault();
+        handleSelect(activePrompt.options[keyIdx]);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [resolvedActive, activePrompt, handleSelect]);
+
   return (
     <div
       data-testid="rush-overlay"
@@ -101,7 +121,8 @@ export const RushOverlay: React.FC<RushOverlayProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '5rem 1.5rem 2rem',
+        gap: '1.25rem',
+        padding: '1.5rem 1rem 2rem',
         width: '100%',
       }}
     >
@@ -110,10 +131,10 @@ export const RushOverlay: React.FC<RushOverlayProps> = ({
 
       {/* Top Rush HUD */}
       <div className="rush-hud-banner">
-        <Zap size={22} />
+        <Zap size={20} style={{ flexShrink: 0 }} />
         <span>猛火注文 RUSH</span>
         <span data-testid="rush-timer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Timer size={20} />
+          <Timer size={18} style={{ flexShrink: 0 }} />
           {resolvedTimeLeft.toFixed(1)}s
         </span>
       </div>

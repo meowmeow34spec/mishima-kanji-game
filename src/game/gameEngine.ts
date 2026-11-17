@@ -57,6 +57,7 @@ import {
   calculateBossRoundTime,
   initBossBattle,
   submitBossAnswer,
+  withShuffledBossOptions,
 } from './bossBattleEngine';
 
 // Subsystem Integrations
@@ -352,7 +353,15 @@ export class GameEngine {
       this.state.currentTier = tier;
       this.state.currentStageId = stageId;
       this.state.score = 0;
-      this.startBoss(undefined, tier);
+      if (stageId === 'stage-special-boss') {
+        this.startBoss('boss-08-mishima-grand', 4);
+      } else if (stageId.endsWith('-boss-2')) {
+        const tierBosses = getAllBossPairs().filter((p) => p.tier === tier);
+        this.startBoss(tierBosses[1]?.id || tierBosses[0]?.id, tier);
+      } else {
+        const tierBosses = getAllBossPairs().filter((p) => p.tier === tier);
+        this.startBoss(tierBosses[0]?.id, tier);
+      }
       return;
     }
 
@@ -699,7 +708,7 @@ export class GameEngine {
       const tierKanji = getKanjiByTier(this.state.currentTier);
       const offset = this.getStageOffset(this.state.currentStageId);
       const nextKanji =
-        tierKanji[(offset + this.state.stageOrderIndex) % Math.max(1, tierKanji.length)] ||
+        tierKanji[(offset + (this.state.stageOrderIndex % 5)) % Math.max(1, tierKanji.length)] ||
         tierKanji[0];
       if (nextKanji) {
         const token = ++this.stageRequestToken;
@@ -792,10 +801,15 @@ export class GameEngine {
     this.stageRequestToken++;
     let resolvedPairId = bossPairId;
     if (!resolvedPairId && tier) {
-      const tierPair = getAllBossPairs().find((p) => p.tier === tier);
-      if (tierPair) {
-        resolvedPairId = tierPair.id;
+      const tierPairs = getAllBossPairs().filter((p) => p.tier === tier);
+      const completed = this.state.profile?.completedStages || [];
+      const uncompleted = tierPairs.find((p) => !completed.includes(`boss-${p.id}`));
+      const chosen = uncompleted || tierPairs[0];
+      if (chosen) {
+        resolvedPairId = chosen.id;
       }
+      this.state.currentTier = tier;
+    } else if (tier) {
       this.state.currentTier = tier;
     }
     this.state.mode = 'boss';
@@ -803,7 +817,11 @@ export class GameEngine {
     this.state.isLevelComplete = false;
     this.state.activeOrder = null;
     this.state.traySlots = [];
-    this.state.bossState = initBossBattle(resolvedPairId);
+    const bossState = initBossBattle(resolvedPairId);
+    if (!tier && typeof bossState.bossPair?.tier === 'number') {
+      this.state.currentTier = bossState.bossPair.tier;
+    }
+    this.state.bossState = bossState;
     try {
       unlockAudio().catch(() => {});
       startBgm('boss');
@@ -825,7 +843,9 @@ export class GameEngine {
       }
       const questions = this.state.bossState.bossPair.questions;
       const nextIdx = (this.state.bossState.currentQuestionIndex + 1) % Math.max(1, questions.length);
-      const nextQ = questions[nextIdx] || this.state.bossState.currentQuestion;
+      const nextQ = withShuffledBossOptions(
+        questions[nextIdx] || this.state.bossState.currentQuestion
+      );
       const resetTime = calculateBossRoundTime(
         this.state.bossState.bossPair.timeLimitSeconds || 8.0,
         nextIdx
@@ -883,9 +903,20 @@ export class GameEngine {
         if (!completed.includes(bossStageId)) {
           completed.push(bossStageId);
         }
-        const tierBossId = `stage-${this.state.currentTier}-boss`;
-        if (!completed.includes(tierBossId)) {
-          completed.push(tierBossId);
+        if (newState.bossPair.tier === 'special') {
+          if (!completed.includes('stage-special-boss')) {
+            completed.push('stage-special-boss');
+          }
+        } else {
+          const tierBosses = getAllBossPairs().filter((p) => p.tier === this.state.currentTier);
+          const bossIndex = tierBosses.findIndex((p) => p.id === newState.bossPair.id);
+          const tierBossId =
+            bossIndex === 1
+              ? `stage-${this.state.currentTier}-boss-2`
+              : `stage-${this.state.currentTier}-boss`;
+          if (!completed.includes(tierBossId)) {
+            completed.push(tierBossId);
+          }
         }
         const unlocked = [...this.state.profile.unlockedTiers];
         const nextTier = (this.state.currentTier + 1) as CurriculumTierNumber;

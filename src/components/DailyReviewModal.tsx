@@ -8,6 +8,7 @@ import { Calendar, CheckCircle2, Flame, X, Volume2 } from 'lucide-react';
 import type { CardProgress, PlayerProfile } from '../types/srs';
 import type { MishimaKanjiEntry } from '../types/curriculum';
 import { getAllKanji, getKanjiById } from '../data/mishimaCurriculum';
+import { getKoreanGloss } from '../data/koreanGlossary';
 import { getDueKanji, getWeakestKanji, getDistractors } from '../srs/leitnerEngine';
 import { loadProfile, recordReviewResult } from '../srs/storageManager';
 import { playSound } from '../audio/soundSynthesizer';
@@ -287,6 +288,9 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
             <div className="reveal-quote-box" style={{ marginBottom: '1.25rem' }}>
               <p style={{ fontWeight: 700, marginBottom: '0.35rem' }}>
                 意味: {currentKanji.meanings.join(', ')}
+                {getKoreanGloss(currentKanji.character)
+                  ? ` (${getKoreanGloss(currentKanji.character)!.huneum})`
+                  : ''}
               </p>
               <p style={{ fontSize: '0.9rem', color: 'var(--color-ink-secondary)' }}>
                 読み: {[...(currentKanji.onyomi || []), ...(currentKanji.kunyomi || [])].join('・')}
