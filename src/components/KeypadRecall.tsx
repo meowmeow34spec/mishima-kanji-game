@@ -1,9 +1,10 @@
 /**
- * Salon Mishima 3D - High-Contrast Reading Recall Keycaps
+ * Salon Mishima 3D - High-Contrast Reading Recall Keycaps (Kana + Hangul!)
  * File: src/components/KeypadRecall.tsx
  */
 
 import React from 'react';
+import { formatReadingWithHangul } from '../data/koreanMnemonics';
 
 export interface KeypadRecallProps {
   prompt: string;
@@ -21,7 +22,7 @@ export const KeypadRecall: React.FC<KeypadRecallProps> = ({
   return (
     <div className="keypad-recall-wrap">
       <p className="keypad-prompt-label">
-        {prompt || '🎹 알맞은 일본어 발음을 눌러 서빙하세요 (숫자키 1~4)'}
+        {prompt || '알맞은 일본어 발음(한글 발음 표기)을 눌러 서빙하세요 (숫자키 1~4)'}
       </p>
       <div
         className="keypad-recall"
@@ -39,7 +40,7 @@ export const KeypadRecall: React.FC<KeypadRecallProps> = ({
             disabled={disabled}
             onClick={() => onSelectReading(reading)}
           >
-            {reading}
+            {formatReadingWithHangul(reading)}
           </button>
         ))}
       </div>

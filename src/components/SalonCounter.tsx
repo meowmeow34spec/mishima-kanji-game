@@ -1,9 +1,9 @@
 /**
- * Salon Mishima 3D - Ultra-Compact High-Contrast Cafe Counter HUD Over Live 3D World
+ * Salon Mishima 3D - Beginner-Friendly High-Contrast Cafe Counter HUD Over Live 3D World
  * File: src/components/SalonCounter.tsx
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   ArrowLeft,
   Coins,
@@ -12,11 +12,21 @@ import {
   Lightbulb,
   Shield,
   Sparkles,
+  BookOpen,
+  Volume2,
+  X,
 } from 'lucide-react';
 import type { ActiveOrder } from '../types/game';
 import type { SpeechBubbleAnchor2D } from '../types/three3d';
+import { getAllKanji } from '../data/mishimaCurriculum';
 import { getKoreanCustomer } from '../data/koreanGlossary';
-import { getKoreanMnemonic } from '../data/koreanMnemonics';
+import {
+  getKoreanMnemonic,
+  formatReadingWithHangul,
+  getCompoundSlotHuneums,
+  getStageKanjiList,
+} from '../data/koreanMnemonics';
+import { speakKanji } from '../audio/speechSynthesizer';
 import { ConveyorRail } from './ConveyorRail';
 import { ServingTray } from './ServingTray';
 import { KeypadRecall } from './KeypadRecall';
@@ -36,6 +46,8 @@ export interface SalonCounterProps {
   stageTotalOrders?: number;
   isGameOver?: boolean;
   speechAnchor?: SpeechBubbleAnchor2D | null;
+  /** Notifies parent when the 5-kanji Stage Cheat-Sheet overlay pauses/resumes patience timer */
+  onPauseChange?: (paused: boolean) => void;
   onReturnToMap?: () => void;
   onExit?: () => void;
 }
@@ -54,6 +66,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
   stageTotalOrders,
   isGameOver,
   speechAnchor,
+  onPauseChange,
   onReturnToMap,
   onExit,
 }) => {
@@ -64,6 +77,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     isCorrect: boolean;
   } | null>(null);
   const [manualHintOpen, setManualHintOpen] = useState(false);
+  const [isCheatSheetOpen, setCheatSheetOpen] = useState(false);
   const pickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -93,14 +107,22 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     setManualHintOpen(false);
   }, [resolvedOrder?.id]);
 
-  const isInputDisabled =
-    Boolean(!isStandalone && gameState.revealKanji) || resolvedGameOver;
+  const toggleCheatSheet = (nextOpen: boolean) => {
+    setCheatSheetOpen(nextOpen);
+    onPauseChange?.(nextOpen);
+  };
 
-  // Live customer patience ticker during active Shift Counter play
+  const isInputDisabled =
+    Boolean(!isStandalone && gameState.revealKanji) ||
+    resolvedGameOver ||
+    isCheatSheetOpen;
+
+  // Live customer patience ticker (automatically paused when Cheat-Sheet or Reveal is open!)
   useEffect(() => {
     if (
       isStandalone ||
       isInputDisabled ||
+      isCheatSheetOpen ||
       !resolvedOrder ||
       gameState.mode !== 'lesson'
     ) {
@@ -111,7 +133,14 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
       dispatch({ type: 'TICK_PATIENCE', payload: { deltaSeconds: 0.25 } });
     }, 250);
     return () => clearInterval(interval);
-  }, [isStandalone, isInputDisabled, resolvedOrder, gameState.mode, dispatch]);
+  }, [
+    isStandalone,
+    isInputDisabled,
+    isCheatSheetOpen,
+    resolvedOrder,
+    gameState.mode,
+    dispatch,
+  ]);
 
   const handlePick = (option: string) => {
     if (isInputDisabled || !resolvedOrder) return;
@@ -149,6 +178,9 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
   };
 
   const handleReturn = () => {
+    if (isCheatSheetOpen) {
+      toggleCheatSheet(false);
+    }
     if (onReturnToMap) {
       onReturnToMap();
     } else if (onExit) {
@@ -176,6 +208,11 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isCheatSheetOpen) {
+        e.preventDefault();
+        toggleCheatSheet(false);
+        return;
+      }
       if (isInputDisabled || !resolvedOrder) return;
       if (
         e.target instanceof HTMLInputElement ||
@@ -193,6 +230,26 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   });
+
+  // Resolve the 5 stage kanji for the Cheat-Sheet reference card
+  const stageCheatSheetItems = useMemo(() => {
+    const target = resolvedOrder?.targetKanji;
+    if (!isStandalone && gameState.currentStageId) {
+      return getStageKanjiList(gameState.currentTier, gameState.currentStageId);
+    }
+    if (target) {
+      const allInTier = getAllKanji().filter((k) => k.tier === target.tier);
+      const idx = allInTier.findIndex((k) => k.id === target.id);
+      const stageNum = idx >= 0 ? (Math.floor(idx / 5) + 1) : 1;
+      return getStageKanjiList(target.tier, stageNum);
+    }
+    return getStageKanjiList(1, 1);
+  }, [
+    isStandalone,
+    gameState.currentTier,
+    gameState.currentStageId,
+    resolvedOrder?.targetKanji,
+  ]);
 
   if (!resolvedOrder) {
     return (
@@ -223,8 +280,13 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
     ? `${customerKo.nameKo} (${resolvedOrder.customerName})`
     : resolvedOrder.customerName;
 
-  const orderCompoundReading =
-    targetKanji?.literaryCompounds?.[0]?.reading || '';
+  const primaryCompound = targetKanji?.literaryCompounds?.[0];
+  const orderCompoundReading = primaryCompound?.reading || '';
+  const compoundSlotHints =
+    resolvedOrder.mode === 'build' && primaryCompound?.compound
+      ? getCompoundSlotHuneums(primaryCompound.compound)
+      : [];
+
   const onyomiFirst =
     targetKanji?.onyomi?.[0] || targetKanji?.readings?.onyomi?.[0] || '';
   const huneumText = resolvedOrder.huneumKo || mne?.huneum || '';
@@ -249,22 +311,35 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
       {/* 1. ULTRA-COMPACT TOP ZONE (<= 155px desktop / <= 190px mobile so 3D Customer Shines!) */}
       <div className="counter-top-zone">
         <div className="counter-status-bar">
-          <button
-            type="button"
-            data-testid="btn-return-map"
-            className="btn-lacquer"
-            style={{ padding: '0.28rem 0.65rem', fontSize: '0.875rem' }}
-            onClick={handleReturn}
-          >
-            <ArrowLeft size={14} />
-            <span>맵으로</span>
-          </button>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+            <button
+              type="button"
+              data-testid="btn-return-map"
+              className="btn-lacquer"
+              style={{ padding: '0.26rem 0.6rem', fontSize: '0.875rem' }}
+              onClick={handleReturn}
+            >
+              <ArrowLeft size={14} />
+              <span>맵으로</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="btn-stage-cheatsheet"
+              className="btn-ivory"
+              style={{ padding: '0.26rem 0.65rem', fontSize: '0.875rem' }}
+              onClick={() => toggleCheatSheet(!isCheatSheetOpen)}
+            >
+              <BookOpen size={14} color="#047857" />
+              <span>배운 5글자 컨닝페이퍼</span>
+            </button>
+          </div>
 
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.35rem',
+              gap: '0.32rem',
               flexWrap: 'wrap',
               justifyContent: 'flex-end',
             }}
@@ -310,7 +385,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
           data-testid="order-blackboard"
           style={{ '--bubble-tail-x': bubbleTailX } as React.CSSProperties}
         >
-          {/* Row 1: Patron + Progress + Crisp Reading/Huneum Pills + Hint Button */}
+          {/* Row 1: Patron + Progress + Crisp Reading/Huneum Pills (with Hangul!) + Hint Button */}
           <div
             style={{
               display: 'flex',
@@ -337,13 +412,15 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
             </div>
 
             <div className="pill-row">
-              {huneumText && (
+              {resolvedOrder.mode !== 'build' && huneumText && (
                 <span className="pill-badge pill-badge--huneum">{huneumText}</span>
               )}
               {resolvedOrder.mode === 'pick' && onyomiFirst && (
-                <span className="pill-badge pill-badge--onyomi">음독 {onyomiFirst}</span>
+                <span className="pill-badge pill-badge--onyomi">
+                  음독 {formatReadingWithHangul(onyomiFirst)}
+                </span>
               )}
-              {mne && (
+              {mne && resolvedOrder.mode !== 'build' && (
                 <button
                   type="button"
                   data-testid="btn-mnemonic-hint"
@@ -407,7 +484,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
           </div>
 
           {/* Expanded Mnemonic Hint when user clicks '연상 힌트' */}
-          {manualHintOpen && mne && (
+          {manualHintOpen && mne && resolvedOrder.mode !== 'build' && (
             <div className="mnemonic-hint-strip" data-testid="mnemonic-hint-pill">
               <span>{mne.visualPictogram}</span>
               <span>
@@ -436,7 +513,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
       {/* 2. OPEN 3D STAGE WINDOW (3D Customer + 3D Counter Kanji Blocks!) */}
       <div className="counter-3d-viewport-spacer" aria-hidden="true" />
 
-      {/* 3. SLEEK BOTTOM ACTION DOCK (Fits 100% Above y=844px on Mobile!) */}
+      {/* 3. SLEEK BOTTOM ACTION DOCK */}
       <div className="counter-bottom-dock">
         {resolvedOrder.mode === 'build' && (
           <>
@@ -444,6 +521,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
               slots={resolvedTraySlots}
               capacity={resolvedTraySlots.length || 2}
               orderKanji={orderCompoundReading}
+              slotHints={compoundSlotHints}
               onClearSlot={handleClearTray}
             />
             <ConveyorRail
@@ -457,7 +535,7 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
 
         {resolvedOrder.mode === 'recall' && (
           <KeypadRecall
-            prompt="알맞은 일본어 발음을 선택해 서빙하세요 (숫자키 1~4)"
+            prompt="알맞은 일본어 발음(한글 병기)을 선택해 서빙하세요 (숫자키 1~4)"
             options={resolvedOrder.options}
             onSelectReading={handlePick}
             disabled={isInputDisabled}
@@ -473,6 +551,99 @@ export const SalonCounter: React.FC<SalonCounterProps> = ({
           />
         )}
       </div>
+
+      {/* Paused 5-Kanji Stage Cheat-Sheet Overlay */}
+      {isCheatSheetOpen && (
+        <div
+          className="word-reveal-modal"
+          data-testid="stage-cheatsheet-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="이번 교시 배운 5글자 컨닝페이퍼"
+        >
+          <div className="reveal-parchment-card" style={{ maxWidth: '640px', textAlign: 'left' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '0.5rem',
+                borderBottom: '2px solid #e7dfd0',
+                paddingBottom: '0.6rem',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#141210' }}>
+                  이번 교시 배운 5글자 컨닝페이퍼
+                </h3>
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#047857' }}>
+                  열어두는 동안 손님의 인내심 타이머가 일시정지됩니다! 천천히 확인하세요.
+                </p>
+              </div>
+              <button
+                type="button"
+                data-testid="btn-close-cheatsheet"
+                className="btn-ivory"
+                style={{ padding: '0.35rem 0.65rem' }}
+                onClick={() => toggleCheatSheet(false)}
+              >
+                <X size={16} />
+                <span>닫기</span>
+              </button>
+            </div>
+
+            <div className="cheatsheet-grid">
+              {stageCheatSheetItems.map((item) => (
+                <div key={item.id} className="cheatsheet-item">
+                  <span
+                    className="kanji-serif"
+                    style={{ fontSize: '2.35rem', fontWeight: 900, color: '#111111', lineHeight: 1 }}
+                  >
+                    {item.character}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 900, fontSize: '1rem', color: '#7c2d12' }}>
+                      {item.huneum} ({item.meaningKo})
+                    </div>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#7f1d1d' }}>
+                      발음: {item.primaryReadingFormatted}
+                    </div>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#2c2520' }}>
+                      {item.mnemonic.visualPictogram} {item.mnemonic.radicalBreakdown}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-ivory"
+                    aria-label={`${item.character} 발음 듣기`}
+                    style={{ padding: '0.35rem 0.5rem' }}
+                    onClick={() => {
+                      try {
+                        speakKanji(item.character);
+                      } catch {
+                        // Safe fallback
+                      }
+                    }}
+                  >
+                    <Volume2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.85rem' }}>
+              <button
+                type="button"
+                className="btn-gold"
+                onClick={() => toggleCheatSheet(false)}
+              >
+                <span>확인 완료 · 서빙 계속하기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Shift Ended / Game Over Modal */}
       {resolvedGameOver && (

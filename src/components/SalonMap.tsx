@@ -1,5 +1,5 @@
 /**
- * Salon Mishima 3D - Korean-First Chapter Map & Quick-Play Hub
+ * Salon Mishima 3D - Beginner-Friendly Chapter Map (5-Kanji Preview + Learn-Before-Shift)
  * File: src/components/SalonMap.tsx
  */
 
@@ -14,7 +14,7 @@ import {
   Settings,
   Crown,
   Store,
-  Coffee,
+  GraduationCap,
 } from 'lucide-react';
 import type { CurriculumTierNumber } from '../types/curriculum';
 import type { PlayerProfile } from '../types/srs';
@@ -29,6 +29,8 @@ export interface SalonMapProps {
   completedStages?: string[];
   profile?: PlayerProfile | null;
   onSelectStage?: (tier: CurriculumTierNumber, stageId: string) => void;
+  /** Opens the 1-minute Pre-Shift Beginner Lesson for a stage before starting the shift */
+  onRequestStageLesson?: (tier: CurriculumTierNumber, stageId: string) => void;
   onQuickPlay?: () => void;
   onOpenShop?: () => void;
   onStartBoss?: (tier: CurriculumTierNumber, bossPairId?: string) => void;
@@ -55,7 +57,7 @@ const TIER_TITLES_KO: Record<CurriculumTierNumber, string> = {
 };
 
 const TIER_SUBTITLES_KO: Record<CurriculumTierNumber, string> = {
-  1: '『금각사』 필수 한자 20자 · 황금 누각과 불꽃의 미학',
+  1: '『금각사』 필수 한자 20자 · 5글자씩 배우고 손님에게 서빙하세요',
   2: '『조소』『봄눈』『천인오쇠』 필수 한자 20자 · 바다와 순수의 서약',
   3: '『가면의 고백』『금색』『록명관』 필수 한자 20자 · 가면 뒤의 진실',
   4: '『우국』『분마』『태양과 철』 필수 한자 20자 · 태양과 강철의 결의',
@@ -66,6 +68,7 @@ export const SalonMap: React.FC<SalonMapProps> = ({
   completedStages,
   profile,
   onSelectStage,
+  onRequestStageLesson,
   onQuickPlay,
   onOpenShop,
   onStartBoss,
@@ -101,11 +104,15 @@ export const SalonMap: React.FC<SalonMapProps> = ({
   };
 
   const handleQuickPlay = () => {
+    const next = findNextStage();
+    if (onRequestStageLesson) {
+      onRequestStageLesson(next.tier, next.stageId);
+      return;
+    }
     if (onQuickPlay) {
       onQuickPlay();
       return;
     }
-    const next = findNextStage();
     if (onSelectStage) {
       onSelectStage(next.tier, next.stageId);
       return;
@@ -137,6 +144,11 @@ export const SalonMap: React.FC<SalonMapProps> = ({
       } else {
         dispatch({ type: 'START_BOSS', payload: { tier, bossPairId } });
       }
+      return;
+    }
+
+    if (onRequestStageLesson) {
+      onRequestStageLesson(tier, stageId);
       return;
     }
 
@@ -208,10 +220,10 @@ export const SalonMap: React.FC<SalonMapProps> = ({
     <div className="salon-map" data-testid="salon-map">
       <div className="map-header">
         <h2 className="map-header-title">
-          살롱 미시마 3D 문학 챕터 맵 (サロン案内図)
+          살롱 미시마 3D 한자 교실 &amp; 챕터 맵 (サロン案内図)
         </h2>
         <p className="map-header-subtitle">
-          원하는 챕터를 골라 손님에게 한자를 대접하거나, 상점에서 3D 카페 인테리어를 꾸며보세요!
+          각 교시를 누르면 <strong>오늘 배울 한자 5개를 먼저 과외로 익힌 뒤</strong> 카운터 서빙을 시작합니다!
         </p>
 
         <div
@@ -238,8 +250,8 @@ export const SalonMap: React.FC<SalonMapProps> = ({
             className="btn-emerald"
             onClick={handleQuickPlay}
           >
-            <Coffee size={15} />
-            <span>바로 카운터 출근</span>
+            <GraduationCap size={16} />
+            <span>다음 교시 배우고 출근</span>
           </button>
 
           <button
@@ -328,6 +340,12 @@ export const SalonMap: React.FC<SalonMapProps> = ({
           const tierKanji = getKanjiByTier(tierNum);
           const tierBosses = getBossPairsByTier(tierNum);
 
+          const fivePreview = (offset: number) =>
+            tierKanji
+              .slice(offset, offset + 5)
+              .map((k) => k.character)
+              .join(' ');
+
           const stageConfigs: {
             id: string;
             label: string;
@@ -338,30 +356,30 @@ export const SalonMap: React.FC<SalonMapProps> = ({
           }[] = [
             {
               id: `stage-${tierNum}-1`,
-              label: `제${tierNum}막 · 1장`,
-              sub: '기초 서빙 (1~5번)',
-              preview: tierKanji[0]?.character || '金',
+              label: `1교시 · 제${tierNum}막 1장`,
+              sub: '기초 뜻·모양 익히기 (5글자)',
+              preview: fivePreview(0) || '金 閣 寺 美 鏡',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-2`,
-              label: `제${tierNum}막 · 2장`,
-              sub: '발음 응대 (6~10번)',
-              preview: tierKanji[5]?.character || '閣',
+              label: `2교시 · 제${tierNum}막 2장`,
+              sub: '발음·연상 익히기 (5글자)',
+              preview: fivePreview(5) || '炎 影 僧 幻 滅',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-3`,
-              label: `제${tierNum}막 · 3장`,
-              sub: '숙어 조립 (11~15번)',
-              preview: tierKanji[10]?.character || '寺',
+              label: `3교시 · 제${tierNum}막 3장`,
+              sub: '숙어 조립 익히기 (5글자)',
+              preview: fivePreview(10) || '焼 灰 鳳 凰 池',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-4`,
-              label: `제${tierNum}막 · 4장`,
-              sub: '완전 정복 (16~20번)',
-              preview: tierKanji[15]?.character || '光',
+              label: `4교시 · 제${tierNum}막 4장`,
+              sub: '완전 정복 (5글자)',
+              preview: fivePreview(15) || '光 絶 嫉 妬 生',
               isBoss: false,
             },
             ...tierBosses.map((boss, bIdx) => ({
@@ -423,13 +441,34 @@ export const SalonMap: React.FC<SalonMapProps> = ({
                         !isUnlocked ? 'stage-btn--locked' : ''
                       }`.trim()}
                     >
-                      <span className="stage-kanji-preview">{stage.preview}</span>
+                      <span
+                        className="stage-kanji-preview"
+                        style={
+                          stage.isBoss
+                            ? undefined
+                            : { fontSize: '1.35rem', letterSpacing: '0.06em' }
+                        }
+                      >
+                        {stage.preview}
+                      </span>
                       <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#141210' }}>
                         {stage.label}
                       </span>
                       <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#2c2520' }}>
                         {stage.sub}
                       </span>
+                      {!stage.isBoss && isUnlocked && (
+                        <span
+                          className={
+                            isCompleted
+                              ? 'pill-badge pill-badge--huneum'
+                              : 'pill-badge pill-badge--kunyomi'
+                          }
+                          style={{ fontSize: '0.875rem', padding: '0.1rem 0.5rem' }}
+                        >
+                          {isCompleted ? '재복습 과외' : '배우고 출근'}
+                        </span>
+                      )}
                       <span
                         className="stage-stars"
                         data-testid={`stage-stars-${stage.id}`}

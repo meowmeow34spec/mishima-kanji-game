@@ -293,3 +293,13 @@ export function getKoreanCustomer(idOrName: string): KoreanCustomerMeta | undefi
 export function getKoreanBossMeta(bossId: string): KoreanBossPairMeta | undefined {
   return BOSS_PAIRS_KO[bossId];
 }
+
+export {
+  kanaToHangul,
+  formatReadingWithHangul,
+  getCompoundSlotHuneums,
+  getStageKanjiList,
+  parseStageId,
+  getNextUncompletedStage,
+  type StageKanjiLessonItem,
+} from './koreanMnemonics';

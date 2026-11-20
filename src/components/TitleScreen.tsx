@@ -1,5 +1,5 @@
 /**
- * Salon Mishima 3D - Korean-First High-Contrast Title Screen Over Live 3D Kissaten
+ * Salon Mishima 3D - Beginner-First Korean Title Screen Over Live 3D Kissaten
  * File: src/components/TitleScreen.tsx
  */
 
@@ -9,10 +9,10 @@ import {
   BookOpen,
   Calendar,
   Settings,
-  Zap,
   Flame,
   Coins,
   Store,
+  GraduationCap,
 } from 'lucide-react';
 import type { CurriculumTierNumber } from '../types/curriculum';
 import type { PlayerProfile } from '../types/srs';
@@ -29,6 +29,8 @@ export interface TitleScreenProps {
     kanjiLearned?: number;
   };
   onStartShift?: () => void;
+  /** Invoked to open the 1-minute Pre-Shift Beginner Lesson for the recommended stage */
+  onStartWithLesson?: (tier: CurriculumTierNumber, stageId: string) => void;
   onQuickPlay?: () => void;
   onOpenShop?: () => void;
   onOpenCodex?: () => void;
@@ -36,30 +38,32 @@ export interface TitleScreenProps {
   onOpenSettings?: () => void;
 }
 
-function pickRecommendedQuickStage(profile?: PlayerProfile | null): {
+export function pickRecommendedQuickStage(profile?: PlayerProfile | null): {
   tier: CurriculumTierNumber;
   stageId: string;
+  stageNum: 1 | 2 | 3 | 4;
 } {
   const unlocked = profile?.unlockedTiers?.length ? profile.unlockedTiers : [1];
   const completed = new Set(profile?.completedStages ?? []);
 
   for (const rawTier of [1, 2, 3, 4] as CurriculumTierNumber[]) {
     if (!unlocked.includes(rawTier)) continue;
-    for (const s of [1, 2, 3, 4]) {
+    for (const s of [1, 2, 3, 4] as const) {
       const stageId = `stage-${rawTier}-${s}`;
       if (!completed.has(stageId)) {
-        return { tier: rawTier, stageId };
+        return { tier: rawTier, stageId, stageNum: s };
       }
     }
   }
   const highestTier = (Math.min(4, Math.max(1, ...unlocked)) || 1) as CurriculumTierNumber;
-  return { tier: highestTier, stageId: `stage-${highestTier}-1` };
+  return { tier: highestTier, stageId: `stage-${highestTier}-1`, stageNum: 1 };
 }
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   profile,
   stats,
   onStartShift,
+  onStartWithLesson,
   onQuickPlay,
   onOpenShop,
   onOpenCodex,
@@ -79,6 +83,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
     Object.values(cards).filter((c) => c.box > 0 || c.totalReviews > 0).length;
   const totalKanji = getAllKanji().length;
   const dueCount = getDueKanji(cards).length;
+  const recommended = pickRecommendedQuickStage(resolvedProfile);
 
   const handleStart = () => {
     if (onStartShift) {
@@ -88,15 +93,24 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
     }
   };
 
-  const handleQuickPlay = () => {
+  const handleBeginnerLessonStart = () => {
+    if (onStartWithLesson) {
+      onStartWithLesson(recommended.tier, recommended.stageId);
+      return;
+    }
     if (onQuickPlay) {
       onQuickPlay();
       return;
     }
-    const rec = pickRecommendedQuickStage(resolvedProfile);
-    dispatch({ type: 'QUICK_PLAY', payload: rec });
+    dispatch({
+      type: 'QUICK_PLAY',
+      payload: { tier: recommended.tier, stageId: recommended.stageId },
+    });
     if (gameEngine.getState().mode === 'title') {
-      dispatch({ type: 'SELECT_STAGE', payload: rec });
+      dispatch({
+        type: 'SELECT_STAGE',
+        payload: { tier: recommended.tier, stageId: recommended.stageId },
+      });
     }
   };
 
@@ -135,44 +149,44 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           </h1>
         </div>
         <p className="title-subtitle">
-          미시마 유키오 명작 80한자 3D 카페 서빙 게임 (Salon Mishima)
+          한자를 하나도 몰라도 OK! 5글자씩 먼저 배우고 서빙하는 3D 한자 카페 (Salon Mishima)
         </p>
       </div>
 
       {/* Open Center Window so the 3D Cafe Interior & Counter Shine Unobstructed! */}
       <div className="title-3d-window" aria-hidden="true" />
 
-      {/* Bottom High-Contrast Warm Ivory Welcome & Quick-Start Card */}
+      {/* Bottom High-Contrast Warm Ivory Beginner Onboarding Card */}
       <div className="title-shift-card">
         <p className="title-tagline-ko">
-          커피와 화과자를 손님에게 서빙하다 보면 『금각사』『조소』『가면의 고백』『우국』 필수 한자 80자가 1초 연상법으로 저절로 외워집니다!
+          오픈 전 마스터의 <strong>1분 그림·소리 과외</strong>로 오늘의 한자 5개(한글 발음 완비!)를 먼저 익힌 뒤 여유롭게 서빙을 시작해보세요!
         </p>
 
-        <div className="title-cta-row">
-          <button
-            type="button"
-            data-testid="btn-quick-play"
-            className="btn-emerald"
-            style={{ width: '100%', fontSize: '1.02rem', padding: '0.75rem 1rem' }}
-            onClick={handleQuickPlay}
-          >
-            <Zap size={18} />
-            <span>바로 카운터 출근</span>
-          </button>
+        {/* Primary Hero CTA: Learn 5 Kanji First -> Start Shift! */}
+        <button
+          type="button"
+          data-testid="btn-quick-play"
+          className="btn-emerald"
+          style={{ width: '100%', fontSize: '1.02rem', padding: '0.78rem 1rem' }}
+          onClick={handleBeginnerLessonStart}
+        >
+          <GraduationCap size={20} />
+          <span>
+            {recommended.stageNum}교시: 한자 5개 먼저 배우고 출근하기 (한자 몰라도 OK!)
+          </span>
+        </button>
 
+        <div className="title-secondary-row">
           <button
             type="button"
             data-testid="btn-start-shift"
             className="btn-gold btn-start-shift"
-            style={{ width: '100%', fontSize: '1.02rem', padding: '0.75rem 1rem' }}
             onClick={handleStart}
           >
-            <Coffee size={18} />
-            <span>영업 시작 (맵 선택)</span>
+            <Coffee size={16} />
+            <span>스테이지 고르기</span>
           </button>
-        </div>
 
-        <div className="title-secondary-row">
           <button
             type="button"
             data-testid="btn-open-shop"
@@ -214,7 +228,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
             onClick={handleCodex}
           >
             <BookOpen size={15} color="#047857" />
-            <span>미시마 80한자 도감</span>
+            <span>80한자 도감</span>
           </button>
 
           {onOpenSettings && (

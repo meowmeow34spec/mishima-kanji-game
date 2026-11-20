@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Zap, Timer, Coins, X } from 'lucide-react';
 import type { RushPrompt } from '../types/game';
 import { getAllKanji } from '../data/mishimaCurriculum';
+import { formatReadingWithHangul } from '../data/koreanMnemonics';
 import { generateRushPrompt } from '../game/rushController';
 import { useGameState, useGameDispatch } from '../hooks/useGameState';
 
@@ -256,7 +257,7 @@ export const RushOverlay: React.FC<RushOverlayProps> = ({
                   className="wooden-block conveyor-block"
                   onClick={() => handleSelect(opt)}
                 >
-                  {opt}
+                  {formatReadingWithHangul(opt)}
                 </button>
               ))}
             </div>

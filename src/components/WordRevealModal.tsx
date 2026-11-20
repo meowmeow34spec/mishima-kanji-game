@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import { Volume2, ArrowRight } from 'lucide-react';
 import type { MishimaKanjiEntry } from '../types/curriculum';
 import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
-import { getKoreanMnemonic } from '../data/koreanMnemonics';
+import { getKoreanMnemonic, formatReadingWithHangul } from '../data/koreanMnemonics';
 import { speakKanji } from '../audio/speechSynthesizer';
 
 export interface WordRevealModalProps {
@@ -107,16 +107,16 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
           </div>
         </div>
 
-        {/* Crisp >= 15px Furigana / Reading Pill Badges */}
+        {/* Crisp >= 15px Furigana / Reading Pill Badges (with Hangul!) */}
         <div className="reveal-readings">
           {onyomiList.length > 0 && (
             <span className="pill-badge pill-badge--onyomi">
-              음독 {onyomiList.join(' · ')}
+              음독 {onyomiList.map((r) => formatReadingWithHangul(r)).join(' · ')}
             </span>
           )}
           {kunyomiList.length > 0 && (
             <span className="pill-badge pill-badge--kunyomi">
-              훈독 {kunyomiList.join(' · ')}
+              훈독 {kunyomiList.map((r) => formatReadingWithHangul(r)).join(' · ')}
             </span>
           )}
         </div>

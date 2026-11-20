@@ -11,6 +11,9 @@
  * - Lively 3D cafe customer order lines & happy/angry reactions in Korean
  */
 
+import type { CurriculumTierNumber, MishimaKanjiEntry } from '../types/curriculum';
+import { getKanjiByTier } from './mishimaCurriculum';
+
 export interface KoreanMnemonicEntry {
   /** Curriculum entry ID (e.g. 'kinkaku-01-kin') */
   id: string;
@@ -1454,4 +1457,438 @@ export function getFirstSightHintKo(charOrId: string): string {
   if (!entry) return '';
   return `${entry.visualPictogram} [${entry.huneum}] ${entry.radicalBreakdown} — ${entry.storyMnemonicKo}`;
 }
+
+// ============================================================================
+// Phase 3 Beginner Onboarding Helpers:
+// 1) Accurate Hiragana/Katakana -> Hangul pronunciation bridge
+// 2) WEB-03-safe compound slot Korean 훈음 lookup (zero kanji glyph leakage!)
+// 3) 5-kanji Stage Pre-Shift Lesson builder
+// ============================================================================
+
+const YOON_DIGRAPH_TO_HANGUL: Record<string, string> = {
+  きゃ: '캬', きゅ: '큐', きょ: '쿄',
+  ぎゃ: '갸', ぎゅ: '규', ぎょ: '교',
+  しゃ: '샤', しゅ: '슈', しょ: '쇼',
+  じゃ: '쟈', じゅ: '쥬', じょ: '죠',
+  ぢゃ: '쟈', ぢゅ: '쥬', ぢょ: '죠',
+  ちゃ: '챠', ちゅ: '츄', ちょ: '쵸',
+  にゃ: '냐', にゅ: '뉴', にょ: '뇨',
+  ひゃ: '햐', ひゅ: '휴', ひょ: '효',
+  びゃ: '뱌', びゅ: '뷰', びょ: '뵤',
+  ぴゃ: '퍄', ぴゅ: '퓨', ぴょ: '표',
+  みゃ: '먀', みゅ: '뮤', みょ: '묘',
+  りゃ: '랴', りゅ: '류', りょ: '료',
+  ふぁ: '파', ふぃ: '피', ふぇ: '페', ふぉ: '포',
+  てぃ: '티', でぃ: '디', しぇ: '셰', ちぇ: '체', じぇ: '제',
+  うぃ: '위', うぇ: '웨', うぉ: '워',
+};
+
+const HIRAGANA_TO_HANGUL: Record<string, string> = {
+  あ: '아', い: '이', う: '우', え: '에', お: '오',
+  か: '카', き: '키', く: '쿠', け: '케', こ: '코',
+  が: '가', ぎ: '기', ぐ: '구', げ: '게', ご: '고',
+  さ: '사', し: '시', す: '스', せ: '세', そ: '소',
+  ざ: '자', じ: '지', ず: '즈', ぜ: '제', ぞ: '조',
+  た: '타', ち: '치', つ: '츠', て: '테', と: '토',
+  だ: '다', ぢ: '지', づ: '즈', で: '데', ど: '도',
+  な: '나', に: '니', ぬ: '누', ね: '네', の: '노',
+  は: '하', ひ: '히', ふ: '후', へ: '헤', ほ: '호',
+  ば: '바', び: '비', ぶ: '부', べ: '베', ぼ: '보',
+  ぱ: '파', ぴ: '피', ぷ: '푸', ぺ: '페', ぽ: '포',
+  ま: '마', み: '미', む: '무', め: '메', も: '모',
+  や: '야', ゆ: '유', よ: '요',
+  ら: '라', り: '리', る: '루', れ: '레', ろ: '로',
+  わ: '와', ゐ: '이', ゑ: '에', を: '오',
+  ぁ: '아', ぃ: '이', ぅ: '우', ぇ: '에', ぉ: '오',
+  ゃ: '야', ゅ: '유', ょ: '요', ゎ: '와', ゔ: '부',
+};
+
+const KANA_CHAR_REGEX = /[\u3040-\u309F\u30A0-\u30FF]/;
+
+function normalizeKatakanaToHiragana(input: string): string {
+  let out = '';
+  for (const ch of input) {
+    const code = ch.charCodeAt(0);
+    // Katakana ァ(0x30A1)..ヶ(0x30F6) -> Hiragana ぁ(0x3041)..ゖ(0x3096)
+    if (code >= 0x30a1 && code <= 0x30f6) {
+      out += String.fromCharCode(code - 0x60);
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+/**
+ * Attaches a Korean final consonant (종성 받침: 4 = 'ㄴ' for ん/ン, 19 = 'ㅅ' for っ/ッ)
+ * onto the preceding open Hangul syllable if possible.
+ */
+function attachBatchimToLastSyllable(syllables: string[], jongIndex: number, fallback: string): void {
+  if (syllables.length === 0) {
+    syllables.push(fallback);
+    return;
+  }
+  const last = syllables[syllables.length - 1];
+  const code = last.charCodeAt(0);
+  if (code >= 0xac00 && code <= 0xd7a3) {
+    const offset = code - 0xac00;
+    const existingJong = offset % 28;
+    if (existingJong === 0) {
+      syllables[syllables.length - 1] = String.fromCharCode(code + jongIndex);
+      return;
+    }
+  }
+  syllables.push(fallback);
+}
+
+/**
+ * Extends a Katakana chōonpu ('ー') using the vowel of the preceding Hangul syllable.
+ */
+function resolveChoonpuVowel(syllables: string[]): string {
+  if (syllables.length === 0) return '';
+  const last = syllables[syllables.length - 1];
+  const code = last.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return '';
+  const jung = Math.floor((code - 0xac00) / 28) % 21;
+  // Jungseong indices: 0:ㅏ, 2:ㅑ, 4:ㅓ, 5:ㅔ, 6:ㅕ, 7:ㅖ, 8:ㅗ, 12:ㅛ, 13:ㅜ, 17:ㅠ, 18:ㅡ, 20:ㅣ
+  if (jung === 0 || jung === 2 || jung === 9) return '아';
+  if (jung === 5 || jung === 7 || jung === 1 || jung === 3 || jung === 4 || jung === 6) return '에';
+  if (jung === 8 || jung === 12) return '오';
+  if (jung === 13 || jung === 17) return '우';
+  if (jung === 18) return '으';
+  if (jung === 20) return '이';
+  return '아';
+}
+
+function convertSingleKanaSegmentToHangul(segment: string): string {
+  const cleaned = segment.replace(/[・\-\s]/g, '').trim();
+  if (!cleaned) return '';
+  const hira = normalizeKatakanaToHiragana(cleaned);
+  const chars = Array.from(hira);
+  const syllables: string[] = [];
+
+  let i = 0;
+  while (i < chars.length) {
+    const ch = chars[i];
+    const next = chars[i + 1] || '';
+
+    if (next) {
+      const pair = ch + next;
+      const yoon = YOON_DIGRAPH_TO_HANGUL[pair];
+      if (yoon) {
+        syllables.push(yoon);
+        i += 2;
+        continue;
+      }
+    }
+
+    if (ch === 'ん') {
+      // Attach 받침 ㄴ (jongseong index 4)
+      attachBatchimToLastSyllable(syllables, 4, '은');
+      i += 1;
+      continue;
+    }
+
+    if (ch === 'っ') {
+      // Attach 받침 ㅅ (jongseong index 19)
+      attachBatchimToLastSyllable(syllables, 19, '읏');
+      i += 1;
+      continue;
+    }
+
+    if (ch === 'ー') {
+      const ext = resolveChoonpuVowel(syllables);
+      if (ext) syllables.push(ext);
+      i += 1;
+      continue;
+    }
+
+    const mapped = HIRAGANA_TO_HANGUL[ch];
+    if (mapped) {
+      syllables.push(mapped);
+    } else if (!KANA_CHAR_REGEX.test(ch)) {
+      syllables.push(ch);
+    }
+    i += 1;
+  }
+
+  return syllables.join('');
+}
+
+/**
+ * Converts Japanese Hiragana/Katakana reading into accurate, beginner-friendly Korean Hangul.
+ * Examples:
+ * - 'キン' -> '킨'
+ * - 'きんかくじ' -> '킨카쿠지'
+ * - 'うつく・しい' -> '우츠쿠시이'
+ * - 'ほのお' -> '호노오'
+ * - 'せっぷく' -> '셋푸쿠'
+ * - 'は / ヨウ' -> '하 / 요우'
+ */
+export function kanaToHangul(kana: string): string {
+  if (!kana) return '';
+  if (kana.includes('/')) {
+    return kana
+      .split('/')
+      .map((part) => convertSingleKanaSegmentToHangul(part))
+      .filter(Boolean)
+      .join(' / ');
+  }
+  return convertSingleKanaSegmentToHangul(kana);
+}
+
+/**
+ * Formats a Japanese Kana reading alongside its Korean Hangul pronunciation.
+ * Examples:
+ * - 'キン' -> 'キン (킨)'
+ * - 'きんかくじ' -> 'きんかくじ (킨카쿠지)'
+ * - 'うつく・しい' -> 'うつくしい (우츠쿠시이)'
+ * - 'ほのお' -> 'ほのお (호노오)'
+ * - 'は / ヨウ' -> 'は (하) / ヨウ (요우)'
+ * Safe & idempotent: returns pure Kanji strings (e.g. '寺') or already-annotated strings unchanged.
+ */
+export function formatReadingWithHangul(kana: string): string {
+  if (!kana) return '';
+  const trimmed = kana.trim();
+  if (!trimmed) return '';
+  // Already annotated with Hangul in parentheses
+  if (/[\(（][가-힣\s·\/]+[\)）]/.test(trimmed)) {
+    return trimmed;
+  }
+  // No Hiragana/Katakana present (e.g. pure Kanji option in Boss Duel)
+  if (!KANA_CHAR_REGEX.test(trimmed)) {
+    return trimmed;
+  }
+  if (trimmed.includes('/')) {
+    return trimmed
+      .split('/')
+      .map((part) => formatReadingWithHangul(part))
+      .join(' / ');
+  }
+  const displayKana = trimmed.replace(/[・\-]/g, '').trim();
+  const hangul = convertSingleKanaSegmentToHangul(displayKana);
+  if (!hangul) return displayKana;
+  return `${displayKana} (${hangul})`;
+}
+
+/**
+ * Complete Korean 훈음 lookup for every auxiliary/partner Kanji appearing in any
+ * literaryCompounds entry or Boss Duel pair across the entire Salon Mishima corpus.
+ * Zero CJK/Kana characters appear in the values so WEB-03 never sees raw glyph leaks!
+ */
+const COMPOUND_AUX_HUNEUM_KO: Record<string, string> = {
+  // Boss comparison kanji
+  侍: '모실 시', 炭: '숯 탄', 華: '빛날 화', 葉: '잎 엽', 優: '넉넉할 우',
+  闊: '트일 활', 魄: '넋 백', 刀: '칼 도', 力: '힘 력', 回: '돌 회',
+  // All auxiliary kanji appearing across literaryCompounds in Tiers 1–4
+  黄: '누를 황', 箔: '금박 박', 楼: '다락 루', 院: '집 원', 禅: '참선 선',
+  対: '마주할 대', 意: '뜻 의', 識: '알 식', 湖: '호수 호', 明: '밝을 명',
+  水: '물 수', 火: '불 화', 上: '위 상', 情: '뜻 정', 暗: '어두울 암',
+  学: '배울 학', 侶: '짝 려', 高: '높을 고', 夢: '꿈 몽', 破: '깨뜨릴 파',
+  不: '아닐 불', 失: '잃을 실', 全: '온전할 전', 延: '늘일 연', 燼: '깜부기불 진',
+  降: '내릴 강', 死: '죽을 사', 冠: '갓 관', 翼: '날개 익', 畔: '물가 반',
+  古: '예 고', 栄: '영화 영', 輝: '빛날 휘', 望: '바랄 망', 拒: '막을 거',
+  視: '볼 시', 猜: '시기할 시', 再: '두 재', 存: '있을 존', 黒: '검을 흑',
+  風: '바람 풍', 喧: '시끄러울 훤', 物: '만물 물', 原: '언덕 원', 深: '깊을 심',
+  富: '부자 부', 作: '지을 작', 舌: '혀 설', 濤: '큰물결 도', 夫: '사내 부',
+  船: '배 선', 歌: '노래 가', 孤: '외로울 고', 民: '백성 민', 小: '작을 소',
+  笹: '조릿대 세', 辺: '가 변', 漠: '사막 막', 夜: '밤 야', 伏: '엎드릴 복',
+  入: '들 입', 約: '맺을 약', 祈: '빌 기', 青: '푸를 청', 残: '남을 잔',
+  吹: '불 취', 天: '하늘 천', 人: '사람 인', 五: '다섯 오', 退: '물러날 퇴',
+  弱: '약할 약', 下: '아래 하', 壺: '항아리 호', 川: '내 천', 莫: '없을 막',
+  静: '고요할 정', 寥: '쓸쓸할 료', 象: '모양 상', 予: '미리 예', 宣: '베풀 선',
+  純: '순수할 순', 潔: '깨끗할 결', 断: '끊을 단', 厳: '엄할 엄', 景: '볕 경',
+  悪: '악할 악', 業: '업 업', 善: '착할 선', 虚: '빌 허', 羞: '부끄러울 수',
+  辱: '욕될 욕', 部: '떼 부', 悲: '슬플 비', 薬: '약 약', 場: '마당 장',
+  技: '재주 기', 公: '공변될 공', 溺: '빠질 닉', 読: '읽을 독', 毒: '독 독',
+  弓: '활 궁', 教: '가르칠 교', 難: '어려울 난', 放: '놓을 방', 止: '그칠 지',
+  照: '비출 조', 然: '그럴 연', 境: '지경 경', 自: '스스로 자', 共: '함께 공',
+  洋: '큰바다 양', 内: '안 내', 慮: '생각할 려', 杞: '구기자 기', 皇: '임금 황',
+  祖: '조상 조', 疾: '빠를 질', 神: '귀신 신', 星: '별 성', 鋼: '강철 강',
+  拳: '주먹 권', 朝: '아침 조', 丸: '둥글 환', 体: '몸 체', 骨: '뼈 골',
+  大: '클 대', 和: '화할 화', 霊: '신령 령', 闘: '싸울 투', 凶: '흉할 흉',
+  割: '가를 할', 背: '등 배', 実: '열매 실', 親: '친할 친', 義: '옳을 의',
+  誠: '정성 성', 節: '마디 절', 日: '날 일', 車: '수레 거', 巡: '돌 순',
+  転: '구를 전', 那: '어찌 나', 痾: '고질병 아', 泊: '머무를 박', 運: '운전할 운',
+  使: '부릴 사', 穣: '풍년 양',
+};
+
+function sanitizeNoJapaneseGlyphs(label: string): string {
+  return label
+    .replace(/[\u4E00-\u9FFF\u3400-\u4DBF\u3040-\u309F\u30A0-\u30FF々]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/**
+ * Returns Korean 훈음 per character slot of a compound word
+ * (e.g. '金閣寺' -> ['쇠 금', '누각 각', '절 사']).
+ * Guaranteed NEVER to include raw CJK kanji or Japanese kana characters so WEB-03 stays 100% green!
+ */
+export function getCompoundSlotHuneums(compound: string): string[] {
+  if (!compound) return [];
+  return Array.from(compound.trim()).map((ch) => {
+    const mne = KOREAN_MNEMONICS[ch];
+    if (mne?.huneum) {
+      return sanitizeNoJapaneseGlyphs(mne.huneum);
+    }
+    const aux = COMPOUND_AUX_HUNEUM_KO[ch];
+    if (aux) {
+      return sanitizeNoJapaneseGlyphs(aux);
+    }
+    if (ch === 'の') {
+      return '조사 의(노)';
+    }
+    if (ch === 'と') {
+      return '조사 과(토)';
+    }
+    if (KANA_CHAR_REGEX.test(ch)) {
+      return `가나 ${kanaToHangul(ch)}`;
+    }
+    return '한자 조각';
+  });
+}
+
+export interface StageKanjiLessonItem {
+  /** Full curriculum entry from mishimaCurriculum.ts */
+  kanji: MishimaKanjiEntry;
+  /** Full Korean mnemonic & cafe dialogue entry */
+  mnemonic: KoreanMnemonicEntry;
+  /** Convenience top-level shortcuts */
+  id: string;
+  character: string;
+  huneum: string;
+  meaningKo: string;
+  primaryReading: string;
+  primaryReadingHangul: string;
+  primaryReadingFormatted: string;
+  onyomiFormatted: string[];
+  kunyomiFormatted: string[];
+  /** Gentle, zero-stress master coaching tip for warm-up practice */
+  warmTipKo: string;
+}
+
+/**
+ * Parses a stage identifier (e.g. 'stage-1-2') or stage number into normalized { tier, stageNum, stageId }.
+ */
+export function parseStageId(
+  stageIdOrNum?: string | number | null,
+  fallbackTier: CurriculumTierNumber = 1
+): { tier: CurriculumTierNumber; stageNum: 1 | 2 | 3 | 4; stageId: string } {
+  let tier: CurriculumTierNumber =
+    fallbackTier === 1 || fallbackTier === 2 || fallbackTier === 3 || fallbackTier === 4
+      ? fallbackTier
+      : 1;
+  let stageNum: 1 | 2 | 3 | 4 = 1;
+
+  if (typeof stageIdOrNum === 'number' && Number.isFinite(stageIdOrNum)) {
+    const clamped = Math.max(1, Math.min(4, Math.floor(stageIdOrNum))) as 1 | 2 | 3 | 4;
+    stageNum = clamped;
+  } else if (typeof stageIdOrNum === 'string') {
+    const match = stageIdOrNum.match(/stage-(\d+)-(\d+)/);
+    if (match) {
+      const parsedTier = Number(match[1]);
+      const parsedStage = Number(match[2]);
+      if (parsedTier >= 1 && parsedTier <= 4) {
+        tier = parsedTier as CurriculumTierNumber;
+      }
+      if (parsedStage >= 1 && parsedStage <= 4) {
+        stageNum = parsedStage as 1 | 2 | 3 | 4;
+      }
+    } else {
+      const trailing = stageIdOrNum.match(/(\d+)$/);
+      if (trailing) {
+        const parsedStage = Number(trailing[1]);
+        if (parsedStage >= 1 && parsedStage <= 4) {
+          stageNum = parsedStage as 1 | 2 | 3 | 4;
+        }
+      }
+    }
+  }
+
+  return {
+    tier,
+    stageNum,
+    stageId: `stage-${tier}-${stageNum}`,
+  };
+}
+
+/**
+ * Resolves the player's next uncompleted regular stage (defaults to Stage 1-1: 金 閣 寺 美 鏡 for new players).
+ */
+export function getNextUncompletedStage(
+  unlockedTiers: readonly number[] = [1],
+  completedStages: readonly string[] = []
+): { tier: CurriculumTierNumber; stageNum: 1 | 2 | 3 | 4; stageId: string } {
+  const validTiers = ([1, 2, 3, 4] as CurriculumTierNumber[]).filter((t) =>
+    unlockedTiers.includes(t)
+  );
+  const tiersToScan: CurriculumTierNumber[] = validTiers.length > 0 ? validTiers : [1];
+
+  for (const tier of tiersToScan) {
+    for (const stageNum of [1, 2, 3, 4] as const) {
+      const stageId = `stage-${tier}-${stageNum}`;
+      if (!completedStages.includes(stageId)) {
+        return { tier, stageNum, stageId };
+      }
+    }
+  }
+
+  const lastTier = tiersToScan[tiersToScan.length - 1] || 1;
+  return { tier: lastTier, stageNum: 1, stageId: `stage-${lastTier}-1` };
+}
+
+/**
+ * Returns the exact 5 MishimaKanjiEntry + KoreanMnemonicEntry pairs for a given tier (1..4) and stage (1..4 or 'stage-X-Y').
+ * Matches GameEngine's exact stage slicing (`offset = (stageNum - 1) * 5`, slice of 5).
+ */
+export function getStageKanjiList(
+  tier: 1 | 2 | 3 | 4 | number,
+  stageNum: 1 | 2 | 3 | 4 | number | string = 1
+): StageKanjiLessonItem[] {
+  const safeTier: CurriculumTierNumber =
+    tier === 1 || tier === 2 || tier === 3 || tier === 4 ? tier : 1;
+  const parsed = parseStageId(stageNum, safeTier);
+  const effectiveTier = typeof stageNum === 'string' && stageNum.startsWith('stage-') ? parsed.tier : safeTier;
+  const offset = (parsed.stageNum - 1) * 5;
+
+  const tierKanji = getKanjiByTier(effectiveTier);
+  const slice = tierKanji.slice(offset, offset + 5);
+
+  return slice.map((kanji) => {
+    const mnemonic =
+      getKoreanMnemonic(kanji.character) ||
+      getKoreanMnemonic(kanji.id) ||
+      KOREAN_MNEMONIC_LIST[0];
+
+    const onyomiRaw = kanji.onyomi?.length ? kanji.onyomi : kanji.readings?.onyomi || [];
+    const kunyomiRaw = kanji.kunyomi?.length ? kanji.kunyomi : kanji.readings?.kunyomi || [];
+
+    const primaryReadingRaw = onyomiRaw[0] || kunyomiRaw[0] || kanji.character;
+    const primaryReading = primaryReadingRaw.replace(/[・\-]/g, '').trim();
+    const primaryReadingHangul = kanaToHangul(primaryReadingRaw);
+    const primaryReadingFormatted = formatReadingWithHangul(primaryReadingRaw);
+
+    const onyomiFormatted = onyomiRaw.map((r) => formatReadingWithHangul(r));
+    const kunyomiFormatted = kunyomiRaw.map((r) => formatReadingWithHangul(r));
+
+    const warmTipKo = `괜찮아요! ${mnemonic.visualPictogram} ${mnemonic.radicalBreakdown} → '${mnemonic.huneum}(${kanji.character})' · 발음은 ${primaryReadingFormatted}이에요 😊 다시 눌러볼까요?`;
+
+    return {
+      kanji,
+      mnemonic,
+      id: kanji.id,
+      character: kanji.character,
+      huneum: mnemonic.huneum,
+      meaningKo: mnemonic.meaningKo,
+      primaryReading,
+      primaryReadingHangul,
+      primaryReadingFormatted,
+      onyomiFormatted,
+      kunyomiFormatted,
+      warmTipKo,
+    };
+  });
+}
+
 

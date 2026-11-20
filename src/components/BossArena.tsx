@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Swords, Timer, Lightbulb } from 'lucide-react';
 import type { BossChoiceOption, BossKanjiPair } from '../types/curriculum';
 import { getAnyKoreanGloss, getKoreanBossMeta } from '../data/koreanGlossary';
+import { formatReadingWithHangul } from '../data/koreanMnemonics';
 import { useGameState, useGameDispatch } from '../hooks/useGameState';
 
 export interface BossArenaQuestion {
@@ -290,13 +291,16 @@ export const BossArena: React.FC<BossArenaProps> = ({
             {resolvedQuestion.options.map((opt, idx) => {
               let label: string;
               if (typeof opt === 'string') {
-                label = opt;
+                label = formatReadingWithHangul(opt);
               } else {
                 const koOptGloss = getAnyKoreanGloss(opt.kanji);
                 const meaningLabel = koOptGloss ? koOptGloss.huneum : opt.meaning;
+                const formattedReading = opt.reading
+                  ? formatReadingWithHangul(opt.reading)
+                  : '';
                 label =
                   resolvedQuestion.type === 'glyph_to_sound'
-                    ? `${opt.reading} (${meaningLabel})`
+                    ? `${formattedReading} — ${meaningLabel}`
                     : `${opt.kanji}${meaningLabel ? ` — ${meaningLabel}` : ''}`;
               }
 

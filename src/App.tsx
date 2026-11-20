@@ -1,5 +1,5 @@
 /**
- * Salon Mishima 3D - Root Application Component, Persistent 3D World & HUD Router
+ * Salon Mishima 3D - Root Application Component, Persistent 3D World & Beginner Onboarding Router
  * File: src/App.tsx
  */
 
@@ -23,9 +23,11 @@ import {
   deriveCustomerAnimState,
   deriveQualityLevel3D,
   deriveUnlockedUpgrades,
+  deriveStageKanjiLesson,
 } from './hooks/useGameState';
 import { getAllKanji } from './data/mishimaCurriculum';
 import { getKoreanTierMeta } from './data/koreanGlossary';
+import { parseStageId } from './data/koreanMnemonics';
 import { generateRushPrompt } from './game/rushController';
 import { SALON_CUSTOMERS } from './game/orderGenerator';
 import { recordDailyLogin } from './srs/storageManager';
@@ -36,7 +38,12 @@ import {
   unlockAudio,
   suspendAudio,
 } from './audio/soundSynthesizer';
-import { setSpeechEnabled, cancelSpeech } from './audio/speechSynthesizer';
+import {
+  setSpeechEnabled,
+  cancelSpeech,
+  speakKanji,
+} from './audio/speechSynthesizer';
+import type { CurriculumTierNumber, MishimaKanjiEntry } from './types/curriculum';
 import type { RushPrompt } from './types/game';
 import type {
   ActiveCustomer3D,
@@ -55,6 +62,13 @@ import { StudyCodexModal } from './components/StudyCodexModal';
 import { DailyReviewModal } from './components/DailyReviewModal';
 import { SettingsModal } from './components/SettingsModal';
 import { CafeShopModal } from './components/CafeShopModal';
+import { PreShiftLessonModal } from './components/PreShiftLessonModal';
+
+interface PendingLessonStage {
+  tier: CurriculumTierNumber;
+  stageId: string;
+  stageNum: 1 | 2 | 3 | 4;
+}
 
 function buildRushPromptAt(seedIndex: number): RushPrompt {
   const all = getAllKanji();
@@ -68,6 +82,12 @@ export const App: React.FC = () => {
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMuted] = useState<boolean>(() => isAudioMuted());
   const [speechAnchor, setSpeechAnchor] = useState<SpeechBubbleAnchor2D | null>(null);
+  const [isCounterPaused, setCounterPaused] = useState(false);
+  const [pendingLessonStage, setPendingLessonStage] =
+    useState<PendingLessonStage | null>(null);
+  const [activeLessonKanji, setActiveLessonKanji] =
+    useState<MishimaKanjiEntry | null>(null);
+
   const [blockFlash, setBlockFlash] = useState<{
     label: string;
     isCorrect: boolean;
@@ -88,6 +108,12 @@ export const App: React.FC = () => {
       );
     }
   }, [state.mode, rushTurnCount, state.currentTier]);
+
+  useEffect(() => {
+    if (state.mode !== 'lesson') {
+      setCounterPaused(false);
+    }
+  }, [state.mode]);
 
   useEffect(() => {
     return () => {
@@ -193,10 +219,61 @@ export const App: React.FC = () => {
     }
   };
 
+  // Opens the 1-minute Pre-Shift Beginner Lesson before entering the cafe shift
+  const handleOpenStageLesson = useCallback(
+    (tier: CurriculumTierNumber, stageId: string) => {
+      if (stageId.includes('boss')) {
+        setPendingLessonStage(null);
+        setActiveLessonKanji(null);
+        dispatch({ type: 'SELECT_STAGE', payload: { tier, stageId } });
+        return;
+      }
+      const parsed = parseStageId(stageId, tier);
+      const lessonItems = deriveStageKanjiLesson(parsed.tier, parsed.stageId);
+      setPendingLessonStage(parsed);
+      setActiveLessonKanji(lessonItems[0]?.kanji ?? null);
+    },
+    [dispatch]
+  );
+
+  // Completes or skips the Pre-Shift Lesson and launches the selected stage shift
+  const handleLaunchStageAfterLesson = useCallback(
+    (overrideTier?: CurriculumTierNumber, overrideStageId?: string) => {
+      const targetTier =
+        overrideTier ?? pendingLessonStage?.tier ?? state.currentTier;
+      const targetStageId =
+        overrideStageId ??
+        pendingLessonStage?.stageId ??
+        `stage-${targetTier}-1`;
+
+      setPendingLessonStage(null);
+      setActiveLessonKanji(null);
+      setCounterPaused(false);
+      dispatch({
+        type: 'SELECT_STAGE',
+        payload: { tier: targetTier, stageId: targetStageId },
+      });
+    },
+    [pendingLessonStage, state.currentTier, dispatch]
+  );
+
+  const handleCloseLessonModal = useCallback(() => {
+    setPendingLessonStage(null);
+    setActiveLessonKanji(null);
+  }, []);
+
   // Unified handler for picking an option from either 3D WebGL raycasting or Counter HUD/Hotkeys
   const handleCounterOptionPick = useCallback(
     (option: string) => {
-      if (state.revealKanji || state.isGameOver || state.isLevelComplete) return;
+      if (
+        pendingLessonStage ||
+        isCounterPaused ||
+        state.revealKanji ||
+        state.isGameOver ||
+        state.isLevelComplete
+      ) {
+        return;
+      }
       const order = state.activeOrder;
       if (!order) return;
 
@@ -205,6 +282,8 @@ export const App: React.FC = () => {
       dispatch({ type: 'PICK_BLOCK', payload: { option } });
     },
     [
+      pendingLessonStage,
+      isCounterPaused,
       state.revealKanji,
       state.isGameOver,
       state.isLevelComplete,
@@ -214,9 +293,18 @@ export const App: React.FC = () => {
     ]
   );
 
-  // Direct 3D block click/tap handler across Counter, Build, and 25s Rush modes
+  // Direct 3D block click/tap handler across Pre-Shift Study, Counter, Build, and 25s Rush modes
   const handle3DBlockPick = useCallback(
     (label: string) => {
+      if (pendingLessonStage) {
+        try {
+          speakKanji(label);
+        } catch {
+          // Safe fallback
+        }
+        return;
+      }
+
       if (state.mode === 'rush') {
         if (!state.rushState?.isActive) return;
         const isCorrect = label === rushPrompt.correctOption;
@@ -233,6 +321,7 @@ export const App: React.FC = () => {
       }
     },
     [
+      pendingLessonStage,
       state.mode,
       state.rushState?.isActive,
       rushPrompt.correctOption,
@@ -242,14 +331,29 @@ export const App: React.FC = () => {
     ]
   );
 
-  // Derive 3D Scene & Actor props from live game state
-  const cameraMode = deriveCameraMode3D(state);
+  // Derive 3D Scene & Actor props from live game state + Pre-Shift Beginner Lesson showcase
+  const cameraMode = pendingLessonStage ? 'counter' : deriveCameraMode3D(state);
+  const effectiveTier = pendingLessonStage?.tier ?? state.currentTier;
   const patienceRatio = derivePatienceRatio(state);
-  const customerAnim = deriveCustomerAnimState(state, patienceRatio);
+  const customerAnim =
+    pendingLessonStage || isCounterPaused
+      ? 'idle'
+      : deriveCustomerAnimState(state, patienceRatio);
   const qualityLevel = deriveQualityLevel3D(state);
   const unlockedUpgrades = useMemo(
     () => deriveUnlockedUpgrades(state),
     [state.unlockedUpgrades, state.profile?.unlockedUpgrades]
+  );
+
+  const pendingLessonItems = useMemo(
+    () =>
+      pendingLessonStage
+        ? deriveStageKanjiLesson(
+            pendingLessonStage.tier,
+            pendingLessonStage.stageId
+          )
+        : [],
+    [pendingLessonStage]
   );
 
   const activeCustomer3D = useMemo<ActiveCustomer3D | null>(() => {
@@ -276,6 +380,19 @@ export const App: React.FC = () => {
   ]);
 
   const blocks3D = useMemo<KanjiBlock3DItem[]>(() => {
+    // Showcase the 5 study kanji on the 3D counter while PreShiftLessonModal is open!
+    if (pendingLessonStage && pendingLessonItems.length > 0) {
+      return pendingLessonItems.map((item, idx) => ({
+        id: `lesson-preview-${item.id}-${idx}`,
+        label: item.character,
+        sublabel: String(idx + 1),
+        isSelected: activeLessonKanji?.id === item.id,
+        isCorrectFlash: activeLessonKanji?.id === item.id,
+        isWrongFlash: false,
+        slotIndex: -1,
+      }));
+    }
+
     if (state.mode === 'rush') {
       return rushPrompt.options.map((opt, idx) => ({
         id: `${rushPrompt.id}-rush-${idx}`,
@@ -319,6 +436,9 @@ export const App: React.FC = () => {
 
     return [];
   }, [
+    pendingLessonStage,
+    pendingLessonItems,
+    activeLessonKanji?.id,
     state.mode,
     state.activeOrder,
     state.traySlots,
@@ -338,15 +458,17 @@ export const App: React.FC = () => {
     return 1;
   }, [state.activeOrder]);
 
-  const tierMetaKo = getKoreanTierMeta(state.currentTier);
-  const chalkboardTitle =
-    state.mode === 'rush'
-      ? '⚡ 25초 폭풍 주문 러시'
+  const tierMetaKo = getKoreanTierMeta(effectiveTier);
+  const chalkboardTitle = pendingLessonStage
+    ? `☕ ${pendingLessonStage.stageNum}교시 오픈 전 한자 과외`
+    : state.mode === 'rush'
+      ? '25초 폭풍 주문 러시'
       : state.mode === 'shop'
-        ? '🏪 살롱 인테리어 상점'
+        ? '살롱 인테리어 상점'
         : tierMetaKo?.nameKo || '살롱 미시마 3D';
-  const chalkboardSubtitle =
-    state.mode === 'lesson'
+  const chalkboardSubtitle = pendingLessonStage
+    ? `오늘의 한자: ${pendingLessonItems.map((i) => i.character).join(' · ')}`
+    : state.mode === 'lesson'
       ? `주문 ${Math.min(state.stageOrderIndex + 1, state.stageTotalOrders)} / ${state.stageTotalOrders}`
       : state.mode === 'rush'
         ? `성공 ${state.rushState?.hits ?? 0}건 · 코인 보너스`
@@ -363,7 +485,7 @@ export const App: React.FC = () => {
       {/* Persistent Full-Viewport Interactive 3D WebGL Kissaten World */}
       <SalonCanvas3D
         mode={cameraMode}
-        tier={state.currentTier}
+        tier={effectiveTier}
         activeCustomer={activeCustomer3D}
         customerAnim={customerAnim}
         patienceRatio={patienceRatio}
@@ -388,7 +510,11 @@ export const App: React.FC = () => {
         <div
           className="salon-hud-brand"
           style={{ cursor: 'pointer' }}
-          onClick={() => dispatch({ type: 'RETURN_TO_TITLE' })}
+          onClick={() => {
+            setPendingLessonStage(null);
+            setActiveLessonKanji(null);
+            dispatch({ type: 'RETURN_TO_TITLE' });
+          }}
         >
           <Coffee size={22} color="var(--color-gold-light)" style={{ flexShrink: 0 }} />
           <span className="salon-hud-title">
@@ -412,12 +538,13 @@ export const App: React.FC = () => {
             className="btn-icon"
             data-testid="hud-btn-shop"
             aria-label="Open 3D Cafe Shop"
-            title="🏪 3D 카페 인테리어 상점"
-            onClick={() =>
+            title="3D 카페 인테리어 상점"
+            onClick={() => {
+              setPendingLessonStage(null);
               dispatch({
                 type: state.mode === 'shop' ? 'CLOSE_SHOP' : 'OPEN_SHOP',
-              })
-            }
+              });
+            }}
           >
             <Store size={18} />
           </button>
@@ -426,8 +553,11 @@ export const App: React.FC = () => {
             type="button"
             className="btn-icon"
             aria-label="Open Study Codex"
-            title="📖 미시마 80한자 도감 (Study Codex)"
-            onClick={() => dispatch({ type: 'OPEN_CODEX' })}
+            title="미시마 80한자 도감 (Study Codex)"
+            onClick={() => {
+              setPendingLessonStage(null);
+              dispatch({ type: 'OPEN_CODEX' });
+            }}
           >
             <BookOpen size={18} />
           </button>
@@ -446,7 +576,7 @@ export const App: React.FC = () => {
             type="button"
             className="btn-icon"
             aria-label="Open Settings"
-            title="⚙️ 설정 및 3D 그래픽 품질"
+            title="설정 및 3D 그래픽 품질"
             onClick={() => setSettingsOpen(true)}
           >
             <Settings size={18} />
@@ -456,20 +586,28 @@ export const App: React.FC = () => {
 
       {/* Active Transparent Pointer-Through Mode Screen */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {state.mode === 'title' && (
-          <TitleScreen onOpenSettings={() => setSettingsOpen(true)} />
+        {state.mode === 'title' && !pendingLessonStage && (
+          <TitleScreen
+            onStartWithLesson={handleOpenStageLesson}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
         )}
 
         {(state.mode === 'map' ||
           state.mode === 'codex' ||
-          state.mode === 'review') && (
-          <SalonMap onOpenSettings={() => setSettingsOpen(true)} />
-        )}
+          state.mode === 'review') &&
+          !pendingLessonStage && (
+            <SalonMap
+              onRequestStageLesson={handleOpenStageLesson}
+              onOpenSettings={() => setSettingsOpen(true)}
+            />
+          )}
 
         {state.mode === 'lesson' && (
           <SalonCounter
             speechAnchor={speechAnchor}
             onPickOption={handleCounterOptionPick}
+            onPauseChange={setCounterPaused}
           />
         )}
 
@@ -477,6 +615,20 @@ export const App: React.FC = () => {
 
         {state.mode === 'rush' && <RushOverlay currentPrompt={rushPrompt} />}
       </main>
+
+      {/* Pre-Shift 1-Minute Beginner Kanji Lesson Modal ("먼저 배우고 익힌 뒤 출근!") */}
+      <PreShiftLessonModal
+        isOpen={Boolean(pendingLessonStage)}
+        tier={pendingLessonStage?.tier ?? state.currentTier}
+        stageNum={pendingLessonStage?.stageNum ?? 1}
+        stageId={pendingLessonStage?.stageId ?? null}
+        onStartShift={handleLaunchStageAfterLesson}
+        onComplete={handleLaunchStageAfterLesson}
+        onSkip={handleLaunchStageAfterLesson}
+        onSkipLesson={handleLaunchStageAfterLesson}
+        onClose={handleCloseLessonModal}
+        onActiveKanjiChange={(kanji) => setActiveLessonKanji(kanji)}
+      />
 
       {/* Global Overlays & Modals */}
       <CafeShopModal

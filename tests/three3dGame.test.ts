@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, act } from '@testing-library/react';
 import { resolveCustomerActorId } from '../src/types/three3d';
 import { getAllKanji, MISHIMA_KANJI_CURRICULUM } from '../src/data/mishimaCurriculum';
 import { getAllBossPairs } from '../src/data/bossPairs';
@@ -51,11 +51,21 @@ const hasKanjiBlocks3D = fileExists('src/three/KanjiBlocks3D.ts');
 const hasBossAvatar3D = fileExists('src/three/BossAvatar3D.ts');
 const hasSalonCanvas3D = fileExists('src/components/SalonCanvas3D.tsx');
 const hasCafeShopModal = fileExists('src/components/CafeShopModal.tsx');
+const hasPreShiftLessonModal = fileExists('src/components/PreShiftLessonModal.tsx');
+
+const mnemonicsSource = hasMnemonics
+  ? fs.readFileSync(path.join(rootDir, 'src/data/koreanMnemonics.ts'), 'utf-8')
+  : '';
+const hasPhase3MnemonicHelpers =
+  mnemonicsSource.includes('kanaToHangul') &&
+  mnemonicsSource.includes('getCompoundSlotHuneums') &&
+  mnemonicsSource.includes('getStageKanjiList');
 
 const appSource = fileExists('src/App.tsx')
   ? fs.readFileSync(path.join(rootDir, 'src/App.tsx'), 'utf-8')
   : '';
 const isPhase2Integrated = appSource.includes('SalonCanvas3D');
+const isPhase3Integrated = appSource.includes('PreShiftLessonModal');
 
 const CANONICAL_UPGRADE_IDS = [
   'siphon',
@@ -915,5 +925,237 @@ describe('Salon Mishima 3D Overhaul Verification Suite', () => {
       fireEvent.click(correctBtn!);
       expect(onPickOption).toHaveBeenCalledWith(pickOrder.correctOption);
     });
+  });
+
+  // =========================================================================
+  // 5. Phase 3 Zero-Kanji Beginner Onboarding ("먼저 배우고 익힌 뒤 출근!")
+  // =========================================================================
+  describe('5. Phase 3 Zero-Kanji Beginner Onboarding & Kana-to-Hangul Scaffolding', () => {
+    it.skipIf(!hasPhase3MnemonicHelpers)(
+      'T3D-BEG-01: kanaToHangul, formatReadingWithHangul, getCompoundSlotHuneums (WEB-03 safe), and getStageKanjiList cover all 80 kanji',
+      async () => {
+        const mod = await importModuleSafe('../src/data/koreanMnemonics');
+        expect(typeof mod.kanaToHangul).toBe('function');
+        expect(typeof mod.formatReadingWithHangul).toBe('function');
+        expect(typeof mod.getCompoundSlotHuneums).toBe('function');
+        expect(typeof mod.getStageKanjiList).toBe('function');
+
+        // Core phonetic mappings (Katakana, Hiragana, okurigana dots, youon, sokuon, dakuten)
+        expect(mod.kanaToHangul('キン')).toBe('킨');
+        expect(mod.kanaToHangul('きんかくじ')).toBe('킨카쿠지');
+        expect(mod.kanaToHangul('ほのお')).toBe('호노오');
+        expect(HANGUL_REGEX.test(mod.kanaToHangul('うつく・しい'))).toBe(true);
+        expect(mod.kanaToHangul('うつく・しい')).not.toContain('・');
+
+        const formatted = mod.formatReadingWithHangul('キン');
+        expect(formatted).toContain('キン');
+        expect(formatted).toContain('킨');
+
+        // Slot-by-slot huneum hints must NEVER leak raw target compound kanji (WEB-03 guardrail)
+        const kinkakuSlots: string[] = mod.getCompoundSlotHuneums('金閣寺');
+        expect(kinkakuSlots.length).toBe(3);
+        for (const slotHint of kinkakuSlots) {
+          expect(HANGUL_REGEX.test(slotHint)).toBe(true);
+          expect(slotHint).not.toContain('金');
+          expect(slotHint).not.toContain('閣');
+          expect(slotHint).not.toContain('寺');
+        }
+
+        const allKanji = getAllKanji();
+        for (const k of allKanji) {
+          const comp = k.literaryCompounds[0].compound;
+          const hints: string[] = mod.getCompoundSlotHuneums(comp);
+          expect(hints.length).toBe(Array.from(comp).length);
+          for (const h of hints) {
+            for (const ch of Array.from(comp)) {
+              expect(h.includes(ch), `Slot hint "${h}" leaked raw kanji "${ch}"`).toBe(false);
+            }
+          }
+        }
+
+        // 16 stages x 5 kanji = all 80 unique curriculum kanji
+        const stageIds = new Set<string>();
+        for (const tier of [1, 2, 3, 4] as const) {
+          for (const stageNum of [1, 2, 3, 4] as const) {
+            const list = mod.getStageKanjiList(tier, stageNum);
+            expect(list.length).toBe(5);
+            for (const item of list) {
+              const entry = item.kanji || item.entry || item;
+              stageIds.add(entry.id);
+            }
+          }
+        }
+        expect(stageIds.size).toBe(80);
+      }
+    );
+
+    it.skipIf(!hasPreShiftLessonModal || !hasPhase3MnemonicHelpers)(
+      'T3D-BEG-02: PreShiftLessonModal walks 5-card study -> zero-penalty warmup practice -> shift launch and supports veteran skip',
+      async () => {
+        const modalMod = await importModuleSafe('../src/components/PreShiftLessonModal');
+        const PreShiftLessonModal = modalMod.PreShiftLessonModal || modalMod.default;
+        expect(PreShiftLessonModal).toBeDefined();
+
+        const stage1Kanji = getAllKanji().slice(0, 5); // 金 閣 寺 美 鏡
+        const onComplete = vi.fn();
+        const onSkip = vi.fn();
+
+        // 1) Veteran skip button immediately triggers shift entry
+        const { getByTestId, unmount } = render(
+          React.createElement(PreShiftLessonModal, {
+            isOpen: true,
+            tier: 1,
+            stageNum: 1,
+            stageId: 'stage-1-1',
+            kanjiList: stage1Kanji,
+            onStartShift: onComplete,
+            onComplete,
+            onSkip,
+            onClose: onSkip,
+          } as any)
+        );
+
+        expect(getByTestId('pre-shift-lesson-modal')).toBeTruthy();
+        const skipBtn = getByTestId('btn-lesson-skip');
+        fireEvent.click(skipBtn);
+        expect(onComplete.mock.calls.length + onSkip.mock.calls.length).toBeGreaterThan(0);
+        unmount();
+
+        // 2) Full 3-step beginner lesson walkthrough (Study 5 cards -> Warmup 5 checks -> Start Shift)
+        const onStartShift = vi.fn();
+        const view = render(
+          React.createElement(PreShiftLessonModal, {
+            isOpen: true,
+            tier: 1,
+            stageNum: 1,
+            stageId: 'stage-1-1',
+            kanjiList: stage1Kanji,
+            onStartShift,
+            onComplete: onStartShift,
+          } as any)
+        );
+
+        expect(view.getByTestId('pre-shift-lesson-modal').textContent).toContain('金');
+
+        // Step 1 -> advance through all 5 study cards
+        for (let step = 0; step < 8; step++) {
+          if (document.querySelector('[data-testid="btn-lesson-start-shift"]')) break;
+          const touchBtn =
+            document.querySelector<HTMLButtonElement>('[data-testid="btn-lesson-touch-kanji"]') ||
+            Array.from(document.querySelectorAll<HTMLButtonElement>('[data-testid="pre-shift-lesson-modal"] button')).find(
+              (b) => /손에 익히기|눌러서|확인 완료/.test(b.textContent || '')
+            );
+          if (touchBtn && !touchBtn.disabled) {
+            fireEvent.click(touchBtn);
+          }
+          const nextBtn =
+            document.querySelector<HTMLButtonElement>('[data-testid="btn-lesson-next"]') ||
+            Array.from(document.querySelectorAll<HTMLButtonElement>('[data-testid="pre-shift-lesson-modal"] button')).find(
+              (b) => /다음 글자|미니 연습|손풀기|다음/.test(b.textContent || '')
+            );
+          if (nextBtn && !nextBtn.disabled) {
+            fireEvent.click(nextBtn);
+          }
+        }
+
+        // Step 2 -> answer warmup practice checks (even if a wrong option is clicked first, zero heart loss & can still complete!)
+        for (let guard = 0; guard < 25; guard++) {
+          if (document.querySelector('[data-testid="btn-lesson-start-shift"]')) break;
+          const practiceOpts = Array.from(
+            document.querySelectorAll<HTMLButtonElement>(
+              '[data-testid^="lesson-practice-option-"], [data-testid^="warmup-option-"], .lesson-practice-option'
+            )
+          );
+          if (practiceOpts.length === 0) break;
+          for (const optBtn of practiceOpts) {
+            fireEvent.click(optBtn);
+            if (document.querySelector('[data-testid="btn-lesson-start-shift"]')) break;
+          }
+          const nextWarmup = document.querySelector<HTMLButtonElement>('[data-testid="btn-lesson-practice-next"]');
+          if (nextWarmup) fireEvent.click(nextWarmup);
+        }
+
+        const startShiftBtn = view.getByTestId('btn-lesson-start-shift');
+        expect(startShiftBtn).toBeTruthy();
+        fireEvent.click(startShiftBtn);
+        expect(onStartShift).toHaveBeenCalled();
+      }
+    );
+
+    it.skipIf(!hasPhase3MnemonicHelpers)(
+      'T3D-BEG-03: ServingTray shows slot Korean huneums without leaking kanji (WEB-03 safe), KeypadRecall shows Hangul, and Cheat-Sheet pauses timer',
+      async () => {
+        const counterSrc = fs.readFileSync(
+          path.join(rootDir, 'src/components/SalonCounter.tsx'),
+          'utf-8'
+        );
+        if (!counterSrc.includes('btn-stage-cheatsheet')) {
+          return;
+        }
+
+        const counterMod = await importModuleSafe('../src/components/SalonCounter');
+        const SalonCounter = counterMod.SalonCounter || counterMod.default;
+
+        // 1) Build mode: verify Korean huneum slot hints without leaking compound kanji
+        const teraKanji = getAllKanji()[2]; // 寺 -> 金閣寺 (きんかくじ)
+        const buildOrder = await generateOrder(teraKanji, 'build');
+        const onPauseChange = vi.fn();
+
+        const { unmount } = render(
+          React.createElement(SalonCounter, {
+            activeOrder: buildOrder,
+            onPauseChange,
+          } as any)
+        );
+
+        const trayTitle = document.querySelector('.tray-title')?.textContent || '';
+        expect(trayTitle).toContain('きんかくじ');
+        expect(trayTitle).not.toContain('金閣寺');
+        expect(document.body.textContent || '').toContain('쇠 금');
+
+        // Cheat-sheet toggle pauses and resumes patience timer
+        const cheatBtn = document.querySelector<HTMLButtonElement>('[data-testid="btn-stage-cheatsheet"]');
+        expect(cheatBtn).not.toBeNull();
+        fireEvent.click(cheatBtn!);
+        expect(onPauseChange).toHaveBeenCalledWith(true);
+        unmount();
+
+        // 2) Recall mode: verify Hangul pronunciation appears alongside Kana on keypad options
+        const recallOrder = await generateOrder(teraKanji, 'recall');
+        render(
+          React.createElement(SalonCounter, {
+            activeOrder: recallOrder,
+          })
+        );
+        const keypadText = document.querySelector('[data-testid="keypad-recall"]')?.textContent || '';
+        expect(HANGUL_REGEX.test(keypadText)).toBe(true);
+      }
+    );
+
+    it.skipIf(!isPhase3Integrated)(
+      'T3D-BEG-04: Phase 3 full App onboarding — TitleScreen primary CTA opens PreShiftLessonModal before entering SalonCounter',
+      async () => {
+        expect(hasPreShiftLessonModal, 'PreShiftLessonModal.tsx must exist').toBe(true);
+        expect(hasPhase3MnemonicHelpers, 'Phase 3 koreanMnemonics helpers must exist').toBe(true);
+
+        const appMod = await importModuleSafe('../src/App');
+        const App = appMod.App || appMod.default;
+        const { getByTestId } = render(React.createElement(App));
+
+        // Clicking beginner hero CTA on TitleScreen opens PreShiftLessonModal first!
+        const heroBtn = getByTestId('btn-quick-play');
+        expect(heroBtn.textContent || '').toMatch(/배우고|과외|1교시/);
+        fireEvent.click(heroBtn);
+
+        expect(getByTestId('pre-shift-lesson-modal')).toBeTruthy();
+
+        // Skipping (or completing) transitions cleanly into live 3D SalonCounter shift
+        await act(async () => {
+          fireEvent.click(getByTestId('btn-lesson-skip'));
+          await new Promise((r) => setTimeout(r, 30));
+        });
+        expect(getByTestId('salon-counter')).toBeTruthy();
+      }
+    );
   });
 });

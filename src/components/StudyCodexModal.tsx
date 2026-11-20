@@ -8,7 +8,7 @@ import { Search, Volume2, X, BookOpen } from 'lucide-react';
 import type { MishimaKanjiEntry, CurriculumTierNumber } from '../types/curriculum';
 import { getAllKanji, TIER_METADATA } from '../data/mishimaCurriculum';
 import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
-import { getKoreanMnemonic } from '../data/koreanMnemonics';
+import { getKoreanMnemonic, formatReadingWithHangul } from '../data/koreanMnemonics';
 import { speakKanji } from '../audio/speechSynthesizer';
 
 export interface StudyCodexModalProps {
@@ -315,7 +315,9 @@ export const StudyCodexModal: React.FC<StudyCodexModalProps> = ({
                   {workKoCard || entry.primaryWork}
                 </span>
                 <span className="codex-card-char">{entry.character}</span>
-                <span className="codex-card-reading">{firstReading}</span>
+                <span className="codex-card-reading">
+                  {formatReadingWithHangul(firstReading)}
+                </span>
                 <span className="codex-card-meaning">
                   {mneCard?.huneum ||
                     (koCard ? koCard.huneum.split(' · ')[0] : entry.meanings?.[0] || '')}

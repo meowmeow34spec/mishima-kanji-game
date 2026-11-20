@@ -9,7 +9,7 @@ import type { CardProgress, PlayerProfile } from '../types/srs';
 import type { MishimaKanjiEntry } from '../types/curriculum';
 import { getAllKanji, getKanjiById } from '../data/mishimaCurriculum';
 import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
-import { getKoreanMnemonic } from '../data/koreanMnemonics';
+import { getKoreanMnemonic, formatReadingWithHangul } from '../data/koreanMnemonics';
 import { getDueKanji, getWeakestKanji, getDistractors } from '../srs/leitnerEngine';
 import { loadProfile, recordReviewResult } from '../srs/storageManager';
 import { playSound } from '../audio/soundSynthesizer';
@@ -318,12 +318,12 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
               <div className="pill-row">
                 {(currentKanji.onyomi || []).length > 0 && (
                   <span className="pill-badge pill-badge--onyomi">
-                    음독 {(currentKanji.onyomi || []).join('·')}
+                    음독 {(currentKanji.onyomi || []).map((r) => formatReadingWithHangul(r)).join(' · ')}
                   </span>
                 )}
                 {(currentKanji.kunyomi || []).length > 0 && (
                   <span className="pill-badge pill-badge--kunyomi">
-                    훈독 {(currentKanji.kunyomi || []).join('·')}
+                    훈독 {(currentKanji.kunyomi || []).map((r) => formatReadingWithHangul(r)).join(' · ')}
                   </span>
                 )}
               </div>

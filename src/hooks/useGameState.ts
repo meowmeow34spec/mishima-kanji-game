@@ -6,9 +6,17 @@
 import { useSyncExternalStore, useCallback, useMemo, useRef } from 'react';
 import { gameEngine } from '../game/gameEngine';
 import { normalizeUnlockedUpgrades } from '../game/cafeShopEngine';
-import { getKoreanMnemonic, getFirstSightHintKo } from '../data/koreanMnemonics';
+import {
+  getKoreanMnemonic,
+  getFirstSightHintKo,
+  getStageKanjiList,
+  getNextUncompletedStage,
+  parseStageId,
+  type StageKanjiLessonItem,
+} from '../data/koreanMnemonics';
 import type { GameState, GameAction, ActiveOrder } from '../types/game';
 import type { CurriculumTierNumber } from '../types/curriculum';
+import type { PlayerProfile } from '../types/srs';
 import type {
   CameraMode3D,
   CustomerAnimState,
@@ -113,6 +121,27 @@ export function deriveFirstSightMnemonicHint(order: ActiveOrder | null | undefin
     hintSummaryKo,
     mnemonic,
   };
+}
+
+/**
+ * Returns the 5-kanji Pre-Shift Beginner Lesson items for a given stage.
+ */
+export function deriveStageKanjiLesson(
+  tier: CurriculumTierNumber,
+  stageIdOrNum: string | number = 1
+): StageKanjiLessonItem[] {
+  const parsed = parseStageId(stageIdOrNum, tier);
+  return getStageKanjiList(parsed.tier, parsed.stageNum);
+}
+
+/**
+ * Resolves the next recommended stage for zero-kanji beginner onboarding.
+ */
+export function deriveRecommendedBeginnerStage(profile?: PlayerProfile | null) {
+  return getNextUncompletedStage(
+    profile?.unlockedTiers ?? [1],
+    profile?.completedStages ?? []
+  );
 }
 
 /**
