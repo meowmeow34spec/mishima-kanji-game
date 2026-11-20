@@ -1,5 +1,5 @@
 /**
- * Salon Mishima - Multi-Slot Serving Tray Component
+ * Salon Mishima 3D - Sleek Single-Row Multi-Slot Serving Tray
  * File: src/components/ServingTray.tsx
  */
 
@@ -33,33 +33,11 @@ export const ServingTray: React.FC<ServingTrayProps> = ({
       className="serving-tray"
       data-testid="serving-tray"
       role="region"
-      aria-label="Serving Tray"
+      aria-label="숙어 조립 서빙 트레이"
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          maxWidth: '420px',
-        }}
-      >
-        <span className="tray-title">
-          給仕盆 {orderKanji ? `— 「${orderKanji}」` : ''}
-        </span>
-        {onClearSlot && normalizedSlots.some((s) => s !== null) && (
-          <button
-            type="button"
-            data-testid="btn-clear-tray"
-            className="btn-lacquer"
-            style={{ padding: '0.25rem 0.65rem', fontSize: '0.75rem' }}
-            onClick={onClearSlot}
-          >
-            <RotateCcw size={13} />
-            <span>盆を空にする</span>
-          </button>
-        )}
-      </div>
+      <span className="tray-title">
+        🍵 서빙 트레이 {orderKanji ? `「${orderKanji}」` : ''}
+      </span>
 
       <div className="tray-slots-row">
         {normalizedSlots.map((placedChar, idx) => {
@@ -89,8 +67,8 @@ export const ServingTray: React.FC<ServingTrayProps> = ({
               }}
               aria-label={
                 isFilled
-                  ? `Tray slot ${idx + 1}: ${placedChar}`
-                  : `Empty tray slot ${idx + 1}`
+                  ? `트레이 ${idx + 1}번 칸: ${placedChar}`
+                  : `비어 있는 트레이 ${idx + 1}번 칸`
               }
             >
               {isFilled ? (
@@ -98,9 +76,10 @@ export const ServingTray: React.FC<ServingTrayProps> = ({
               ) : (
                 <span
                   style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--color-gold)',
-                    opacity: 0.55,
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.875rem',
+                    fontWeight: 800,
+                    color: '#5c2d0c',
                   }}
                 >
                   {idx + 1}
@@ -110,6 +89,19 @@ export const ServingTray: React.FC<ServingTrayProps> = ({
           );
         })}
       </div>
+
+      {onClearSlot && normalizedSlots.some((s) => s !== null) && (
+        <button
+          type="button"
+          data-testid="btn-clear-tray"
+          className="btn-ivory"
+          style={{ padding: '0.25rem 0.6rem', fontSize: '0.875rem' }}
+          onClick={onClearSlot}
+        >
+          <RotateCcw size={13} />
+          <span>비우기</span>
+        </button>
+      )}
     </div>
   );
 };

@@ -127,3 +127,169 @@ export function getKoreanGloss(character: string): KoreanKanjiGloss | undefined 
 export function getKoreanWorkTitle(japaneseWork: string): string {
   return MISHIMA_WORK_TITLES_KO[japaneseWork] || '';
 }
+
+export interface KoreanTierMeta {
+  tier: 1 | 2 | 3 | 4;
+  nameKo: string;
+  subtitleKo: string;
+  themeKo: string;
+}
+
+export const TIER_METADATA_KO: Record<number, KoreanTierMeta> = {
+  1: {
+    tier: 1,
+    nameKo: '금각의 불꽃과 탐미',
+    subtitleKo: '『금각사』와 절대미의 미학 (20자)',
+    themeKo: '절대적인 아름다움에 대한 집착, 거울 연못에 비친 환영, 그리고 불길 속의 영원한 완성.',
+  },
+  2: {
+    tier: 2,
+    nameKo: '파도 소리의 바다와 유현',
+    subtitleKo: '『조소』·『봄눈』·『천인오쇠』 (20자)',
+    themeKo: '우타지마 섬의 순수한 사랑과 거센 파도, 봄눈처럼 녹아내리는 귀족의 비련과 적막.',
+  },
+  3: {
+    tier: 3,
+    nameKo: '가면의 고백과 애증',
+    subtitleKo: '『가면의 고백』·『금색』·『록명관』 (20자)',
+    themeKo: '세상을 속이는 가면과 내면의 고백, 성 세바스찬의 화살, 화려한 무도회 뒤의 애증.',
+  },
+  4: {
+    tier: 4,
+    nameKo: '우국과 태양·분마',
+    subtitleKo: '『우국』·『분마』·『태양과 철』 (20자)',
+    themeKo: '대의를 향한 결연한 충절, 질주하는 준마, 강철로 단련한 육체와 윤회·찰나의 숙명.',
+  },
+};
+
+export interface KoreanCustomerMeta {
+  id: string;
+  nameJa: string;
+  nameKo: string;
+  roleKo: string;
+  workKo: string;
+}
+
+export const SALON_CUSTOMERS_KO: Record<string, KoreanCustomerMeta> = {
+  uiko: { id: 'uiko', nameJa: '有為子', nameKo: '우이코', roleKo: '비운의 소녀', workKo: '금각사' },
+  kashiwagi: { id: 'kashiwagi', nameJa: '柏木', nameKo: '가시와기', roleKo: '냉소적인 학우', workKo: '금각사' },
+  mizoguchi: { id: 'mizoguchi', nameJa: '溝口', nameKo: '미조구치', roleKo: '젊은 수행승', workKo: '금각사' },
+  shinji: { id: 'shinji', nameJa: '新治', nameKo: '신지', roleKo: '청년 어부', workKo: '조소' },
+  hatsue: { id: 'hatsue', nameJa: '初江', nameKo: '하츠에', roleKo: '해녀 소녀', workKo: '조소' },
+  kiyoaki: { id: 'kiyoaki', nameJa: '松枝清顕', nameKo: '마츠가에 키요아키', roleKo: '미모의 귀공자', workKo: '봄눈' },
+  honda: { id: 'honda', nameJa: '本多繁邦', nameKo: '혼다 시게쿠니', roleKo: '관찰자·법조인', workKo: '풍요의 바다' },
+  kageyama: { id: 'kageyama', nameJa: '影山朝子', nameKo: '카게야마 아사코', roleKo: '백작부인', workKo: '록명관' },
+  asako: { id: 'asako', nameJa: '影山朝子', nameKo: '카게야마 아사코', roleKo: '백작부인', workKo: '록명관' },
+};
+
+/**
+ * Extra comparison kanji appearing in Boss Duels (kept separate so KOREAN_KANJI_GLOSSARY stays exact 80 keys).
+ */
+export const BOSS_EXTRA_KANJI_GLOSSARY_KO: Record<string, KoreanKanjiGloss> = {
+  '侍': { huneum: '모실 시', meaningKo: '무사, 사무라이, 모시다', primaryCompoundKo: '무사 (사무라이)' },
+  '炭': { huneum: '숯 탄', meaningKo: '숯, 목탄', primaryCompoundKo: '목탄 (나무 숯)' },
+  '華': { huneum: '빛날 화', meaningKo: '화려함, 꽃', primaryCompoundKo: '화려 (눈부시게 고움)' },
+  '葉': { huneum: '잎 엽', meaningKo: '나뭇잎, 언어(고토바)', primaryCompoundKo: '단풍잎 (홍엽)' },
+  '優': { huneum: '넉넉할 우', meaningKo: '다정하다, 뛰어나다, 배우', primaryCompoundKo: '배우·우수' },
+  '闊': { huneum: '트일 활', meaningKo: '넓고 트이다, 활달하다', primaryCompoundKo: '활달 (막힘없이 넓음)' },
+  '魄': { huneum: '넋 백', meaningKo: '육체의 혼백', primaryCompoundKo: '혼백 (하늘의 혼과 땅의 백)' },
+  '刀': { huneum: '칼 도', meaningKo: '칼, 일본도', primaryCompoundKo: '일본도 (카타나)' },
+  '力': { huneum: '힘 력', meaningKo: '힘, 기력', primaryCompoundKo: '근력 (힘줄의 힘)' },
+  '回': { huneum: '돌 회', meaningKo: '돌다, 회전하다', primaryCompoundKo: '회전' },
+};
+
+export interface KoreanBossPairMeta {
+  id: string;
+  titleKo: string;
+  bossNameKo: string;
+  bossTitleKo: string;
+  distinctionKo: string;
+  mnemonicTipKo: string;
+}
+
+export const BOSS_PAIRS_KO: Record<string, KoreanBossPairMeta> = {
+  'boss-01-ji-samurai': {
+    id: 'boss-01-ji-samurai',
+    titleKo: '寺(절 사) vs 侍(모실 시): 산사와 무사의 시험',
+    bossNameKo: '사찰·사무라이 환영',
+    bossTitleKo: '제1계층 수호 보스',
+    distinctionKo: '「寺(절 사)」는 땅(土)+법도(寸)만 있는 사찰(てら)이고, 왼쪽에 사람(亻)이 붙은 「侍(모실 시)」는 주군을 모시는 무사 사무라이(さむらい)입니다!',
+    mnemonicTipKo: '사람(亻) 없으면 고요한 절(寺·테라), 사람(亻) 서 있으면 호위 무사(侍·사무라이)!',
+  },
+  'boss-02-en-tan': {
+    id: 'boss-02-en-tan',
+    titleKo: '炎(불꽃 염) vs 炭(숯 탄): 홍련의 화염과 검은 숯',
+    bossNameKo: '업화탄수 (불꽃 야수)',
+    bossTitleKo: '제1계층 열화의 주인',
+    distinctionKo: '「炎(불꽃 염)」은 불(火) 두 개가 위아래로 솟구치는 화염(ほのお)이고, 「炭(숯 탄)」은 산(山) 기슭(厂) 아래서 나무를 구워 만든 검은 숯(すみ)입니다!',
+    mnemonicTipKo: '불(火+火) 2단이면 치솟는 불꽃(炎·호노오), 산(山) 아래 구우면 까만 숯(炭·스미)!',
+  },
+  'boss-03-ka-yo': {
+    id: 'boss-03-ka-yo',
+    titleKo: '華(빛날 화) vs 葉(잎 엽): 만개한 꽃과 흩날리는 잎',
+    bossNameKo: '화엽정령 (정원의 신기루)',
+    bossTitleKo: '제2계층 정원 보스',
+    distinctionKo: '「華(빛날 화)」는 꽃잎이 겹겹이 화려하게 핀 모습(カ·はな)이고, 아래에 나무(木)가 받치는 「葉(잎 엽)」은 나뭇잎(ヨウ·は)입니다!',
+    mnemonicTipKo: '꽃잎이 대칭으로 빛나면 화려할 화(華·카), 아래 나무(木)가 있으면 나뭇잎 엽(葉·요우)!',
+  },
+  'boss-04-yu-yu': {
+    id: 'boss-04-yu-yu',
+    titleKo: '憂(근심 우) vs 優(넉넉할 우): 우국의 시름과 다정한 배우',
+    bossNameKo: '우우(憂優)의 가면사',
+    bossTitleKo: '제3계층 심리극의 주인',
+    distinctionKo: '음독은 둘 다 ユウ(유우)! 사람(亻)이 없으면 가슴을 앓는 「憂(근심 우·うれえる)」, 사람(亻)이 붙으면 다정한 사람·배우인 「優(넉넉할 우·やさしい)」입니다!',
+    mnemonicTipKo: '사람(亻) 없으면 홀로 앓는 근심(憂), 사람(亻)이 곁에 오면 다정하고 우수한 배우(優)!',
+  },
+  'boss-05-kaku-katsu': {
+    id: 'boss-05-kaku-katsu',
+    titleKo: '閣(누각 각) vs 闊(트일 활): 황금 누각과 광활한 공간',
+    bossNameKo: '누각광활마',
+    bossTitleKo: '제3계층 공간의 괴인',
+    distinctionKo: '둘 다 문(門) 안이지만, 속이 「各(각각 각)」이면 층층이 솟은 금각 누각 「閣(カク)」, 물 흐르는 「活(살 활)」이면 탁 트인 「闊(カツ)」입니다!',
+    mnemonicTipKo: '문(門) 안에 각(各)이 들면 금각사 누각(閣·카쿠), 물(氵) 흐르는 활(活)이면 활달(闊·카츠)!',
+  },
+  'boss-06-kon-haku': {
+    id: 'boss-06-kon-haku',
+    titleKo: '魂(넋 혼) vs 魄(넋 백): 승천하는 영혼과 대지의 혼백',
+    bossNameKo: '혼백천마',
+    bossTitleKo: '제4계층 사생관의 심판자',
+    distinctionKo: '구름(云)이 붙은 「魂(넋 혼·コン·たましい)」은 하늘로 솟구치는 정신적 영혼이고, 흰 백(白)이 붙은 「魄(넋 백·ハク)」은 해골·대지에 남는 육체적 넋입니다!',
+    mnemonicTipKo: '구름(云) 타고 하늘로 오르면 영혼 혼(魂·타마시이), 하얀 뼈(白)로 남으면 백(魄·하쿠)!',
+  },
+  'boss-07-blade-family': {
+    id: 'boss-07-blade-family',
+    titleKo: '사인(四刃)의 문: 刀 · 刃 · 切 · 力 완벽 구별',
+    bossNameKo: '사면백인왕',
+    bossTitleKo: '제4계층 발도의 무신',
+    distinctionKo: '「刀(칼 도)」는 칼 몸체, 안에 점(丶)이 박힌 「刃(칼날 인·やいば)」은 베이는 칼날, 칠(七)이 붙은 「切(끊을 절·きる)」은 베어 자르기, 위로 삐져나온 「力(힘 력·ちから)」은 근육의 힘입니다!',
+    mnemonicTipKo: '칼(刀)에 점 찍으면 칼날(刃·야이바), 칠(七) 붙으면 자를 절(切·키루), 삐죽 솟으면 힘 력(力)!',
+  },
+  'boss-08-mishima-grand': {
+    id: 'boss-08-mishima-grand',
+    titleKo: '문호 미시마 유키오의 최종 시험: 輪廻 · 刹那 · 宿命',
+    bossNameKo: '환영문호 미시마',
+    bossTitleKo: '살롱 미시마 최종 시험관',
+    distinctionKo: '수레바퀴 「輪(リン)」과 길게 도는 「廻(カイ/ね)」가 만나 윤회(りんね)를 이루고, 칼날 스치는 「刹(セツ)」의 찰나 속에 타고난 「宿命(しゅくめい)」을 완성합니다!',
+    mnemonicTipKo: '바퀴 륜(輪·린)+돌 회(廻)는 윤회(린네), 선칼(刂) 선 찰(刹·세츠)은 찰나, 지붕 백 명은 숙명(宿命)!',
+  },
+};
+
+export function getAnyKoreanGloss(character: string): KoreanKanjiGloss | undefined {
+  return KOREAN_KANJI_GLOSSARY[character] || BOSS_EXTRA_KANJI_GLOSSARY_KO[character];
+}
+
+export function getKoreanTierMeta(tier: number): KoreanTierMeta | undefined {
+  return TIER_METADATA_KO[tier];
+}
+
+export function getKoreanCustomer(idOrName: string): KoreanCustomerMeta | undefined {
+  if (!idOrName) return undefined;
+  if (SALON_CUSTOMERS_KO[idOrName]) return SALON_CUSTOMERS_KO[idOrName];
+  return Object.values(SALON_CUSTOMERS_KO).find(
+    (c) => c.nameJa === idOrName || `avatar-${c.id}` === idOrName
+  );
+}
+
+export function getKoreanBossMeta(bossId: string): KoreanBossPairMeta | undefined {
+  return BOSS_PAIRS_KO[bossId];
+}

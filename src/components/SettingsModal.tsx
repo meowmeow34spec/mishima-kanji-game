@@ -1,10 +1,11 @@
 /**
- * Salon Mishima - Audio & Salon Settings Modal
+ * Salon Mishima 3D - Korean-First Audio & 3D Graphics Quality Settings Modal
  * File: src/components/SettingsModal.tsx
  */
 
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Bell, X } from 'lucide-react';
+import { Volume2, VolumeX, Bell, X, Sparkles } from 'lucide-react';
+import type { QualityLevel3D } from '../types/three3d';
 import {
   isAudioMuted,
   setAudioMuted,
@@ -33,20 +34,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [voiceEnabled, setVoiceEnabled] = useState<boolean>(
     () => gameState.profile?.settings?.voiceEnabled ?? isSpeechEnabled()
   );
+  const [qualityLevel, setQualityLevel] = useState<QualityLevel3D>(
+    () => gameState.profile?.settings?.qualityLevel ?? 'high'
+  );
 
   useEffect(() => {
     if (isOpen) {
       setMuted(isAudioMuted());
       setVolume(getAudioVolume());
       setVoiceEnabled(gameState.profile?.settings?.voiceEnabled ?? isSpeechEnabled());
+      setQualityLevel(gameState.profile?.settings?.qualityLevel ?? 'high');
     }
-  }, [isOpen, gameState.profile?.settings?.voiceEnabled]);
+  }, [
+    isOpen,
+    gameState.profile?.settings?.voiceEnabled,
+    gameState.profile?.settings?.qualityLevel,
+  ]);
 
   if (!isOpen) {
     return null;
   }
 
-  const persistAudioSettings = (nextMuted: boolean, nextVol: number, nextVoice: boolean) => {
+  const persistSettings = (
+    nextMuted: boolean,
+    nextVol: number,
+    nextVoice: boolean,
+    nextQuality: QualityLevel3D
+  ) => {
     if (gameState.profile) {
       dispatch({
         type: 'UPDATE_PROFILE',
@@ -61,6 +75,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             sfxVolume: nextVol,
             bgmVolume: nextVol * 0.6,
             voiceEnabled: nextVoice,
+            qualityLevel: nextQuality,
           },
         },
       });
@@ -71,20 +86,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const nextMuted = !muted;
     setMuted(nextMuted);
     setAudioMuted(nextMuted);
-    persistAudioSettings(nextMuted, volume, voiceEnabled);
+    persistSettings(nextMuted, volume, voiceEnabled, qualityLevel);
   };
 
   const handleVolumeChange = (nextVol: number) => {
     setVolume(nextVol);
     setAudioVolume(nextVol);
-    persistAudioSettings(muted, nextVol, voiceEnabled);
+    persistSettings(muted, nextVol, voiceEnabled, qualityLevel);
   };
 
   const handleToggleVoice = () => {
     const nextVoice = !voiceEnabled;
     setVoiceEnabled(nextVoice);
     setSpeechEnabled(nextVoice);
-    persistAudioSettings(muted, volume, nextVoice);
+    persistSettings(muted, volume, nextVoice, qualityLevel);
+  };
+
+  const handleSelectQuality = (nextQuality: QualityLevel3D) => {
+    setQualityLevel(nextQuality);
+    persistSettings(muted, volume, voiceEnabled, nextQuality);
   };
 
   const handleTestBell = () => {
@@ -102,26 +122,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       data-testid="settings-modal"
       role="dialog"
       aria-modal="true"
-      aria-label="Salon Settings"
+      aria-label="살롱 환경 설정"
     >
-      <div className="reveal-parchment-card" style={{ maxWidth: '460px', textAlign: 'left' }}>
+      <div className="reveal-parchment-card" style={{ maxWidth: '480px', textAlign: 'left' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '1.5rem',
-            borderBottom: '1px solid rgba(0,0,0,0.1)',
+            marginBottom: '1.25rem',
+            borderBottom: '2px solid #e7dfd0',
             paddingBottom: '0.75rem',
           }}
         >
-          <h2 style={{ fontSize: '1.4rem', color: 'var(--color-ink)' }}>
-            サロン設定 (Settings)
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#141210' }}>
+            ⚙️ 살롱 환경 및 3D 설정
           </h2>
           <button
             type="button"
             data-testid="btn-close-settings"
-            className="btn-lacquer"
+            className="btn-ivory"
             style={{ padding: '0.35rem 0.7rem' }}
             onClick={onClose}
           >
@@ -129,29 +149,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
           {/* Mute Toggle */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              gap: '0.75rem',
             }}
           >
             <div>
-              <div style={{ fontWeight: 700 }}>消音設定 (Master Mute)</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-ink-secondary)' }}>
-                効果音・BGM・音声朗読を一括消音
+              <div style={{ fontWeight: 800, fontSize: '1rem', color: '#141210' }}>
+                전체 소리 켜기 / 끄기
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#2c2520' }}>
+                배경 재즈·효과음·발음 낭독 일괄 음소거
               </div>
             </div>
             <button
               type="button"
               data-testid="toggle-mute"
-              className={muted ? 'btn-crimson' : 'btn-lacquer'}
+              className={muted ? 'btn-crimson' : 'btn-emerald'}
+              style={{ padding: '0.5rem 0.95rem', fontSize: '0.9rem' }}
               onClick={handleToggleMute}
             >
               {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              <span>{muted ? '消音中 (Muted)' : '音声有効 (On)'}</span>
+              <span>{muted ? '음소거됨' : '소리 켜짐'}</span>
             </button>
           </div>
 
@@ -162,10 +186,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '0.4rem',
-                fontWeight: 700,
+                fontWeight: 800,
+                fontSize: '0.98rem',
+                color: '#141210',
               }}
             >
-              <label htmlFor="volume-slider">主音量 (Master Volume)</label>
+              <label htmlFor="volume-slider">사운드 볼륨</label>
               <span>{Math.round(volume * 100)}%</span>
             </div>
             <input
@@ -177,7 +203,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               step={0.05}
               value={volume}
               onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              style={{ width: '100%', accentColor: 'var(--color-crimson)' }}
+              style={{ width: '100%', accentColor: '#991b1b' }}
             />
           </div>
 
@@ -187,43 +213,85 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              gap: '0.75rem',
             }}
           >
             <div>
-              <div style={{ fontWeight: 700 }}>日本語朗読 (Japanese TTS)</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-ink-secondary)' }}>
-                Web Speech APIによる漢字・熟語の発音
+              <div style={{ fontWeight: 800, fontSize: '1rem', color: '#141210' }}>
+                일본어 발음 자동 낭독 (TTS)
+              </div>
+              <div style={{ fontSize: '0.875rem', color: '#2c2520' }}>
+                정답 서빙 시 한자·숙어 일본어 발음 재생
               </div>
             </div>
             <button
               type="button"
               data-testid="toggle-voice"
-              className={voiceEnabled ? 'btn-gold' : 'btn-lacquer'}
-              style={{ padding: '0.45rem 1rem' }}
+              className={voiceEnabled ? 'btn-gold' : 'btn-ivory'}
+              style={{ padding: '0.45rem 1rem', fontSize: '0.9rem' }}
               onClick={handleToggleVoice}
             >
-              {voiceEnabled ? '有効 (ON)' : '無効 (OFF)'}
+              {voiceEnabled ? '켜짐 (ON)' : '꺼짐 (OFF)'}
             </button>
           </div>
 
-          {/* Test Sound Button */}
+          {/* 3D Quality Selector */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontWeight: 800,
+                fontSize: '1rem',
+                color: '#141210',
+                marginBottom: '0.45rem',
+              }}
+            >
+              <Sparkles size={16} color="#b45309" />
+              <span>3D 카페 그래픽 품질</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              {(
+                [
+                  { id: 'high', label: '고화질' },
+                  { id: 'medium', label: '표준' },
+                  { id: 'low', label: '절전' },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  data-testid={`quality-${opt.id}`}
+                  className={qualityLevel === opt.id ? 'btn-gold' : 'btn-ivory'}
+                  style={{ padding: '0.45rem 0.5rem', fontSize: '0.9rem' }}
+                  onClick={() => handleSelectQuality(opt.id)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Test Sound & Close */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderTop: '1px solid rgba(0,0,0,0.1)',
+              borderTop: '2px solid #e7dfd0',
               paddingTop: '1rem',
+              gap: '0.75rem',
             }}
           >
             <button
               type="button"
               data-testid="btn-test-audio"
-              className="btn-lacquer"
+              className="btn-ivory"
               onClick={handleTestBell}
             >
               <Bell size={16} />
-              <span>呼び鈴を試聴 (Test Bell)</span>
+              <span>카운터 종소리 테스트</span>
             </button>
 
             <button
@@ -231,7 +299,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="btn-gold"
               onClick={onClose}
             >
-              <span>完了</span>
+              <span>확인</span>
             </button>
           </div>
         </div>

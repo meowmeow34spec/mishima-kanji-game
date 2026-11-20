@@ -7,6 +7,7 @@ import { MishimaKanjiEntry } from '../types/curriculum';
 import { RushSessionConfig, RushSessionState, RushPrompt } from '../types/game';
 import { getAllKanji } from '../data/mishimaCurriculum';
 import { getKoreanGloss } from '../data/koreanGlossary';
+import * as KoreanMnemonicsMod from '../data/koreanMnemonics';
 import { getDistractors } from '../srs/leitnerEngine';
 
 export const DEFAULT_RUSH_DURATION_SECONDS = 25.0;
@@ -14,6 +15,19 @@ export const DEFAULT_MISTAKE_PENALTY_SECONDS = 1.5;
 export const DEFAULT_RUSH_COIN_REWARD = 15;
 
 export type { RushSessionConfig, RushSessionState, RushPrompt };
+
+function lookupMnemonic(charOrId: string): KoreanMnemonicsMod.KoreanMnemonicEntry | undefined {
+  const mod = KoreanMnemonicsMod as Record<string, any>;
+  if (typeof mod.getKoreanMnemonic === 'function') {
+    return mod.getKoreanMnemonic(charOrId);
+  }
+  if (Array.isArray(mod.KOREAN_MNEMONIC_LIST)) {
+    return mod.KOREAN_MNEMONIC_LIST.find(
+      (entry: any) => entry.character === charOrId || entry.id === charOrId
+    );
+  }
+  return undefined;
+}
 
 /**
  * Decrements the rush countdown timer by deltaSeconds, clamped strictly to >= 0.0s.
@@ -108,7 +122,7 @@ export async function runRushSession(
 }
 
 /**
- * Generates a rapid-fire rush prompt for quick conveyor picking.
+ * Generates a rapid-fire Korean-first rush prompt for quick 3D block picking.
  */
 export function generateRushPrompt(
   kanji: MishimaKanjiEntry,
@@ -134,13 +148,28 @@ export function generateRushPrompt(
   }
 
   const baseMeaning = kanji.meanings?.[0] || (kanji as any).meaning || '';
+  const mne = lookupMnemonic(kanji.character) || lookupMnemonic(kanji.id);
   const koGloss = getKoreanGloss(kanji.character);
+
+  const huneum = mne?.huneum || koGloss?.huneum || '';
+  const meaningKo = mne?.meaningKo || koGloss?.meaningKo || baseMeaning;
+  const primaryOnyomi = kanji.readings?.onyomi?.[0] || '';
+
+  const promptText = huneum
+    ? `${huneum} (${meaningKo})${primaryOnyomi ? ` · 음독 ${primaryOnyomi}` : ''}`
+    : meaningKo;
+
+  const hintKo = mne
+    ? `${mne.visualPictogram} ${mne.radicalBreakdown}`
+    : huneum || undefined;
 
   return {
     id: `rush-prompt-${kanji.id}-${Date.now()}`,
     kanji,
-    promptText: koGloss ? `${baseMeaning} · ${koGloss.meaningKo}` : baseMeaning,
+    promptText,
     options,
     correctOption,
+    huneumKo: huneum || undefined,
+    hintKo,
   };
 }

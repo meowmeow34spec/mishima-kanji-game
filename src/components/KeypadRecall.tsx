@@ -1,5 +1,5 @@
 /**
- * Salon Mishima - Virtual Reading Keypad Recall Component
+ * Salon Mishima 3D - High-Contrast Reading Recall Keycaps
  * File: src/components/KeypadRecall.tsx
  */
 
@@ -19,35 +19,22 @@ export const KeypadRecall: React.FC<KeypadRecallProps> = ({
   disabled = false,
 }) => {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '1rem',
-        width: '100%',
-      }}
-    >
-      <p
-        style={{
-          color: 'var(--color-washi-dim)',
-          fontSize: 'var(--font-size-sm)',
-          letterSpacing: '0.1em',
-        }}
-      >
-        {prompt || '正しい読みを選んでください'}
+    <div className="keypad-recall-wrap">
+      <p className="keypad-prompt-label">
+        {prompt || '🎹 알맞은 일본어 발음을 눌러 서빙하세요 (숫자키 1~4)'}
       </p>
       <div
         className="keypad-recall"
         data-testid="keypad-recall"
         role="group"
-        aria-label="Reading Selection Keypad"
+        aria-label="일본어 발음 선택 키패드"
       >
         {options.map((reading, idx) => (
           <button
             key={`${reading}-${idx}`}
             type="button"
             data-testid={`keypad-option-${reading}`}
+            data-hotkey={idx < 4 ? String(idx + 1) : undefined}
             className="keypad-key"
             disabled={disabled}
             onClick={() => onSelectReading(reading)}

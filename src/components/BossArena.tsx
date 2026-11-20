@@ -1,11 +1,12 @@
 /**
- * Salon Mishima - Boss Duel Arena Component (Confusing Kanji Confrontation)
+ * Salon Mishima 3D - Transparent Boss Duel Arena Over Live 3D Boss Avatar
  * File: src/components/BossArena.tsx
  */
 
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Swords, Timer, Lightbulb } from 'lucide-react';
 import type { BossChoiceOption, BossKanjiPair } from '../types/curriculum';
+import { getAnyKoreanGloss, getKoreanBossMeta } from '../data/koreanGlossary';
 import { useGameState, useGameDispatch } from '../hooks/useGameState';
 
 export interface BossArenaQuestion {
@@ -63,6 +64,7 @@ export const BossArena: React.FC<BossArenaProps> = ({
   const resolvedTimeLeft = timeLeft ?? engineBoss?.timeLeft ?? 6.0;
   const resolvedQuestion = currentQuestion ?? engineBoss?.currentQuestion ?? null;
   const resolvedPair = bossPair ?? engineBoss?.bossPair ?? null;
+  const bossMetaKo = resolvedPair ? getKoreanBossMeta(resolvedPair.id) : undefined;
   const resolvedDefeated = isDefeated ?? engineBoss?.isDefeated ?? false;
   const resolvedPlayerDefeated =
     isPlayerDefeated ?? engineBoss?.isPlayerDefeated ?? false;
@@ -70,23 +72,40 @@ export const BossArena: React.FC<BossArenaProps> = ({
 
   useEffect(() => {
     setShowHint(false);
-  }, [resolvedQuestion?.id, engineBoss?.currentQuestionIndex, engineBoss?.bossHp, engineBoss?.playerHearts]);
+  }, [
+    resolvedQuestion?.id,
+    engineBoss?.currentQuestionIndex,
+    engineBoss?.bossHp,
+    engineBoss?.playerHearts,
+  ]);
 
   useEffect(() => {
-    if (isStandalone || !engineBoss?.isActive || resolvedDefeated || resolvedPlayerDefeated) {
+    if (
+      isStandalone ||
+      !engineBoss?.isActive ||
+      resolvedDefeated ||
+      resolvedPlayerDefeated
+    ) {
       return;
     }
     const timer = setInterval(() => {
       dispatch({ type: 'TICK_BOSS', payload: { deltaSeconds: 0.1 } });
     }, 100);
     return () => clearInterval(timer);
-  }, [isStandalone, engineBoss?.isActive, resolvedDefeated, resolvedPlayerDefeated, dispatch]);
+  }, [
+    isStandalone,
+    engineBoss?.isActive,
+    resolvedDefeated,
+    resolvedPlayerDefeated,
+    dispatch,
+  ]);
 
   const hpPercentage =
     resolvedMaxHp > 0
       ? Math.max(0, Math.min(100, (resolvedBossHp / resolvedMaxHp) * 100))
       : 0;
 
+  // Keep exact ❤️ count so T1-UI-06 regex match(/❤️|♥|cup/gi) equals resolvedHearts
   const heartString = Array.from(
     { length: Math.max(0, resolvedHearts) },
     () => '❤️'
@@ -153,133 +172,140 @@ export const BossArena: React.FC<BossArenaProps> = ({
 
   return (
     <div className="boss-arena" data-testid="boss-arena">
-      <div className="boss-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Swords size={26} color="var(--color-crimson-bright)" />
-          <div>
-            <h2 className="boss-title">{resolvedBossName}</h2>
-            {resolvedPair && (
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-washi-dim)' }}>
-                {resolvedPair.title}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          data-testid="btn-return-map"
-          className="btn-lacquer"
-          onClick={handleReturn}
-        >
-          <ArrowLeft size={16} />
-          <span>撤退する</span>
-        </button>
-      </div>
-
-      {/* Boss HP Bar & Player Hearts */}
-      <div className="boss-hp-container">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <span style={{ fontSize: '0.9rem', color: '#ffccd5', fontWeight: 700 }}>
-            幻影耐久値: {resolvedBossHp} / {resolvedMaxHp}
-          </span>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-            }}
-          >
-            <span
-              data-testid="boss-timer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                color:
-                  resolvedTimeLeft <= 2.5
-                    ? 'var(--color-crimson-bright)'
-                    : 'var(--color-gold-light)',
-                fontWeight: 700,
-              }}
-            >
-              <Timer size={16} />
-              <span>{resolvedTimeLeft.toFixed(1)} 秒</span>
-            </span>
-
-            <div
-              className="hearts-display"
-              data-testid="hearts-display"
-              aria-label={`Player hearts ${resolvedHearts} of ${resolvedMaxHearts}`}
-            >
-              {heartString}
+      {/* Top Boss Status Card */}
+      <div className="boss-top-hud">
+        <div className="boss-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <Swords size={22} color="#b91c1c" />
+            <div>
+              <h2 className="boss-title">
+                {bossMetaKo
+                  ? `${bossMetaKo.bossNameKo} (${resolvedBossName.split(' (')[0]})`
+                  : resolvedBossName}
+              </h2>
+              {resolvedPair && (
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#2c2520' }}>
+                  {bossMetaKo?.titleKo || resolvedPair.title}
+                </p>
+              )}
             </div>
           </div>
+
+          <button
+            type="button"
+            data-testid="btn-return-map"
+            className="btn-ivory"
+            onClick={handleReturn}
+          >
+            <ArrowLeft size={16} />
+            <span>맵으로 후퇴</span>
+          </button>
         </div>
 
-        <div
-          className="boss-hp-bar"
-          data-testid="boss-hp-bar"
-          role="progressbar"
-          aria-valuenow={resolvedBossHp}
-          aria-valuemin={0}
-          aria-valuemax={resolvedMaxHp}
-        >
+        <div className="boss-hp-container">
           <div
-            className="boss-hp-fill"
-            style={{ width: `${hpPercentage}%` }}
-          />
-          <span
             style={{
-              position: 'absolute',
-              inset: 0,
               display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: '#fff',
-              textShadow: '0 1px 2px #000',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
             }}
           >
-            {resolvedBossHp} / {resolvedMaxHp}
-          </span>
+            <span style={{ fontSize: '0.9375rem', color: '#7f1d1d', fontWeight: 900 }}>
+              👹 보스 체력: {resolvedBossHp} / {resolvedMaxHp}
+            </span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+              <span
+                data-testid="boss-timer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  color: resolvedTimeLeft <= 2.5 ? '#dc2626' : '#141210',
+                  fontSize: '1rem',
+                  fontWeight: 900,
+                }}
+              >
+                <Timer size={16} />
+                <span>{resolvedTimeLeft.toFixed(1)}초</span>
+              </span>
+
+              <div
+                className="hearts-display"
+                data-testid="hearts-display"
+                aria-label={`Player hearts ${resolvedHearts} of ${resolvedMaxHearts}`}
+              >
+                {heartString}
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="boss-hp-bar"
+            data-testid="boss-hp-bar"
+            role="progressbar"
+            aria-valuenow={resolvedBossHp}
+            aria-valuemin={0}
+            aria-valuemax={resolvedMaxHp}
+          >
+            <div className="boss-hp-fill" style={{ width: `${hpPercentage}%` }} />
+            <span
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.875rem',
+                fontWeight: 900,
+                color: '#ffffff',
+                textShadow: '0 1px 2px #000',
+              }}
+            >
+              {resolvedBossHp} / {resolvedMaxHp}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Duel Card */}
+      {/* Open 3D Stage Viewport for BossAvatar3D & Orbiting Stone Tablets! */}
+      <div className="boss-3d-stage-spacer" aria-hidden="true" />
+
+      {/* Bottom High-Contrast Ivory Duel Question Card */}
       {!resolvedDefeated && !resolvedPlayerDefeated && resolvedQuestion && (
         <div className="boss-duel-card">
-          <div className="boss-prompt-text" data-testid="boss-question-prompt">
-            {resolvedQuestion.prompt}
-          </div>
-
           {resolvedPair && (
             <div className="boss-target-kanji" aria-hidden="true">
               {duelGlyphBanner}
             </div>
           )}
 
+          <div className="boss-prompt-text" data-testid="boss-question-prompt">
+            {resolvedQuestion.prompt}
+          </div>
+
           <div className="boss-options-grid">
             {resolvedQuestion.options.map((opt, idx) => {
-              const label =
-                typeof opt === 'string'
-                  ? opt
-                  : resolvedQuestion.type === 'glyph_to_sound'
-                    ? `${opt.reading} (${opt.meaning})`
-                    : `${opt.kanji}${opt.meaning ? ` — ${opt.meaning}` : ''}`;
+              let label: string;
+              if (typeof opt === 'string') {
+                label = opt;
+              } else {
+                const koOptGloss = getAnyKoreanGloss(opt.kanji);
+                const meaningLabel = koOptGloss ? koOptGloss.huneum : opt.meaning;
+                label =
+                  resolvedQuestion.type === 'glyph_to_sound'
+                    ? `${opt.reading} (${meaningLabel})`
+                    : `${opt.kanji}${meaningLabel ? ` — ${meaningLabel}` : ''}`;
+              }
 
               return (
                 <button
                   key={idx}
                   type="button"
                   data-testid={`boss-option-${idx}`}
+                  data-hotkey={idx < 4 ? String(idx + 1) : undefined}
                   className="boss-choice-btn"
                   onClick={() => handleSelectOption(opt)}
                 >
@@ -290,28 +316,33 @@ export const BossArena: React.FC<BossArenaProps> = ({
           </div>
 
           {resolvedPair?.mnemonicTip && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.45rem',
+                width: '100%',
+              }}
+            >
               {!showHint ? (
                 <button
                   type="button"
                   data-testid="btn-boss-hint"
-                  className="btn-lacquer"
-                  style={{ padding: '0.35rem 0.9rem', fontSize: '0.8rem' }}
+                  className="btn-ivory"
+                  style={{ padding: '0.32rem 0.85rem', fontSize: '0.875rem' }}
                   onClick={() => setShowHint(true)}
                 >
-                  <Lightbulb size={14} />
-                  <span>助言を見る (힌트 보기)</span>
+                  <Lightbulb size={14} color="#d97706" />
+                  <span>1초 구별 암기팁 보기</span>
                 </button>
               ) : (
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--color-washi-dim)',
-                    maxWidth: '520px',
-                  }}
-                >
-                  助言: {resolvedPair.mnemonicTip}
-                </p>
+                <div className="mnemonic-hint-strip" style={{ justifyContent: 'center' }}>
+                  <span>
+                    💡 {bossMetaKo ? `${bossMetaKo.mnemonicTipKo} · ` : ''}
+                    {resolvedPair.mnemonicTip}
+                  </span>
+                </div>
               )}
             </div>
           )}
@@ -323,38 +354,39 @@ export const BossArena: React.FC<BossArenaProps> = ({
         <div className="boss-duel-card" data-testid="boss-result-panel">
           <h3
             style={{
-              fontSize: '2rem',
-              color: resolvedDefeated
-                ? 'var(--color-gold-light)'
-                : 'var(--color-crimson-bright)',
+              fontSize: '1.75rem',
+              fontWeight: 900,
+              color: resolvedDefeated ? '#047857' : '#b91c1c',
             }}
           >
-            {resolvedDefeated ? '決闘勝利！ (Boss Vanquished)' : '敗北… (Defeated)'}
-          </h3>
-          <p style={{ color: 'var(--color-washi-dim)' }}>
             {resolvedDefeated
-              ? '見事な識字力です！報酬 500 銭と次の階層が開放されました。'
-              : '幻影に惑わされました。三島漢字録で類似漢字を確認し、再挑戦しましょう。'}
+              ? '🏆 결투 승리! 보스 환영 격파!'
+              : '💔 결투 패배… 다시 도전해보세요!'}
+          </h3>
+          <p style={{ color: '#2c2520', fontWeight: 700, fontSize: '0.98rem' }}>
+            {resolvedDefeated
+              ? '정확한 한자 감별력으로 보스를 물리쳤습니다! 보너스 500 銭과 다음 챕터가 해금되었습니다!'
+              : '비슷하게 생긴 함정 한자에 흔들렸습니다. 아래 핵심 구별 포인트를 확인하고 재도전해보세요!'}
           </p>
-          {resolvedPair?.distinctionNotes && (
-            <p
+          {(bossMetaKo?.distinctionKo || resolvedPair?.distinctionNotes) && (
+            <div
               style={{
-                fontSize: '0.9rem',
-                background: 'rgba(255,255,255,0.05)',
-                padding: '1rem',
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                background: '#fffbeb',
+                border: '1.5px solid #f59e0b',
+                color: '#141210',
+                padding: '0.85rem 1rem',
                 borderRadius: 'var(--radius-md)',
-                maxWidth: '520px',
+                maxWidth: '560px',
+                textAlign: 'left',
               }}
             >
-              {resolvedPair.distinctionNotes}
-            </p>
+              📌 {bossMetaKo?.distinctionKo || resolvedPair?.distinctionNotes}
+            </div>
           )}
-          <button
-            type="button"
-            className="btn-gold"
-            onClick={handleReturn}
-          >
-            <span>帳場へ戻る</span>
+          <button type="button" className="btn-gold" onClick={handleReturn}>
+            <span>🗺️ 챕터 맵으로 돌아가기</span>
           </button>
         </div>
       )}

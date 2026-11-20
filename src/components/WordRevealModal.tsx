@@ -1,5 +1,5 @@
 /**
- * Salon Mishima - Celebratory Washi Word Reveal Modal
+ * Salon Mishima 3D - Effortless Korean Mnemonic & Literary Word Reveal Modal
  * File: src/components/WordRevealModal.tsx
  */
 
@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { Volume2, ArrowRight } from 'lucide-react';
 import type { MishimaKanjiEntry } from '../types/curriculum';
 import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
+import { getKoreanMnemonic } from '../data/koreanMnemonics';
 import { speakKanji } from '../audio/speechSynthesizer';
 
 export interface WordRevealModalProps {
@@ -23,7 +24,7 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
   useEffect(() => {
     if (!isOpen || !kanji) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === 'Escape') {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
         e.preventDefault();
         onClose();
       }
@@ -36,6 +37,7 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
     return null;
   }
 
+  const mne = getKoreanMnemonic(kanji.character);
   const koGloss = getKoreanGloss(kanji.character);
   const workKo = getKoreanWorkTitle(kanji.literaryQuote.sourceWork);
 
@@ -46,10 +48,13 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
     ? kanji.kunyomi
     : kanji.readings?.kunyomi || [];
 
+  const huneumLabel = mne?.huneum || koGloss?.huneum || kanji.meanings[0] || '';
+  const meaningKoLabel =
+    mne?.meaningKo || koGloss?.meaningKo || kanji.meanings.join(', ');
+
   const handlePlayAudio = () => {
     const text =
-      kanji.literaryCompounds?.[0]?.reading ||
-      kanji.character;
+      kanji.literaryCompounds?.[0]?.reading || kanji.character;
     try {
       speakKanji(text);
     } catch {
@@ -71,100 +76,130 @@ export const WordRevealModal: React.FC<WordRevealModalProps> = ({
         </div>
 
         <div className="reveal-header-badge">
-          一字習得 — LITERARY REVEAL
+          ✨ 서빙 성공 · 1초 연상 한자 카드
         </div>
 
-        <div
-          id="reveal-character-heading"
-          className="reveal-character"
-          data-testid="reveal-character"
-        >
-          {kanji.character}
+        {/* Hero Kanji + Big Korean Huneum */}
+        <div className="reveal-hero-row">
+          <div
+            id="reveal-character-heading"
+            className="reveal-character"
+            data-testid="reveal-character"
+          >
+            {kanji.character}
+          </div>
+
+          <div style={{ textAlign: 'left', minWidth: 0 }}>
+            <div className="reveal-huneum-headline">
+              {mne?.visualPictogram ? `${mne.visualPictogram} ` : ''}
+              {huneumLabel}
+            </div>
+            <div
+              style={{
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                color: '#2c2520',
+                marginTop: '0.1rem',
+              }}
+            >
+              뜻: {meaningKoLabel}
+            </div>
+          </div>
         </div>
 
+        {/* Crisp >= 15px Furigana / Reading Pill Badges */}
         <div className="reveal-readings">
           {onyomiList.length > 0 && (
-            <span>音読み: {onyomiList.join('、')}</span>
-          )}
-          {onyomiList.length > 0 && kunyomiList.length > 0 && (
-            <span> ／ </span>
+            <span className="pill-badge pill-badge--onyomi">
+              음독 {onyomiList.join(' · ')}
+            </span>
           )}
           {kunyomiList.length > 0 && (
-            <span>訓読み: {kunyomiList.join('、')}</span>
+            <span className="pill-badge pill-badge--kunyomi">
+              훈독 {kunyomiList.join(' · ')}
+            </span>
           )}
         </div>
 
-        <div className="reveal-meaning">
-          <strong>意味:</strong> {kanji.meanings.join(', ')}
-          {koGloss && (
-            <div style={{ marginTop: '0.25rem', color: 'var(--color-crimson)', fontWeight: 700 }}>
-              훈음: {koGloss.huneum} ({koGloss.meaningKo})
+        {/* Effortless Memorization Box: Radical Split + Story Mnemonic + Sound Bridge */}
+        {mne && (
+          <div className="reveal-mnemonic-box" data-testid="reveal-mnemonic-box">
+            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#451a03' }}>
+              🧩 <strong>부수 분해:</strong> {mne.radicalBreakdown}
             </div>
-          )}
-        </div>
-
-        {kanji.literaryCompounds?.length > 0 && (
-          <div
-            style={{
-              fontSize: '0.9rem',
-              color: 'var(--color-ink-secondary)',
-              marginBottom: '1rem',
-            }}
-          >
-            <strong>代表熟語:</strong>{' '}
-            {kanji.literaryCompounds[0].compound}（
-            {kanji.literaryCompounds[0].reading}）—{' '}
-            {kanji.literaryCompounds[0].meaning}
-            {koGloss?.primaryCompoundKo ? ` · ${koGloss.primaryCompoundKo}` : ''}
+            <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#141210', lineHeight: 1.42 }}>
+              💡 <strong>1초 연상:</strong> {mne.storyMnemonicKo}
+            </div>
+            <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#7f1d1d', lineHeight: 1.4 }}>
+              🗣️ <strong>발음 공식:</strong> {mne.koreanSoundTip}
+            </div>
           </div>
         )}
 
+        {/* Primary Literary Compound */}
+        {kanji.literaryCompounds?.length > 0 && (
+          <div
+            style={{
+              fontSize: '0.92rem',
+              fontWeight: 800,
+              color: '#141210',
+              backgroundColor: '#f3efe6',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.4rem 0.75rem',
+              marginBottom: '0.6rem',
+            }}
+          >
+            <strong>핵심 숙어:</strong>{' '}
+            <span className="kanji-serif" style={{ fontSize: '1.05rem' }}>
+              {kanji.literaryCompounds[0].compound}
+            </span>
+            （{kanji.literaryCompounds[0].reading}）—{' '}
+            {mne?.compoundsKo?.[0] ||
+              koGloss?.primaryCompoundKo ||
+              kanji.literaryCompounds[0].meaning}
+          </div>
+        )}
+
+        {/* Original Japanese Quote + Crisp Korean Translation */}
         <div className="reveal-quote-box">
           <p className="reveal-quote" data-testid="reveal-quote">
             {kanji.literaryQuote.originalJapanese}
           </p>
-          <p
-            style={{
-              fontSize: '0.85rem',
-              color: 'var(--color-ink-secondary)',
-              fontStyle: 'italic',
-              marginBottom: '0.45rem',
-            }}
-          >
-            {kanji.literaryQuote.englishTranslation}
-          </p>
+          {mne?.quoteKo ? (
+            <p className="reveal-quote-ko">{mne.quoteKo}</p>
+          ) : (
+            <p className="reveal-quote-ko">
+              {kanji.literaryQuote.englishTranslation}
+            </p>
+          )}
           <div className="reveal-source" data-testid="reveal-source">
-            —— 三島由紀夫『{kanji.literaryQuote.sourceWork}』{workKo ? ` (${workKo})` : ''}
+            —— 미시마 유키오 『{kanji.literaryQuote.sourceWork}』
+            {workKo ? ` (${workKo})` : ''}
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '1rem',
-            flexWrap: 'wrap',
-          }}
-        >
+        {/* Single-Row Footer Actions (Fits 100% Above Fold on 390x844 Mobile!) */}
+        <div className="reveal-footer-actions">
           <button
             type="button"
             data-testid="btn-reveal-audio"
-            className="btn-lacquer"
+            className="btn-ivory"
+            style={{ flex: '0 0 auto', whiteSpace: 'nowrap', padding: '0.58rem 0.85rem' }}
             onClick={handlePlayAudio}
           >
-            <Volume2 size={18} />
-            <span>朗読を聴く</span>
+            <Volume2 size={17} />
+            <span>발음 듣기</span>
           </button>
 
           <button
             type="button"
             data-testid="btn-modal-continue"
             className="btn-gold"
+            style={{ flex: '1 1 auto', whiteSpace: 'nowrap', padding: '0.58rem 0.95rem' }}
             onClick={onClose}
           >
-            <span>次へ進む (Continue)</span>
-            <ArrowRight size={18} />
+            <span>다음 손님 받기 (Enter)</span>
+            <ArrowRight size={17} />
           </button>
         </div>
       </div>

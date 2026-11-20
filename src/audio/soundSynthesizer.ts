@@ -14,6 +14,21 @@ import {
 } from '../types/audio';
 import { cancelSpeech } from './speechSynthesizer';
 
+/**
+ * Additional tactile 3D cafe SFX cues introduced for the 3D kissaten overhaul.
+ * All original 9 SoundEffectType cues remain 100% preserved.
+ */
+export type CafeExtraSoundType =
+  | 'hover'
+  | 'slide'
+  | 'coin'
+  | 'angry'
+  | 'upgrade'
+  | 'shield'
+  | 'fever';
+
+export type ExtendedSoundType = SoundEffectType | CafeExtraSoundType;
+
 // ---------------------------------------------------------------------------
 // Music & Scale Theory Data
 // ---------------------------------------------------------------------------
@@ -63,6 +78,18 @@ const BGM_CONFIGS: Record<BgmMode, BgmConfig> = {
   },
 };
 
+const FEVER_SALON_CONFIG: BgmConfig = {
+  bpm: 124,
+  chords: [
+    [53, 57, 60, 64, 67], // Fmaj9
+    [55, 59, 62, 65, 69], // G13
+    [52, 55, 59, 62, 67], // Em9
+    [57, 60, 64, 67, 71], // Am9
+  ],
+  scale: [74, 76, 79, 81, 84, 86, 88, 91], // Bright upbeat swing pentatonic
+  lead: 'triangle',
+};
+
 function getAudioContextClass(): typeof AudioContext | null {
   if (typeof window !== 'undefined') {
     const w = window as any;
@@ -93,6 +120,7 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
 
   // BGM scheduling state
   private currentBgmMode: BgmMode | null = null;
+  private feverBgmActive: boolean = false;
   private bgmIntervalId: any = null;
   private bgmNextTime: number = 0;
   private bgmStepCount: number = 0;
@@ -213,6 +241,14 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
     return this.currentBgmMode;
   }
 
+  public setFeverBgm(active: boolean): void {
+    this.feverBgmActive = Boolean(active);
+  }
+
+  public isFeverBgm(): boolean {
+    return this.feverBgmActive;
+  }
+
   // -------------------------------------------------------------------------
   // Low-Level Procedural Tone & Noise Generators
   // -------------------------------------------------------------------------
@@ -331,10 +367,10 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
   }
 
   // -------------------------------------------------------------------------
-  // High-Level Procedural Sound Effects (9 Required Types)
+  // High-Level Procedural Sound Effects (9 Core + 3D Tactile Cafe Cues)
   // -------------------------------------------------------------------------
 
-  public play(type: SoundEffectType, options: PlaySoundOptions = {}): void {
+  public play(type: ExtendedSoundType, options: PlaySoundOptions = {}): void {
     if (this.muted) return;
     if (!this.ctx) {
       this.initAudioContext();
@@ -418,11 +454,75 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
         this.playTone(160, 50, 0.3, { type: 'sine', vol: 0.35 });
         break;
       }
+
+      // --- New 3D Tactile Kissaten Audio Cues ---
+      case 'hover': {
+        // Soft tactile wooden block hover tick
+        this.playTone(860, 600, 0.03, { type: 'triangle', vol: 0.06, attack: 0.002 });
+        this.playNoise(0.015, { type: 'bandpass', f0: 2600, q: 3.0, vol: 0.025 });
+        break;
+      }
+
+      case 'slide': {
+        // Porcelain teacup & lacquer tray sliding across polished wood counter
+        this.playNoise(0.16, { type: 'bandpass', f0: 850, f1: 1850, q: 1.8, vol: 0.09 });
+        this.playTone(1760, 2093, 0.07, { type: 'sine', vol: 0.08, delay: 0.11 });
+        break;
+      }
+
+      case 'coin': {
+        // Crisp vintage brass register ka-ching
+        this.playTone(1567.98, 1567.98, 0.085, { type: 'triangle', vol: 0.17 });
+        this.playTone(2093.0, 2093.0, 0.26, { type: 'sine', vol: 0.2, delay: 0.065 });
+        this.playTone(4186.01, 4186.01, 0.16, { type: 'sine', vol: 0.07, delay: 0.07 });
+        break;
+      }
+
+      case 'angry': {
+        // Comical katakana-cafe style low buzz & steam puff ("틀리면 손님이 화내 ㅋㅋ")
+        this.playTone(185, 98, 0.22, { type: 'sawtooth', vol: 0.11 });
+        this.playTone(148, 82, 0.24, { type: 'square', vol: 0.08, delay: 0.08 });
+        this.playNoise(0.2, { type: 'bandpass', f0: 1400, f1: 480, q: 1.4, vol: 0.15, delay: 0.04 });
+        break;
+      }
+
+      case 'upgrade': {
+        // Warm celebratory Showa jazz major-9th arpeggio chord
+        const chordFreqs = [523.25, 659.25, 783.99, 987.77, 1174.66];
+        chordFreqs.forEach((freq, idx) => {
+          this.playTone(freq, freq, idx === chordFreqs.length - 1 ? 0.55 : 0.24, {
+            type: idx === chordFreqs.length - 1 ? 'sine' : 'triangle',
+            vol: 0.16,
+            delay: idx * 0.065,
+          });
+        });
+        break;
+      }
+
+      case 'shield': {
+        // Golden Kinkaku phoenix chime barrier preserving heart & combo
+        this.playTone(880, 1318.51, 0.18, { type: 'sine', vol: 0.16 });
+        this.playTone(1760, 1760, 0.28, { type: 'triangle', vol: 0.13, delay: 0.06 });
+        break;
+      }
+
+      case 'fever': {
+        // Upbeat brassy swing Fever ignition flourish
+        const feverFreqs = [523.25, 659.25, 783.99, 1046.5];
+        feverFreqs.forEach((freq, idx) => {
+          this.playTone(freq, freq * 1.01, 0.22, {
+            type: 'triangle',
+            vol: 0.19,
+            delay: idx * 0.055,
+          });
+        });
+        break;
+      }
     }
   }
 
   // -------------------------------------------------------------------------
-  // Procedural BGM Engine
+  // Procedural BGM Engine (with Upbeat Fever Jazz Variation)
   // -------------------------------------------------------------------------
 
   public startBgm(mode: BgmMode): void {
@@ -436,6 +536,9 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
     this.unlock().catch(() => {});
 
     this.currentBgmMode = mode;
+    if (mode === 'boss') {
+      this.feverBgmActive = false;
+    }
     this.bgmStepCount = 0;
     this.bgmLeadIndex = 3;
     this.bgmNextTime = this.ctx.currentTime + 0.05;
@@ -481,13 +584,15 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
     }
 
     this.currentBgmMode = null;
+    this.feverBgmActive = false;
   }
 
   private scheduleBgmNotes(): void {
     if (!this.ctx || !this.currentBgmMode || !this.bgmGain || this.muted) return;
     if (typeof document !== 'undefined' && document.hidden) return;
 
-    const config = BGM_CONFIGS[this.currentBgmMode];
+    const isSalonFever = this.currentBgmMode === 'salon' && this.feverBgmActive;
+    const config = isSalonFever ? FEVER_SALON_CONFIG : BGM_CONFIGS[this.currentBgmMode];
     const stepDuration = 60 / config.bpm / 2; // Eighth note duration
     const lookahead = 0.25;
 
@@ -502,58 +607,60 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
       const currentChord = config.chords[chordIndex];
       const barStep = this.bgmStepCount % 8;
 
-      // 1. Chords pad (on beat 0 of bar)
-      if (barStep === 0) {
+      // 1. Chords pad (on beat 0 of bar, plus syncopated comping in Fever jazz)
+      if (barStep === 0 || (isSalonFever && barStep === 5)) {
+        const padLen = isSalonFever && barStep === 5 ? stepDuration * 2.2 : stepDuration * 7.5;
         for (const note of currentChord) {
           const freq = midiToFreq(note);
-          this.playTone(freq, freq, stepDuration * 7.5, {
+          this.playTone(freq, freq, padLen, {
             type: 'triangle',
-            vol: this.currentBgmMode === 'boss' ? 0.035 : 0.045,
-            attack: 0.25,
+            vol: this.currentBgmMode === 'boss' ? 0.035 : isSalonFever ? 0.05 : 0.045,
+            attack: isSalonFever && barStep === 5 ? 0.02 : 0.25,
             delay,
             bus: this.bgmGain,
           });
         }
       }
 
-      // 2. Bassline
+      // 2. Bassline (walking swing bass on every quarter beat during Fever!)
       const isBassBeat =
-        this.currentBgmMode === 'boss'
+        this.currentBgmMode === 'boss' || isSalonFever
           ? barStep % 2 === 0
           : barStep === 0 || barStep === 4;
 
       if (isBassBeat) {
-        const bassFreq = midiToFreq(currentChord[0] - 12);
+        const walkInterval = isSalonFever && barStep === 4 ? 7 : isSalonFever && barStep === 6 ? 4 : 0;
+        const bassFreq = midiToFreq(currentChord[0] - 12 + walkInterval);
         this.playTone(bassFreq, bassFreq, stepDuration * 1.6, {
           type: this.currentBgmMode === 'boss' ? 'sawtooth' : 'sine',
-          vol: this.currentBgmMode === 'boss' ? 0.05 : 0.12,
+          vol: this.currentBgmMode === 'boss' ? 0.05 : isSalonFever ? 0.14 : 0.12,
           delay,
           bus: this.bgmGain,
         });
       }
 
-      // 3. Hi-hat (filtered noise on off-beats)
-      if (barStep % 2 === 1) {
-        this.playNoise(0.05, {
+      // 3. Hi-hat / Swing Ride Cymbal
+      if (barStep % 2 === 1 || (isSalonFever && barStep % 4 === 0)) {
+        this.playNoise(isSalonFever ? 0.06 : 0.05, {
           type: 'highpass',
-          f0: 7000,
-          vol: this.currentBgmMode === 'boss' ? 0.05 : 0.025,
+          f0: isSalonFever ? 8200 : 7000,
+          vol: this.currentBgmMode === 'boss' ? 0.05 : isSalonFever ? 0.038 : 0.025,
           delay,
           bus: this.bgmGain,
         });
       }
 
-      // 4. Kick drum (Boss mode beats 1 & 3)
-      if (this.currentBgmMode === 'boss' && barStep % 4 === 0) {
+      // 4. Kick drum (Boss mode beats 1 & 3, subtle jazz pulse in Fever)
+      if ((this.currentBgmMode === 'boss' || isSalonFever) && barStep % 4 === 0) {
         this.playTone(120, 45, 0.18, {
-          vol: 0.18,
+          vol: this.currentBgmMode === 'boss' ? 0.18 : 0.09,
           delay,
           bus: this.bgmGain,
         });
       }
 
       // 5. Melodic Solo / Improvisation
-      const soloProb = this.currentBgmMode === 'boss' ? 0.55 : 0.38;
+      const soloProb = this.currentBgmMode === 'boss' ? 0.55 : isSalonFever ? 0.65 : 0.38;
       if (Math.random() < soloProb) {
         const walk = Math.floor(Math.random() * 5) - 2;
         this.bgmLeadIndex = Math.max(0, Math.min(config.scale.length - 1, this.bgmLeadIndex + walk));
@@ -562,7 +669,7 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
 
         this.playTone(leadFreq, leadFreq, noteLength, {
           type: config.lead,
-          vol: this.currentBgmMode === 'boss' ? 0.025 : 0.05,
+          vol: this.currentBgmMode === 'boss' ? 0.025 : isSalonFever ? 0.065 : 0.05,
           delay,
           bus: this.bgmGain,
         });
@@ -580,7 +687,7 @@ export class SoundSynthesizerImpl implements SoundSynthesizer {
 
 export const soundSynthesizer = new SoundSynthesizerImpl();
 
-export function playSound(type: SoundType, options?: PlaySoundOptions): void {
+export function playSound(type: ExtendedSoundType | SoundType, options?: PlaySoundOptions): void {
   soundSynthesizer.play(type, options);
 }
 
@@ -590,6 +697,14 @@ export function startBgm(mode: BgmMode): void {
 
 export function stopBgm(): void {
   soundSynthesizer.stopBgm();
+}
+
+export function setFeverBgm(active: boolean): void {
+  soundSynthesizer.setFeverBgm(active);
+}
+
+export function isFeverBgm(): boolean {
+  return soundSynthesizer.isFeverBgm();
 }
 
 export function setAudioMuted(isMuted: boolean): void {

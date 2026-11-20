@@ -1,5 +1,5 @@
 /**
- * Salon Mishima - Salon Floor Plan & Chapter Stage Selection Map
+ * Salon Mishima 3D - Korean-First Chapter Map & Quick-Play Hub
  * File: src/components/SalonMap.tsx
  */
 
@@ -13,12 +13,15 @@ import {
   ArrowLeft,
   Settings,
   Crown,
+  Store,
+  Coffee,
 } from 'lucide-react';
 import type { CurriculumTierNumber } from '../types/curriculum';
 import type { PlayerProfile } from '../types/srs';
 import { TIER_METADATA, getKanjiByTier } from '../data/mishimaCurriculum';
 import { getBossPairsByTier, getBossPairById } from '../data/bossPairs';
 import { getDueKanji } from '../srs/leitnerEngine';
+import { gameEngine } from '../game/gameEngine';
 import { useGameState, useGameDispatch } from '../hooks/useGameState';
 
 export interface SalonMapProps {
@@ -26,6 +29,8 @@ export interface SalonMapProps {
   completedStages?: string[];
   profile?: PlayerProfile | null;
   onSelectStage?: (tier: CurriculumTierNumber, stageId: string) => void;
+  onQuickPlay?: () => void;
+  onOpenShop?: () => void;
   onStartBoss?: (tier: CurriculumTierNumber, bossPairId?: string) => void;
   onOpenBoss?: (tier?: CurriculumTierNumber) => void;
   onStartRush?: () => void;
@@ -42,11 +47,18 @@ const TIER_ACCENTS: Record<CurriculumTierNumber, string> = {
   4: 'var(--tier-4-color)',
 };
 
+const TIER_TITLES_KO: Record<CurriculumTierNumber, string> = {
+  1: '제1막 · 금각의 불꽃과 탐미',
+  2: '제2막 · 파도 소리의 바다와 유현',
+  3: '제3막 · 가면의 고백과 애증',
+  4: '제4막 · 우국과 태양·분마',
+};
+
 const TIER_SUBTITLES_KO: Record<CurriculumTierNumber, string> = {
-  1: '금각의 불꽃과 탐미 · 『금각사』 20자',
-  2: '조소의 바다와 유현 · 『조소』『봄눈』『천인오쇠』 20자',
-  3: '가면의 고백과 애증 · 『가면의 고백』『금색』『록명관』 20자',
-  4: '우국과 태양·분마 · 『우국』『분마』『태양과 철』 20자',
+  1: '『금각사』 필수 한자 20자 · 황금 누각과 불꽃의 미학',
+  2: '『조소』『봄눈』『천인오쇠』 필수 한자 20자 · 바다와 순수의 서약',
+  3: '『가면의 고백』『금색』『록명관』 필수 한자 20자 · 가면 뒤의 진실',
+  4: '『우국』『분마』『태양과 철』 필수 한자 20자 · 태양과 강철의 결의',
 };
 
 export const SalonMap: React.FC<SalonMapProps> = ({
@@ -54,6 +66,8 @@ export const SalonMap: React.FC<SalonMapProps> = ({
   completedStages,
   profile,
   onSelectStage,
+  onQuickPlay,
+  onOpenShop,
   onStartBoss,
   onOpenBoss,
   onStartRush,
@@ -71,6 +85,44 @@ export const SalonMap: React.FC<SalonMapProps> = ({
   const resolvedCompletedStages =
     completedStages ?? resolvedProfile?.completedStages ?? [];
   const dueCount = getDueKanji(resolvedProfile?.cards ?? {}).length;
+
+  const findNextStage = (): { tier: CurriculumTierNumber; stageId: string } => {
+    for (const rawTier of [1, 2, 3, 4] as CurriculumTierNumber[]) {
+      if (!resolvedUnlockedTiers.includes(rawTier)) continue;
+      for (const s of [1, 2, 3, 4]) {
+        const sid = `stage-${rawTier}-${s}`;
+        if (!resolvedCompletedStages.includes(sid)) {
+          return { tier: rawTier, stageId: sid };
+        }
+      }
+    }
+    const highest = (Math.min(4, Math.max(1, ...resolvedUnlockedTiers)) || 1) as CurriculumTierNumber;
+    return { tier: highest, stageId: `stage-${highest}-1` };
+  };
+
+  const handleQuickPlay = () => {
+    if (onQuickPlay) {
+      onQuickPlay();
+      return;
+    }
+    const next = findNextStage();
+    if (onSelectStage) {
+      onSelectStage(next.tier, next.stageId);
+      return;
+    }
+    dispatch({ type: 'QUICK_PLAY', payload: next });
+    if (gameEngine.getState().mode !== 'lesson') {
+      dispatch({ type: 'SELECT_STAGE', payload: next });
+    }
+  };
+
+  const handleOpenShop = () => {
+    if (onOpenShop) {
+      onOpenShop();
+    } else {
+      dispatch({ type: 'OPEN_SHOP' });
+    }
+  };
 
   const handleStageSelect = (
     tier: CurriculumTierNumber,
@@ -155,9 +207,11 @@ export const SalonMap: React.FC<SalonMapProps> = ({
   return (
     <div className="salon-map" data-testid="salon-map">
       <div className="map-header">
-        <h2 className="map-header-title">文豪サロン案内図 (Salon Floor Plan)</h2>
-        <p style={{ color: 'var(--color-washi-dim)', fontSize: '0.95rem', marginBottom: '1.25rem' }}>
-          三島文学の四つの階層を巡り、80字の漢字を極めよ · 미시마 유키오 문학 한자 80자 완전 정복
+        <h2 className="map-header-title">
+          살롱 미시마 3D 문학 챕터 맵 (サロン案内図)
+        </h2>
+        <p className="map-header-subtitle">
+          원하는 챕터를 골라 손님에게 한자를 대접하거나, 상점에서 3D 카페 인테리어를 꾸며보세요!
         </p>
 
         <div
@@ -165,36 +219,76 @@ export const SalonMap: React.FC<SalonMapProps> = ({
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'center',
-            gap: '0.75rem',
+            gap: '0.5rem',
           }}
         >
           <button
             type="button"
             data-testid="btn-back-title"
-            className="btn-lacquer"
+            className="btn-ivory"
             onClick={handleBackTitle}
           >
-            <ArrowLeft size={16} />
-            <span>表へ戻る</span>
+            <ArrowLeft size={15} />
+            <span>타이틀로</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="btn-quick-play"
+            className="btn-emerald"
+            onClick={handleQuickPlay}
+          >
+            <Coffee size={15} />
+            <span>바로 카운터 출근</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="btn-open-shop"
+            className="btn-gold"
+            onClick={handleOpenShop}
+          >
+            <Store size={15} />
+            <span>3D 카페 인테리어 상점</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="btn-start-rush"
+            className="btn-gold"
+            onClick={handleStartRush}
+          >
+            <Zap size={15} />
+            <span>25초 폭풍 주문 러시</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="btn-boss-arena"
+            className="btn-crimson"
+            onClick={handleBossArena}
+          >
+            <Swords size={15} />
+            <span>헷갈리는 한자 보스전</span>
           </button>
 
           <button
             type="button"
             data-testid="btn-daily-review"
-            className="btn-lacquer"
+            className="btn-ivory"
             onClick={handleOpenReview}
           >
-            <Calendar size={16} />
-            <span>朝の復習 (Daily Review)</span>
+            <Calendar size={15} color="#991b1b" />
+            <span>오늘의 복습</span>
             {dueCount > 0 && (
               <span
                 style={{
-                  background: 'var(--color-crimson)',
-                  color: '#fff',
+                  backgroundColor: '#991b1b',
+                  color: '#ffffff',
                   borderRadius: 'var(--radius-full)',
-                  padding: '0.1rem 0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
+                  padding: '0.08rem 0.45rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 800,
                 }}
               >
                 {dueCount}
@@ -205,42 +299,23 @@ export const SalonMap: React.FC<SalonMapProps> = ({
           <button
             type="button"
             data-testid="btn-open-codex"
-            className="btn-lacquer"
+            className="btn-ivory"
             onClick={handleOpenCodex}
           >
-            <BookOpen size={16} />
-            <span>三島漢字録 (Codex)</span>
-          </button>
-
-          <button
-            type="button"
-            data-testid="btn-start-rush"
-            className="btn-gold"
-            onClick={handleStartRush}
-          >
-            <Zap size={16} />
-            <span>猛火注文 (25s Rush Mode)</span>
-          </button>
-
-          <button
-            type="button"
-            data-testid="btn-boss-arena"
-            className="btn-crimson"
-            onClick={handleBossArena}
-          >
-            <Swords size={16} />
-            <span>決闘 (Boss Duel)</span>
+            <BookOpen size={15} color="#047857" />
+            <span>미시마 80한자 도감</span>
           </button>
 
           {onOpenSettings && (
             <button
               type="button"
               data-testid="btn-open-settings"
-              className="btn-icon"
-              aria-label="Settings"
+              className="btn-ivory"
+              aria-label="설정 열기"
               onClick={onOpenSettings}
             >
-              <Settings size={18} />
+              <Settings size={15} />
+              <span>설정</span>
             </button>
           )}
         </div>
@@ -263,36 +338,36 @@ export const SalonMap: React.FC<SalonMapProps> = ({
           }[] = [
             {
               id: `stage-${tierNum}-1`,
-              label: `第${tierNum}幕・壱`,
-              sub: '基礎給仕 (1–5字)',
+              label: `제${tierNum}막 · 1장`,
+              sub: '기초 서빙 (1~5번)',
               preview: tierKanji[0]?.character || '金',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-2`,
-              label: `第${tierNum}幕・弐`,
-              sub: '読解応対 (6–10字)',
+              label: `제${tierNum}막 · 2장`,
+              sub: '발음 응대 (6~10번)',
               preview: tierKanji[5]?.character || '閣',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-3`,
-              label: `第${tierNum}幕・参`,
-              sub: '熟語調合 (11–15字)',
+              label: `제${tierNum}막 · 3장`,
+              sub: '숙어 조립 (11~15번)',
               preview: tierKanji[10]?.character || '寺',
               isBoss: false,
             },
             {
               id: `stage-${tierNum}-4`,
-              label: `第${tierNum}幕・肆`,
-              sub: '奥義完遂 (16–20字)',
+              label: `제${tierNum}막 · 4장`,
+              sub: '완전 정복 (16~20번)',
               preview: tierKanji[15]?.character || '光',
               isBoss: false,
             },
             ...tierBosses.map((boss, bIdx) => ({
               id: bIdx === 0 ? `stage-${tierNum}-boss` : `stage-${tierNum}-boss-${bIdx + 1}`,
-              label: bIdx === 0 ? `第${tierNum}幕・決闘` : `第${tierNum}幕・決闘弐`,
-              sub: `${boss.characterA} vs ${boss.characterB}`,
+              label: bIdx === 0 ? `제${tierNum}막 · 보스 결투` : `제${tierNum}막 · 보스 결투 II`,
+              sub: `헷갈리는 한자: ${boss.characterA} vs ${boss.characterB}`,
               preview: '⚔️',
               isBoss: true,
               bossPairId: boss.id,
@@ -309,27 +384,21 @@ export const SalonMap: React.FC<SalonMapProps> = ({
               <div className="tier-section-header">
                 <div>
                   <h3 className="tier-section-title">
-                    <span>第{tierNum}階層：{meta.name}</span>
-                    {!isUnlocked && <Lock size={16} color="var(--color-ink-muted)" />}
+                    <span>{TIER_TITLES_KO[tierNum]}</span>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#453b32' }}>
+                      ({meta.name})
+                    </span>
+                    {!isUnlocked && <Lock size={16} color="#574c42" />}
                   </h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--color-washi-dim)' }}>
-                    {meta.subtitle}
-                  </p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-gold)', marginTop: '0.15rem' }}>
+                  <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#2c2520', marginTop: '0.15rem' }}>
                     {TIER_SUBTITLES_KO[tierNum]}
                   </p>
                 </div>
                 <span
-                  style={{
-                    fontSize: '0.8rem',
-                    color: isUnlocked ? 'var(--color-gold-light)' : 'var(--color-ink-muted)',
-                    border: '1px solid var(--color-gold-border)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '0.2rem 0.75rem',
-                    whiteSpace: 'nowrap',
-                  }}
+                  className={isUnlocked ? 'pill-badge pill-badge--kunyomi' : 'pill-badge pill-badge--work'}
+                  style={{ flexShrink: 0, fontSize: '0.875rem' }}
                 >
-                  {isUnlocked ? '開放済 (Unlocked)' : '未開放 (Locked)'}
+                  {isUnlocked ? '입장 가능' : '이전 보스 격파 필요'}
                 </span>
               </div>
 
@@ -355,10 +424,10 @@ export const SalonMap: React.FC<SalonMapProps> = ({
                       }`.trim()}
                     >
                       <span className="stage-kanji-preview">{stage.preview}</span>
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>
+                      <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#141210' }}>
                         {stage.label}
                       </span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--color-washi-dim)' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#2c2520' }}>
                         {stage.sub}
                       </span>
                       <span
@@ -393,25 +462,19 @@ export const SalonMap: React.FC<SalonMapProps> = ({
               <div className="tier-section-header">
                 <div>
                   <h3 className="tier-section-title">
-                    <Crown size={18} color="var(--color-gold-light)" />
-                    <span>最終試練：{grandBoss.title}</span>
-                    {!isGrandUnlocked && <Lock size={16} color="var(--color-ink-muted)" />}
+                    <Crown size={19} color="#b45309" />
+                    <span>최종 시련 · 환영 문호 미시마 결투 ({grandBoss.title})</span>
+                    {!isGrandUnlocked && <Lock size={16} color="#574c42" />}
                   </h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--color-washi-dim)' }}>
-                    {grandBoss.subtitle} · 최종 보스: 환영 문호 미시마 유키오
+                  <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#2c2520', marginTop: '0.15rem' }}>
+                    『풍요의 바다』 윤회·찰나·숙명 총결산 그랜드 보스전
                   </p>
                 </div>
                 <span
-                  style={{
-                    fontSize: '0.8rem',
-                    color: isGrandUnlocked ? 'var(--color-gold-light)' : 'var(--color-ink-muted)',
-                    border: '1px solid var(--color-gold-border)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '0.2rem 0.75rem',
-                    whiteSpace: 'nowrap',
-                  }}
+                  className={isGrandUnlocked ? 'pill-badge pill-badge--onyomi' : 'pill-badge pill-badge--work'}
+                  style={{ flexShrink: 0, fontSize: '0.875rem' }}
                 >
-                  {isGrandUnlocked ? '挑戦可能 (Ready)' : '第4階層で開放'}
+                  {isGrandUnlocked ? '도전 가능' : '제4막 해금 시 개방'}
                 </span>
               </div>
 
@@ -428,10 +491,10 @@ export const SalonMap: React.FC<SalonMapProps> = ({
                   }`.trim()}
                 >
                   <span className="stage-kanji-preview">👑</span>
-                  <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                    最終決闘・幻影文豪
+                  <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#450a0a' }}>
+                    최종 결투 · 환영 문호
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--color-washi-dim)' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#7f1d1d' }}>
                     輪 · 廻 · 刹 · 宿 · 命
                   </span>
                   <span

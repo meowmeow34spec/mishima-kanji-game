@@ -6,6 +6,7 @@
 import {
   PlayerProfile,
   STORAGE_KEY,
+  LEITNER_INTERVALS_DAYS,
 } from '../types/srs';
 import {
   promoteCard,
@@ -17,6 +18,7 @@ import {
 export { STORAGE_KEY };
 
 const MS_PER_DAY = 86_400_000;
+const MAX_LEITNER_BOX = 6;
 
 function getLocalStorage(): Storage | null {
   if (typeof window !== 'undefined' && window.localStorage != null) {
@@ -26,6 +28,19 @@ function getLocalStorage(): Storage | null {
     return (globalThis as any).localStorage;
   }
   return null;
+}
+
+function sanitizeUnlockedUpgrades(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const clean: string[] = [];
+  for (const item of raw) {
+    if (typeof item === 'string' && item.trim().length > 0 && !seen.has(item)) {
+      seen.add(item);
+      clean.push(item);
+    }
+  }
+  return clean;
 }
 
 /**
@@ -57,7 +72,7 @@ export function getCalendarDayDifference(dateStr1: string, dateStr2: string): nu
  * Generates a clean default player profile.
  */
 export function createDefaultProfile(overrides?: Partial<PlayerProfile>): PlayerProfile {
-  return {
+  const base: PlayerProfile = {
     version: 1,
     coins: 100,
     streak: 1,
@@ -65,6 +80,7 @@ export function createDefaultProfile(overrides?: Partial<PlayerProfile>): Player
     cards: {},
     unlockedTiers: [1],
     completedStages: [],
+    unlockedUpgrades: [],
     confusion: {},
     audioSettings: {
       muted: false,
@@ -76,9 +92,13 @@ export function createDefaultProfile(overrides?: Partial<PlayerProfile>): Player
       bgmVolume: 0.5,
       sfxVolume: 0.8,
       voiceEnabled: true,
+      qualityLevel: 'high',
     },
     ...overrides,
   };
+
+  base.unlockedUpgrades = sanitizeUnlockedUpgrades(base.unlockedUpgrades);
+  return base;
 }
 
 /**
@@ -113,6 +133,13 @@ export function loadProfile(): PlayerProfile {
 
     const defaultProfile = createDefaultProfile();
 
+    const qualityLevel =
+      parsed.settings?.qualityLevel === 'low' ||
+      parsed.settings?.qualityLevel === 'medium' ||
+      parsed.settings?.qualityLevel === 'high'
+        ? parsed.settings.qualityLevel
+        : 'high';
+
     const merged: PlayerProfile = {
       version: 1,
       coins: typeof parsed.coins === 'number' && !isNaN(parsed.coins) ? parsed.coins : defaultProfile.coins,
@@ -133,6 +160,7 @@ export function loadProfile(): PlayerProfile {
         Array.isArray(parsed.completedStages)
           ? parsed.completedStages
           : [],
+      unlockedUpgrades: sanitizeUnlockedUpgrades(parsed.unlockedUpgrades),
       confusion:
         typeof parsed.confusion === 'object' && parsed.confusion !== null && !Array.isArray(parsed.confusion)
           ? parsed.confusion
@@ -180,6 +208,7 @@ export function loadProfile(): PlayerProfile {
           typeof parsed.settings?.voiceEnabled === 'boolean'
             ? parsed.settings.voiceEnabled
             : true,
+        qualityLevel,
       },
     };
 
@@ -209,6 +238,7 @@ export function saveProfile(profile: PlayerProfile): void {
         sfxVolume: profile.audioSettings.sfxVolume,
         bgmVolume: profile.audioSettings.bgmVolume,
         voiceEnabled: true,
+        qualityLevel: 'high',
       };
     } else if (!profile.audioSettings && profile.settings) {
       profile.audioSettings = {
@@ -216,6 +246,12 @@ export function saveProfile(profile: PlayerProfile): void {
         sfxVolume: profile.settings.sfxVolume ?? 0.8,
         bgmVolume: profile.settings.bgmVolume ?? 0.5,
       };
+    }
+
+    if (!Array.isArray(profile.unlockedUpgrades)) {
+      profile.unlockedUpgrades = [];
+    } else {
+      profile.unlockedUpgrades = sanitizeUnlockedUpgrades(profile.unlockedUpgrades);
     }
 
     storage.setItem(STORAGE_KEY, JSON.stringify(profile));
@@ -226,21 +262,32 @@ export function saveProfile(profile: PlayerProfile): void {
 
 /**
  * Records a review result for a kanji card and persists the updated profile.
- * - On success: promotes the card.
+ * - On success: promotes the card (plus optional extraBoxBoost for 'bookshelf' fast-serve upgrade).
  * - On failure: demotes the card to Box 1 and logs confusion pair if mistakenOption is given.
  */
 export function recordReviewResult(
   kanjiId: string,
   correct: boolean,
   mistakenOption?: string,
-  now: number = Date.now()
+  now: number = Date.now(),
+  extraBoxBoost: number = 0
 ): PlayerProfile {
   const profile = loadProfile();
 
   const existingCard = profile.cards[kanjiId] || createInitialCard(kanjiId);
-  const updatedCard = correct
+  let updatedCard = correct
     ? promoteCard(existingCard, now)
     : demoteCard(existingCard, now);
+
+  if (correct && extraBoxBoost > 0) {
+    const boostedBox = Math.min(MAX_LEITNER_BOX, updatedCard.box + Math.floor(extraBoxBoost));
+    const intervalDays = LEITNER_INTERVALS_DAYS[boostedBox] ?? 30;
+    updatedCard = {
+      ...updatedCard,
+      box: boostedBox,
+      nextDue: now + intervalDays * MS_PER_DAY,
+    };
+  }
 
   profile.cards[kanjiId] = updatedCard;
 

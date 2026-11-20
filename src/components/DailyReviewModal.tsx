@@ -1,14 +1,15 @@
 /**
- * Salon Mishima - Daily Leitner Spaced Repetition Morning Review Modal
+ * Salon Mishima 3D - Korean-First Daily Leitner Spaced Repetition Review Modal
  * File: src/components/DailyReviewModal.tsx
  */
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Calendar, CheckCircle2, Flame, X, Volume2 } from 'lucide-react';
+import { Calendar, CheckCircle2, Flame, X, Volume2, Lightbulb } from 'lucide-react';
 import type { CardProgress, PlayerProfile } from '../types/srs';
 import type { MishimaKanjiEntry } from '../types/curriculum';
 import { getAllKanji, getKanjiById } from '../data/mishimaCurriculum';
-import { getKoreanGloss } from '../data/koreanGlossary';
+import { getKoreanGloss, getKoreanWorkTitle } from '../data/koreanGlossary';
+import { getKoreanMnemonic } from '../data/koreanMnemonics';
 import { getDueKanji, getWeakestKanji, getDistractors } from '../srs/leitnerEngine';
 import { loadProfile, recordReviewResult } from '../srs/storageManager';
 import { playSound } from '../audio/soundSynthesizer';
@@ -54,6 +55,7 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
+  const [showHint, setShowHint] = useState(false);
   const [feedback, setFeedback] = useState<{
     selected: string;
     isCorrect: boolean;
@@ -66,7 +68,8 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
 
   useEffect(() => {
     const justOpened = isOpen && !prevIsOpenRef.current;
-    const dueCardsChangedWhileOpen = isOpen && dueCards !== prevDueCardsRef.current;
+    const dueCardsChangedWhileOpen =
+      isOpen && dueCards !== prevDueCardsRef.current;
     prevIsOpenRef.current = isOpen;
     prevDueCardsRef.current = dueCards;
 
@@ -78,6 +81,7 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
       setSessionQueue(buildQueue(false));
       setCurrentIndex(0);
       setCorrectCount(0);
+      setShowHint(false);
       setFeedback(null);
       setIsDone(false);
     }
@@ -109,7 +113,6 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
       confusionRef.current
     ).map((k) => k.character);
     const list = Array.from(new Set([currentKanji.character, ...distractors]));
-    // Deterministic sort based on charCode so options don't jump
     return list.sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
   }, [currentKanji]);
 
@@ -125,7 +128,9 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
     try {
       playSound(isCorrect ? 'correct' : 'wrong');
       if (isCorrect) {
-        speakKanji(currentKanji.literaryCompounds?.[0]?.reading || currentKanji.character);
+        speakKanji(
+          currentKanji.literaryCompounds?.[0]?.reading || currentKanji.character
+        );
       }
       const updated = recordReviewResult(
         currentKanji.id,
@@ -150,6 +155,7 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
       setFeedback(null);
+      setShowHint(false);
       if (currentIndex + 1 >= reviewQueue.length) {
         setIsDone(true);
         try {
@@ -172,10 +178,14 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
     }
     setCurrentIndex(0);
     setCorrectCount(0);
+    setShowHint(false);
     setIsDone(false);
     setFeedback(null);
     onClose();
   };
+
+  const mne = currentKanji ? getKoreanMnemonic(currentKanji.character) : undefined;
+  const koGloss = currentKanji ? getKoreanGloss(currentKanji.character) : undefined;
 
   return (
     <div
@@ -183,7 +193,7 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
       data-testid="daily-review-modal"
       role="dialog"
       aria-modal="true"
-      aria-label="Daily Morning Review"
+      aria-label="오늘의 라이트너 복습"
     >
       <div className="reveal-parchment-card" style={{ maxWidth: '580px' }}>
         <div
@@ -199,13 +209,13 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              color: 'var(--color-crimson)',
-              fontWeight: 700,
-              fontSize: '0.9rem',
+              color: '#991b1b',
+              fontWeight: 900,
+              fontSize: '0.98rem',
             }}
           >
-            <Calendar size={16} />
-            <span>朝の復習 — LEITNER SRS</span>
+            <Calendar size={17} />
+            <span>오늘의 복습 (라이트너 암기 상자)</span>
           </span>
 
           <span
@@ -213,37 +223,46 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              fontSize: '0.85rem',
-              color: 'var(--color-ink-secondary)',
+              fontSize: '0.9rem',
+              fontWeight: 800,
+              color: '#451a03',
             }}
           >
-            <Flame size={15} color="var(--color-crimson)" />
-            <span>連続 {resolvedProfile.streak || 1} 日</span>
+            <Flame size={16} color="#b91c1c" />
+            <span>{resolvedProfile.streak || 1}일 연속 출근</span>
           </span>
         </div>
 
         {reviewQueue.length === 0 && !isDone && (
-          <div style={{ padding: '1.25rem 0' }}>
+          <div style={{ padding: '1rem 0' }}>
             <CheckCircle2
               size={48}
-              color="var(--color-emerald)"
-              style={{ margin: '0 auto 0.75rem' }}
+              color="#047857"
+              style={{ margin: '0 auto 0.65rem' }}
             />
-            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>
-              本日の復習予定はありません
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 900, marginBottom: '0.5rem' }}>
+              오늘 복습할 한자를 모두 마쳤습니다!
             </h3>
             <p
               style={{
-                fontSize: '0.95rem',
-                color: 'var(--color-ink-secondary)',
-                marginBottom: '1.5rem',
+                fontSize: '0.96rem',
+                fontWeight: 700,
+                color: '#2c2520',
+                marginBottom: '1.35rem',
               }}
             >
-              すべての習得済み漢字が次回の間隔まで定着しています。
+              학습한 한자들이 다음 복습 주기까지 머릿속에 단단히 정착되어 있습니다.
               {Object.keys(resolvedProfile.cards || {}).length > 0 &&
-                ' 苦手な漢字を特訓することもできます。'}
+                ' 원하시면 자주 헷갈렸던 취약 한자 5개를 집중 복습할 수 있습니다!'}
             </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+              }}
+            >
               {Object.keys(resolvedProfile.cards || {}).length > 0 && (
                 <button
                   type="button"
@@ -253,21 +272,22 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
                     setSessionQueue(buildQueue(true));
                     setCurrentIndex(0);
                     setCorrectCount(0);
+                    setShowHint(false);
                     setFeedback(null);
                     setIsDone(false);
                   }}
                 >
-                  弱点漢字を特訓する
+                  🎯 취약 한자 5개 집중 특훈
                 </button>
               )}
               <button
                 type="button"
                 data-testid="btn-close-review"
-                className="btn-lacquer"
+                className="btn-ivory"
                 onClick={handleClose}
               >
                 <X size={16} />
-                <span>閉じる</span>
+                <span>닫기</span>
               </button>
             </div>
           </div>
@@ -277,41 +297,60 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
           <div>
             <div
               style={{
-                fontSize: '0.85rem',
-                color: 'var(--color-ink-muted)',
-                marginBottom: '0.75rem',
+                fontSize: '0.92rem',
+                fontWeight: 800,
+                color: '#453b32',
+                marginBottom: '0.65rem',
               }}
             >
-              復習 {currentIndex + 1} / {reviewQueue.length} — 『{currentKanji.primaryWork}』
+              복습 {currentIndex + 1} / {reviewQueue.length} · 『
+              {getKoreanWorkTitle(currentKanji.primaryWork) || currentKanji.primaryWork}』
             </div>
 
-            <div className="reveal-quote-box" style={{ marginBottom: '1.25rem' }}>
-              <p style={{ fontWeight: 700, marginBottom: '0.35rem' }}>
-                意味: {currentKanji.meanings.join(', ')}
-                {getKoreanGloss(currentKanji.character)
-                  ? ` (${getKoreanGloss(currentKanji.character)!.huneum})`
-                  : ''}
-              </p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-ink-secondary)' }}>
-                読み: {[...(currentKanji.onyomi || []), ...(currentKanji.kunyomi || [])].join('・')}
-              </p>
+            <div className="reveal-quote-box" style={{ marginBottom: '1rem' }}>
+              <div style={{ fontWeight: 900, fontSize: '1.2rem', color: '#141210', marginBottom: '0.45rem' }}>
+                훈음: {mne?.huneum || koGloss?.huneum || currentKanji.meanings.join(', ')}{' '}
+                <span style={{ fontSize: '0.95rem', color: '#2c2520' }}>
+                  ({mne?.meaningKo || currentKanji.meanings.join(', ')})
+                </span>
+              </div>
+
+              <div className="pill-row">
+                {(currentKanji.onyomi || []).length > 0 && (
+                  <span className="pill-badge pill-badge--onyomi">
+                    음독 {(currentKanji.onyomi || []).join('·')}
+                  </span>
+                )}
+                {(currentKanji.kunyomi || []).length > 0 && (
+                  <span className="pill-badge pill-badge--kunyomi">
+                    훈독 {(currentKanji.kunyomi || []).join('·')}
+                  </span>
+                )}
+              </div>
+
+              {showHint && mne && (
+                <div className="mnemonic-hint-strip" style={{ marginTop: '0.6rem' }}>
+                  <span>{mne.visualPictogram}</span>
+                  <span>🧩 {mne.radicalBreakdown}</span>
+                </div>
+              )}
             </div>
 
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '0.85rem',
-                marginBottom: '1.25rem',
+                gap: '0.8rem',
+                marginBottom: '1.15rem',
               }}
             >
               {options.map((opt) => {
                 const isSelected = feedback?.selected === opt;
-                const bg = isSelected
+                const stateClass = isSelected
                   ? feedback.isCorrect
-                    ? 'var(--color-emerald)'
-                    : 'var(--color-crimson)'
-                  : 'var(--color-counter)';
+                    ? 'wooden-block--correct'
+                    : 'wooden-block--wrong'
+                  : '';
 
                 return (
                   <button
@@ -320,15 +359,8 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
                     data-testid={`review-option-${opt}`}
                     disabled={Boolean(feedback)}
                     onClick={() => handleAnswer(opt)}
-                    style={{
-                      padding: '1rem',
-                      fontSize: '2rem',
-                      fontWeight: 900,
-                      borderRadius: 'var(--radius-md)',
-                      background: bg,
-                      color: 'var(--color-gold-light)',
-                      border: '2px solid var(--color-gold-border)',
-                    }}
+                    className={`wooden-block ${stateClass}`.trim()}
+                    style={{ fontSize: '2.25rem', minHeight: '76px' }}
                   >
                     {opt}
                   </button>
@@ -336,29 +368,50 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
               })}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button
-                type="button"
-                className="btn-lacquer"
-                onClick={() => {
-                  try {
-                    speakKanji(currentKanji.character);
-                  } catch {
-                    // Fallback
-                  }
-                }}
-              >
-                <Volume2 size={16} />
-                <span>ヒント音声</span>
-              </button>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn-ivory"
+                  onClick={() => {
+                    try {
+                      speakKanji(currentKanji.character);
+                    } catch {
+                      // Fallback
+                    }
+                  }}
+                >
+                  <Volume2 size={16} />
+                  <span>발음 힌트</span>
+                </button>
+
+                {mne && !showHint && (
+                  <button
+                    type="button"
+                    className="btn-ivory"
+                    onClick={() => setShowHint(true)}
+                  >
+                    <Lightbulb size={16} color="#d97706" />
+                    <span>부수 힌트</span>
+                  </button>
+                )}
+              </div>
 
               <button
                 type="button"
                 data-testid="btn-close-review"
-                className="btn-lacquer"
+                className="btn-ivory"
                 onClick={handleClose}
               >
-                <span>中断して閉じる</span>
+                <span>복습 닫기</span>
               </button>
             </div>
           </div>
@@ -366,11 +419,18 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
 
         {isDone && (
           <div style={{ padding: '1rem 0' }}>
-            <h3 style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>
-              朝の復習 完了！
+            <h3 style={{ fontSize: '1.65rem', fontWeight: 900, marginBottom: '0.5rem' }}>
+              🎉 오늘의 복습 완료!
             </h3>
-            <p style={{ color: 'var(--color-ink-secondary)', marginBottom: '1.5rem' }}>
-              正答数: {correctCount} / {reviewQueue.length} 問 ／ 報酬: {correctCount * 25} 銭
+            <p
+              style={{
+                color: '#2c2520',
+                fontWeight: 800,
+                fontSize: '1rem',
+                marginBottom: '1.35rem',
+              }}
+            >
+              정답: {correctCount} / {reviewQueue.length}문제 · 보너스 엽전: +{correctCount * 25} 銭
             </p>
             <button
               type="button"
@@ -378,7 +438,7 @@ export const DailyReviewModal: React.FC<DailyReviewModalProps> = ({
               className="btn-gold"
               onClick={handleClose}
             >
-              <span>帳場へ戻る</span>
+              <span>☕ 카페로 돌아가기</span>
             </button>
           </div>
         )}

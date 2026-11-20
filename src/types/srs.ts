@@ -3,6 +3,10 @@
  * File: src/types/srs.ts
  */
 
+import type { CafeUpgradeId, QualityLevel3D } from './three3d';
+
+export type { CafeUpgradeId, QualityLevel3D };
+
 export const STORAGE_KEY = 'mishima-cafe/v1';
 
 export const LEITNER_INTERVALS_DAYS = [0, 1, 2, 4, 7, 14, 30] as const;
@@ -37,6 +41,7 @@ export interface PlayerProfileSettings {
   bgmVolume?: number;
   sfxVolume?: number;
   voiceEnabled?: boolean;
+  qualityLevel?: QualityLevel3D;
 }
 
 export interface PlayerProfile {
@@ -48,6 +53,8 @@ export interface PlayerProfile {
   cards: Record<string, CardProgress>;
   unlockedTiers: number[];
   completedStages: string[];
+  /** Unlocked 3D cafe interior & gameplay buff IDs (e.g. 'siphon', 'velvet', 'kinkaku', ...) */
+  unlockedUpgrades?: string[];
   confusion: ConfusionMatrix;
   audioSettings: AudioSettings;
   settings?: PlayerProfileSettings;

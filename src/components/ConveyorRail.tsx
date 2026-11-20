@@ -1,5 +1,5 @@
 /**
- * Salon Mishima - 3D Mahogany Conveyor Rail & Wooden Kanji Blocks
+ * Salon Mishima 3D - Tactile High-Contrast Ivory Kanji Block Dock
  * File: src/components/ConveyorRail.tsx
  */
 
@@ -23,7 +23,7 @@ export const ConveyorRail: React.FC<ConveyorRailProps> = ({
       className="conveyor-rail"
       data-testid="conveyor-rail"
       role="region"
-      aria-label="Kanji Conveyor Rail"
+      aria-label="한자 블록 선택 트레이"
     >
       <div className="conveyor-track">
         {options.map((option, idx) => {
@@ -39,10 +39,11 @@ export const ConveyorRail: React.FC<ConveyorRailProps> = ({
               key={`${option}-${idx}`}
               type="button"
               data-testid={`conveyor-option-${option}`}
+              data-hotkey={idx < 4 ? String(idx + 1) : undefined}
               className={`wooden-block conveyor-block ${feedbackClass}`.trim()}
               disabled={disabled}
               onClick={() => onSelectOption(option)}
-              aria-label={`Select block ${option}`}
+              aria-label={`${idx + 1}번 한자 블록 ${option} 선택`}
             >
               <span>{option}</span>
             </button>
