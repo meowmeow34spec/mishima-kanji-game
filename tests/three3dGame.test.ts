@@ -4,10 +4,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import React from 'react';
+import React, { act } from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { render, fireEvent, act } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { resolveCustomerActorId } from '../src/types/three3d';
 import { getAllKanji, MISHIMA_KANJI_CURRICULUM } from '../src/data/mishimaCurriculum';
 import { getAllBossPairs } from '../src/data/bossPairs';
